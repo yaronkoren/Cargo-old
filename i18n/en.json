@@ -1,0 +1,12 @@
+{
+    "@metadata": {
+        "authors": []
+    },
+    "cargo-desc": "",
+    "recreatedata": "Recreate data",
+    "cargo-createdatatable": "Create data table",
+    "cargo-recreatedata-desc": "Recreate Cargo data for this template?",
+    "cargo-recreatedata-success": "The data will be recreated.",
+    "viewdata": "View data",
+    "viewtable": "View table"
+}
