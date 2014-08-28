@@ -8,8 +8,6 @@
 
 class CargoQuery {
 
-	static $numCalls = 0;
-
 	/**
 	 * Gets the schema information for the given set of tables.
 	 */
@@ -113,6 +111,40 @@ class CargoQuery {
 	}
 
 	/**
+	 * Display the link to view more results, pointing to Special:ViewData.
+	 */
+	public static function viewMoreResultsLink( $tablesStr, $fieldsStr, $whereStr, $joinOnStr, $groupByStr, $orderByStr, $queryLimit, $format, $displayParams ) {
+		$vd = Title::makeTitleSafe( NS_SPECIAL, 'ViewData' );
+		$queryStringParams = array();
+		$queryStringParams['tables'] = $tablesStr;
+		$queryStringParams['fields'] = $fieldsStr;
+		if ( $whereStr != '' ) {
+			$queryStringParams['where'] = $whereStr;
+		}
+		if ( $joinOnStr != '' ) {
+		$queryStringParams['join_on'] = $joinOnStr;
+		}
+		if ( $groupByStr != '' ) {
+			$queryStringParams['group_by'] = $groupByStr;
+		}
+		if ( $orderByStr != '' ) {
+			$queryStringParams['order_by'] = $orderByStr;
+		}
+		if ( $format != '' ) {
+			$queryStringParams['format'] = $format;
+		}
+		$queryStringParams['offset'] = $queryLimit;
+		$queryStringParams['limit'] = 100; // Is that a reasonable number in all cases?
+
+		// Add format-specific params.
+		foreach ( $displayParams as $key => $value ) {
+				$queryStringParams[$key] = $value;
+		}
+
+		return Html::rawElement( 'p', null, Linker::link( $vd, wfMessage( 'moredotdotdot' )->parse(), array(), $queryStringParams ) );
+	}
+
+	/**
 	 * Takes in a set of strings representing elements of a SQL query,
 	 * and returns either an array of results, or a display of the
 	 * results, depending on whether or not the format parameter is
@@ -143,44 +175,10 @@ class CargoQuery {
 		// If there are (seemingly) more results than what we showed,
 		// show a "View more" link that links to Special:ViewData.
 		if ( count( $queryResults ) == $sqlQuery->mQueryLimit ) {
-			//$text .= '[{{canonicalurl:Special:ViewData}}|See more]';
-			$vd = Title::makeTitleSafe( NS_SPECIAL, 'ViewData' );
-			$queryStringParams = array();
-			$queryStringParams['tables'] = $tablesStr;
-			$queryStringParams['fields'] = $fieldsStr;
-			if ( $whereStr != '' ) {
-				$queryStringParams['where'] = $whereStr;
-			}
-			if ( $joinOnStr != '' ) {
-				$queryStringParams['join_on'] = $joinOnStr;
-			}
-			if ( $groupByStr != '' ) {
-				$queryStringParams['group_by'] = $groupByStr;
-			}
-			if ( $orderByStr != '' ) {
-				$queryStringParams['order_by'] = $orderByStr;
-			}
-			//$queryStringParams['limit'] = $queryLimit;
-			if ( $format != '' ) {
-				$queryStringParams['format'] = $format;
-			}
-			$queryStringParams['offset'] = $sqlQuery->mQueryLimit;
-
-			// Add format-specific params.
-			foreach ( $displayParams as $key => $value ) {
-					$queryStringParams[$key] = $value;
-			}
-
-			$linkHTML = Html::rawElement( 'p', null, Linker::link( $vd, wfMessage( 'moredotdotdot' )->parse(), array(), $queryStringParams ) );
-			$text .= $linkHTML;
+			$text .= self::viewMoreResultsLink( $tablesStr, $fieldsStr, $whereStr, $joinOnStr, $groupByStr, $orderByStr, $sqlQuery->mQueryLimit, $format, $displayParams );
 		}
 
-//		self::$numCalls++;
-
-//		if ( self::$numCalls == 2 ) {
-		// Don't parse the HTML.
 		$text = $parser->insertStripItem( $text, $parser->mStripState );
-//		}
 
 		return $text;
 	}

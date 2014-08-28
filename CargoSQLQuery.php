@@ -242,7 +242,6 @@ class CargoSQLQuery {
 				// It's a standard field - though if it's
 				// '_value', or ends in '__full', it's actually
 				// the type of its corresponding field.
-				$isRealField = false;
 				if ( $fieldName == '_value' ) {
 					if ( $tableName != null ) {
 						list( $tableName, $fieldName ) = explode( '__', $tableName, 2 );
@@ -252,10 +251,8 @@ class CargoSQLQuery {
 						// of tables.
 						list( $tableName, $fieldName ) = explode( '__', $this->mTableSchemas['_fieldTables'][0] );
 					}
-					$isRealField = true;
 				} elseif ( strlen( $fieldName ) > 6 && strpos( $fieldName, '__full', strlen( $fieldName ) - 6 ) !== false ) {
 					$fieldName = substr( $fieldName, 0, strlen( $fieldName ) - 6 );
-					$isRealField = true;
 				}
 				if ( $tableName != null ) {
 					$description = $this->mTableSchemas[$tableName][$fieldName];
@@ -269,11 +266,6 @@ class CargoSQLQuery {
 							break;
 						}
 					}
-				}
-				// Add the "real field" value - used to
-				// identify "virtual" fields by its absence.
-				if ( $isRealField ) {
-					$description['isRealField'] = true;
 				}
 			}
 			// Fix alias.
@@ -413,10 +405,6 @@ class CargoSQLQuery {
 		// "fields"
 		foreach ( $this->mAliasedFieldNames as $alias => $fieldName ) {
 			$fieldDescription = $this->mFieldDescriptions[$alias];
-			// We're only interested in virtual list fields.
-			if ( !array_key_exists( 'isList', $fieldDescription ) || array_key_exists( 'isRealField', $fieldDescription ) ) {
-				continue;
-			}
 
 			if ( strpos( $fieldName, '.' ) !== false ) {
 				// This could probably be done better with
@@ -424,6 +412,18 @@ class CargoSQLQuery {
 				list( $tableName, $fieldName ) = explode( '.', $fieldName, 2 );
 			} else {
 				$tableName = $fieldDescription['tableName'];
+			}
+
+			// We're only interested in virtual list fields.
+			$isVirtualField = false;
+			foreach ( $virtualFields as $virtualField ) {
+				if ( $fieldName == $virtualField['fieldName'] && $tableName == $virtualField['tableName'] ) {
+					$isVirtualField = true;
+					break;
+				}
+			}
+			if ( !$isVirtualField ) {
+				continue;
 			}
 
 			// Since the field name is an alias, it should get

@@ -62,7 +62,7 @@ class CargoViewTable extends IncludableSpecialPage {
 
 		$sqlQuery->mAliasedFieldNames = $aliasedFieldNames;
 		$sqlQuery->setDescriptionsForFields();
-		$sqlQuery->mQueryLimit = 200;
+		$sqlQuery->mQueryLimit = 100;
 
 		$queryResults = $sqlQuery->run();
 
@@ -71,6 +71,19 @@ class CargoViewTable extends IncludableSpecialPage {
 		$displayParams = array();
 		$tableFormat = new CargoTableFormat();
 		$text = $tableFormat->display( $queryResults, $sqlQuery->mFieldDescriptions, $displayParams );
+
+		// If there are (seemingly) more results than what we showed,
+		// show a "View more" link that links to Special:ViewData.
+		if ( count( $queryResults ) == $sqlQuery->mQueryLimit ) {
+			$fieldsStr = '';
+			foreach ( $aliasedFieldNames as $alias => $fieldName ) {
+				$fieldsStr .= "$fieldName=$alias,";
+			}
+			// Remove the comma at the end.
+			$fieldsStr = trim( $fieldsStr, ',' );
+			$text .= CargoQuery::viewMoreResultsLink( $tableName, $fieldsStr, null, null, null, $sqlQuery->mOrderBy, $sqlQuery->mQueryLimit, 'simpletable', $displayParams );
+		}
+
 		$out->addHTML( $text );
 	}
 

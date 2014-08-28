@@ -24,7 +24,7 @@ class CargoListFormat extends CargoDisplayFormat {
 				} else {
 					$text .= ', ';
 				}
-				$text .= "<strong>$fieldName:</strong> $fieldValue";
+				$text .= "<em>$fieldName:</em> $fieldValue";
 			}
 		}
 		if ( $startParenthesisAdded ) {

@@ -212,7 +212,11 @@ class CargoDeclare {
 		$res = $dbr->select( 'cargo_tables', 'main_table', array( 'template_id' => $templatePageID ) );
 		while ( $row = $dbr->fetchRow( $res ) ) {
 			$curTable = $row['main_table'];
-			$cdb->dropTable( $curTable );
+			try {
+				$cdb->dropTable( $curTable );
+			} catch ( Exception $e ) {
+				throw new MWException( "Caught exception ($e) while trying to drop Cargo table. Please make sure that your database user account has the DROP permission." );
+			}
 			$dbr->delete( 'cargo_pages', array( 'table_name' => $curTable ) );
 		}
 

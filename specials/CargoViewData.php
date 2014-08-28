@@ -77,10 +77,10 @@ class ViewDataPage extends QueryPage {
 
 	function getQueryInfo() {
 		$selectOptions = array();
-		$selectOptions['ORDER BY'] = $this->sqlQuery->mOrderBy;
 		if ( $this->sqlQuery->mGroupBy != '' ) {
 			$selectOptions['GROUP BY'] = $this->sqlQuery->mGroupBy;
 		}
+		// "order by" is handled in getOrderFields().
 
 		// Field aliases need to have quotes placed around them
 		// before actually running the query.
@@ -121,7 +121,9 @@ class ViewDataPage extends QueryPage {
 	}
 
 	function getOrderFields() {
-		return array( $this->sqlQuery->mOrderBy );
+		if ( $this->sqlQuery->mOrderBy != '' ) {
+			return array( $this->sqlQuery->mOrderBy );
+		}
 	}
 
 	function sortDescending() {
