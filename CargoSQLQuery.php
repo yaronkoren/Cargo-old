@@ -34,11 +34,11 @@ class CargoSQLQuery {
 		$sqlQuery->setCargoJoinConds( $joinOnStr );
 		$sqlQuery->setAliasedFieldNames();
 		$sqlQuery->mTableSchemas = CargoQuery::getTableSchemas( $sqlQuery->mTableNames );
-		$sqlQuery->setDescriptionsForFields();
+		$sqlQuery->setOrderBy( $orderByStr );
 		$sqlQuery->handleVirtualFields();
+		$sqlQuery->setDescriptionsForFields();
 		$sqlQuery->setMWJoinConds();
 		$sqlQuery->mGroupBy = $groupByStr;
-		$sqlQuery->mOrderBy = $orderByStr;
 		$sqlQuery->mQueryLimit = $wgCargoDefaultQueryLimit;
 		if ( $limitStr != '' ) {
 			$sqlQuery->mQueryLimit = min( $limitStr, $wgCargoMaxQueryLimit );
@@ -69,13 +69,16 @@ class CargoSQLQuery {
 				// Might as well change underscores to spaces
 				// by default - but for regular field names,
 				// not the special ones.
-				if ( $fieldName[0] != '_' ) {
-					if ( strpos( $fieldName, '.' ) !== false ) {
-						list( $tableName, $fieldName ) = explode( '.', $fieldName, 2 );
-					}
-					$alias = str_replace( '_', ' ', $fieldName );
+				// "Real" field = with the table name removed.
+				if ( strpos( $fieldName, '.' ) !== false ) {
+					list( $tableName, $realFieldName ) = explode( '.', $fieldName, 2 );
 				} else {
-					$alias = $fieldName;
+					$realFieldName = $fieldName;
+				}
+				if ( $realFieldName[0] != '_' ) {
+					$alias = str_replace( '_', ' ', $realFieldName );
+				} else {
+					$alias = $realFieldName;
 				}
 			}
 			$this->mAliasedFieldNames[$alias] = $fieldName;
@@ -202,6 +205,16 @@ class CargoSQLQuery {
 		}
 	}
 
+	function setOrderBy( $orderByStr = null ) {
+		if ( $orderByStr != '' ) {
+			$this->mOrderBy = $orderByStr;
+		} else {
+			// By default, sort on the first field.
+			reset( $this->mAliasedFieldNames );
+			$this->mOrderBy = current( $this->mAliasedFieldNames );
+		}
+	}
+
 	/**
 	 * Attempts to get the "field description" (type, etc.) of each field
 	 * specified in a SELECT call (via a #cargo_query call), using the set
@@ -246,10 +259,18 @@ class CargoSQLQuery {
 					if ( $tableName != null ) {
 						list( $tableName, $fieldName ) = explode( '__', $tableName, 2 );
 					} else {
-						// There has to be exactly one
-						// "field table" in the list
-						// of tables.
-						list( $tableName, $fieldName ) = explode( '__', $this->mTableSchemas['_fieldTables'][0] );
+						// We'll assum that there's
+						// exactly one "field table" in
+						// the list of tables -
+						// otherwise a standalone call
+						// to "_value" will presumably
+						// crash the SQL call.
+						foreach ( $this->mTableNames as $curTable ) {
+							if ( strpos( $curTable, '__' ) !== false ) {
+								list( $tableName, $fieldName ) = explode( '__', $curTable );
+								break;
+							}
+						}
 					}
 				} elseif ( strlen( $fieldName ) > 6 && strpos( $fieldName, '__full', strlen( $fieldName ) - 6 ) !== false ) {
 					$fieldName = substr( $fieldName, 0, strlen( $fieldName ) - 6 );
@@ -308,6 +329,22 @@ class CargoSQLQuery {
 		array_splice( $this->mTableNames, $indexOfMainTable + 1, 0, $fieldTableName );
 	}
 
+	/**
+	 * Helper function for handleVirtualFields() - for the query's
+	 * "fields" and "order by" values, the right replacement for "virtual
+	 * fields" depends on whether the separate table for that field has
+	 * been included in the query.
+	 */
+	function fieldTableIsIncluded( $fieldTableName ) {
+		foreach ( $this->mCargoJoinConds as $cargoJoinCond ) {
+			if ( $cargoJoinCond['table1'] == $fieldTableName || $cargoJoinCond['table2'] == $fieldTableName ) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+
 	function handleVirtualFields() {
 		// The array-field alias can be found in the "where", "join on",
 		// "fields" or "order by" clauses. Handling depends on which
@@ -341,12 +378,17 @@ class CargoSQLQuery {
 		foreach ( $virtualFields as $virtualField ) {
 			$fieldName = $virtualField['fieldName'];
 			$tableName = $virtualField['tableName'];
-			$pattern1 = "/\b$tableName\.$fieldName (HOLDS)? /";
+			$pattern1 = "/\b$tableName\.$fieldName(\s*HOLDS\s*)?/";
 			$foundMatch = preg_match( $pattern1, $this->mWhere, $matches);
-			$pattern2 = "/\b$fieldName (HOLDS)? /";
-			$foundMatch2 = preg_match( $pattern2, $this->mWhere, $matches);
+			if ( !$foundMatch ) {
+				$pattern2 = "/\b$fieldName(\s*HOLDS\s*)?/";
+				$foundMatch2 = preg_match( $pattern2, $this->mWhere, $matches);
+			}
 			if ( $foundMatch || $foundMatch2 ) {
-				// @TODO - if no "HOLDS", throw an error.
+				// If no "HOLDS", throw an error.
+				if ( count( $matches ) == 1 ) {
+					throw new MWException( "Error: operator for the virtual field '$tableName.$fieldName' must be 'HOLDS'." );
+				}
 				$fieldTableName = $tableName . '__' . $fieldName;
 				$this->addFieldTableToTableNames( $fieldTableName, $tableName );
 				$this->mCargoJoinConds[] = array(
@@ -431,15 +473,7 @@ class CargoSQLQuery {
 			// the "value" field in the field table - depending on
 			// whether or not that field has been "joined" on.
 			$fieldTableName = $tableName . '__' . $fieldName;
-			$fieldTableIsIncluded = false;
-			foreach ( $this->mCargoJoinConds as $cargoJoinCond ) {
-				if ( $cargoJoinCond['table1'] == $fieldTableName || $cargoJoinCond['table2'] == $fieldTableName ) {
-					$fieldTableIsIncluded = true;
-					break;
-				}
-			}
-
-			if ( $fieldTableIsIncluded ) {
+			if ( $this->fieldTableIsIncluded( $fieldTableName ) ) {
 				$fieldName = $fieldTableName . '._value';
 			} else {
 				$fieldName .= '__full';
@@ -448,6 +482,30 @@ class CargoSQLQuery {
 		}
 
 		// "order by"
+		$matches = array();
+		foreach ( $virtualFields as $virtualField ) {
+			$fieldName = $virtualField['fieldName'];
+			$tableName = $virtualField['tableName'];
+			$pattern1 = "/\b$tableName\.$fieldName\b/";
+			$foundMatch = preg_match( $pattern1, $this->mOrderBy, $matches);
+			if ( !$foundMatch ) {
+				$pattern2 = "/\b$fieldName\b/";
+				$foundMatch2 = preg_match( $pattern2, $this->mOrderBy, $matches);
+			}
+			if ( $foundMatch || $foundMatch2 ) {
+				$fieldTableName = $tableName . '__' . $fieldName;
+				if ( $this->fieldTableIsIncluded( $fieldTableName ) ) {
+					$replacement = "$fieldTableName._value";
+				} else {
+					$replacement = $tableName . '.' . $fieldName . '__full';
+				}
+				if ( $foundMatch ) {
+					$this->mOrderBy = preg_replace( $pattern1, $replacement, $this->mOrderBy );
+				} elseif ( $foundMatch2 ) {
+					$this->mOrderBy = preg_replace( $pattern2, $replacement, $this->mOrderBy );
+				}
+			}
+		}
 	}
 
 	function addTablePrefixesToAll() {
@@ -482,11 +540,6 @@ class CargoSQLQuery {
 
 		if ( $this->mGroupBy != '' ) {
 			$selectOptions['GROUP BY'] = $this->mGroupBy;
-		}
-		if ( $this->mOrderBy == '' ) {
-			// By default, sort on the first field.
-			reset( $this->mAliasedFieldNames );
-			$this->mOrderBy = current( $this->mAliasedFieldNames );
 		}
 		$selectOptions['ORDER BY'] = $this->mOrderBy;
 		$selectOptions['LIMIT'] = $this->mQueryLimit;

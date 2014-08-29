@@ -13,13 +13,13 @@ class CargoQuery {
 	 */
 	static function getTableSchemas( $tableNames ) {
 		$mainTableNames = array();
-		$fieldTableNames = array();
 		foreach( $tableNames as $tableName ) {
 			if ( strpos( $tableName, '__' ) !== false ) {
+				// We just want the first part of it.
 				$tableNameParts = explode( '__', $tableName );
-				$mainTableNames[] = $tableNameParts[0];
-				$fieldTableNames[] = $tableNameParts;
-			} else {
+				$tableName = $tableNameParts[0];
+			}
+			if ( !in_array( $tableName, $mainTableNames ) ) {
 				$mainTableNames[] = $tableName;
 			}
 		}
@@ -31,9 +31,6 @@ class CargoQuery {
 			$tableFieldsString = $row['table_schema'];
 			$tableSchemas[$tableName] = unserialize( $tableFieldsString );
 		}
-		// Somewhat of a @HACK - add $fieldTableNames into this
-		// schemas array.
-		$tableSchemas['_fieldTables'] = $fieldTableNames;
 		return $tableSchemas;
 	}
 
@@ -192,7 +189,7 @@ class CargoQuery {
 
 				$fieldDescription = $fieldDescriptions[$fieldName];
 				if ( array_key_exists( 'type', $fieldDescription ) ) {
-					$type = $fieldDescription['type'];
+					$type = trim( $fieldDescription['type'] );
 				} else {
 					$type = null;
 				}
@@ -223,6 +220,15 @@ class CargoQuery {
 						// Otherwise, do nothing.
 					}
 				} elseif ( $type == 'Wikitext' || $type == '' ) {
+					// This is here in case the value was
+					// set using {{PAGENAME}}, which for
+					// some reason HTML-encodes some of its
+					// characters - see
+					// https://www.mediawiki.org/wiki/Help:Magic_words#Page_names
+					// Of course, Text and Page fields could
+					// be set using {{PAGENAME}} as well,
+					// but those seem less likely.
+					$value = htmlspecialchars_decode( $value );
 					// Parse it as if it's wikitext.
 					global $wgTitle;
 					if ( is_null( $parser ) ) {

@@ -146,8 +146,9 @@ wfDebugLog('cargo', "CargoStore::run() - skipping 4.\n");
 				$delimiter = $typeDescription['delimiter'];
 				$individualValues = explode( $delimiter, $tableFieldValues[$fieldName] );
 				foreach ( $individualValues as $individualValue ) {
+					$individualValue = trim( $individualValue );
 					// Ignore blank values.
-					if ( trim( $individualValue ) == '' ) {
+					if ( $individualValue == '' ) {
 						continue;
 					}
 					$res3 = $cdb->insert( $fieldTableName,

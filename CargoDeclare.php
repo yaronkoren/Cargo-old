@@ -64,7 +64,7 @@ class CargoDeclare {
 				$matches = array();
 				$foundMatch2 = preg_match( '/(.*)\s*\((.*)\)/', $typeDescription, $matches);
 				if ( $foundMatch2 ) {
-					$typeDescription = $matches[1];
+					$typeDescription = trim( $matches[1] );
 					$extraParamsString = $matches[2];
 					$extraParams = explode( ';', $extraParamsString );
 					foreach ( $extraParams as $extraParam ) {

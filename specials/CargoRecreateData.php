@@ -44,12 +44,14 @@ class CargoRecreateData extends IncludableSpecialPage {
 		}
 
 		// Simple form.
-		$text = '<form method="post">';
+		// Add in a little bit of JS to make sure that the button
+		// isn't accidentally pressed twice.
+		$text = '<form method="post" onSubmit="submitButton.disabled = true; return true;">';
 		$text .= Html::element( 'p', null, wfMessage( 'cargo-recreatedata-desc' )->parse() );
 		$text .= Html::hidden( 'action', 'recreatedata' ) . "\n";
 		$text .= Html::hidden( 'submitted', 'yes' ) . "\n";
 
-		$text .= Html::input( null, wfMessage( 'ok' )->parse(), 'submit' );
+		$text .= Html::input( 'submitButton', wfMessage( 'ok' )->parse(), 'submit' );
 		$text .= "\n</form>";
 		$this->getOutput()->addHTML( $text );
 		return true;
