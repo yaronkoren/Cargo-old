@@ -16,7 +16,7 @@ class CargoViewTable extends IncludableSpecialPage {
 
 		$tableName = $query;
 		if ( $tableName == '' ) {
-			$out->addHTML( "<div class=\"error\">A table name must be specified.</div>\n" );
+			$out->addHTML( $this->displayListOfTables() );
 			return;
 		}
 
@@ -86,6 +86,29 @@ class CargoViewTable extends IncludableSpecialPage {
 		}
 
 		$out->addHTML( $text );
+	}
+
+	/**
+	 * Returns HTML for a bulleted list of Cargo tables, with a link to
+	 * the Special:ViewTable page for each one.
+	 */
+	function displayListOfTables() {
+		$tableNames = array();
+		$dbr = wfGetDB( DB_SLAVE );
+		$res = $dbr->select( 'cargo_tables', 'main_table' );
+		while ( $row = $dbr->fetchRow( $res ) ) {
+			$tableNames[] = $row[0];
+		}
+		$viewTablePage = Title::makeTitleSafe( NS_SPECIAL, 'ViewTable' );
+		$viewTableText = $viewTablePage->getFullURL();
+		$text = "<p>The following tables are defined:</p>\n";
+		$text .= "<ul>\n";
+		foreach ( $tableNames as $tableName ) {
+			$tableLink = Html::element( 'a', array( 'href' => "$viewTableText/$tableName" ), $tableName );
+			$text .= Html::rawElement( 'li', null, $tableLink );
+		}
+		$text .= "</ul>\n";
+		return $text;
 	}
 
 }

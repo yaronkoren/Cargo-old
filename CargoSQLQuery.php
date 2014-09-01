@@ -35,8 +35,8 @@ class CargoSQLQuery {
 		$sqlQuery->setAliasedFieldNames();
 		$sqlQuery->mTableSchemas = CargoQuery::getTableSchemas( $sqlQuery->mTableNames );
 		$sqlQuery->setOrderBy( $orderByStr );
-		$sqlQuery->handleVirtualFields();
 		$sqlQuery->setDescriptionsForFields();
+		$sqlQuery->handleVirtualFields();
 		$sqlQuery->setMWJoinConds();
 		$sqlQuery->mGroupBy = $groupByStr;
 		$sqlQuery->mQueryLimit = $wgCargoDefaultQueryLimit;
@@ -58,6 +58,14 @@ class CargoSQLQuery {
 		// Default is "_pageName".
 		if ( count( $fieldNames ) == 0 ) {
 			$fieldNames[] = '_pageName';
+		}
+
+		// Quick error-checking: for now, just disallow "DISTINCT",
+		// and require "GROUP BY" instead.
+		foreach ( $fieldNames as $i => $fieldName ) {
+			if ( strtolower( substr( $fieldName, 0, 9 ) ) == 'distinct ' ) {
+				throw new MWException( "Error: The DISTINCT keyword is not allowed by Cargo; please use \"group by=\" instead." );
+			}
 		}
 
 		foreach ( $fieldNames as $i => $fieldName ) {
