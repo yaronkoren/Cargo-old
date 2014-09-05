@@ -8,5 +8,14 @@
     "cargo-recreatedata-desc": "Recreate Cargo data for this template?",
     "cargo-recreatedata-success": "The data will be recreated.",
     "viewdata": "View data",
-    "viewtable": "View table"
+    "viewtable": "View table",
+    "drilldown": "Drilldown",
+    "cargo-drilldown-choosetable": "Choose a table",
+    "cargo-drilldown-docu": "Click on one or more items below to narrow your results.",
+    "cargo-drilldown-filterbyvalue": "Filter by this value",
+    "cargo-drilldown-or": "or",
+    "cargo-drilldown-removefilter": "Remove this filter",
+    "cargo-drilldown-resetfilters": "Reset filters",
+    "cargo-drilldown-addanothervalue": "Click arrow to add another value",
+    "cargo-drilldown-novalues": "There are no values for this filter"
 }

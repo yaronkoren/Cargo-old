@@ -69,6 +69,14 @@ $wgAutoloadClasses['CargoTemplateFormat'] = $dir . '/formats/CargoTemplateFormat
 $wgAutoloadClasses['CargoTableFormat'] = $dir . '/formats/CargoTableFormat.php';
 $wgAutoloadClasses['CargoCategoryFormat'] = $dir . '/formats/CargoCategoryFormat.php';
 
+// Drilldown
+$wgAutoloadClasses['CargoAppliedFilter'] = $dir . '/drilldown/CargoAppliedFilter.php';
+$wgAutoloadClasses['CargoFilter'] = $dir . '/drilldown/CargoFilter.php';
+$wgAutoloadClasses['CargoFilterValue'] = $dir . '/drilldown/CargoFilterValue.php';
+$wgAutoloadClasses['CargoDrilldownUtils'] = $dir . '/drilldown/CargoDrilldownUtils.php';
+$wgAutoloadClasses['CargoDrilldown'] = $dir . '/drilldown/CargoSpecialDrilldown.php';
+$wgSpecialPages['Drilldown'] = 'CargoDrilldown';
+
 // User right for recreating data.
 $wgAvailableRights[] = 'recreatedata';
 $wgGroupPermissions['sysop']['recreatedata'] = true;
@@ -81,6 +89,22 @@ $wgPageProps['CargoFields'] = 'The set of fields stored for this template';
 $wgResourceModules += array(
 	'ext.cargo.main' => array(
 		'styles' => 'Cargo.css',
+		'localBasePath' => __DIR__,
+		'remoteExtPath' => 'Cargo'
+	),
+	'ext.cargo.drilldown' => array(
+		'styles' => array(
+			'drilldown/resources/CargoDrilldown.css',
+			'drilldown/resources/CargoJQueryUIOverrides.css',
+		),
+		'scripts' => array(
+			'drilldown/resources/CargoDrilldown.js',
+		),
+		'dependencies' => array(
+			'jquery.ui.autocomplete',
+			'jquery.ui.button',
+		),
+		'position' => 'top',
 		'localBasePath' => __DIR__,
 		'remoteExtPath' => 'Cargo'
 	),
@@ -112,3 +136,9 @@ $wgCargoDisplayFormats = array(
 	'simpletable' => 'CargoTableFormat',
 	'category' => 'CargoCategoryFormat',
 );
+$wgCargoDrilldownUseTabs = false;
+// Set these to a positive number for cloud-style display.
+$wgCargoDrilldownSmallestFontSize = -1;
+$wgCargoDrilldownLargestFontSize = -1;
+$wgCargoDrilldownMinValuesForComboBox = 40;
+$wgCargoDrilldownNumRangesForNumbers = 6;
