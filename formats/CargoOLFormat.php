@@ -6,7 +6,7 @@ class CargoOLFormat extends CargoListFormat {
 		return array();
 	}
 
-	function display( $valuesTable, $fieldDescriptions, $displayParams ) {
+	function display( $valuesTable, $formattedValuesTable, $fieldDescriptions, $displayParams ) {
 		if ( array_key_exists( 'offset', $displayParams ) ) {
 			$offset = $displayParams['offset'];
 		} else {

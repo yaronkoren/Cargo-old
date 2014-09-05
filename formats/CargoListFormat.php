@@ -33,7 +33,7 @@ class CargoListFormat extends CargoDisplayFormat {
 		return $text;
 	}
 
-	function display( $valuesTable, $fieldDescriptions, $displayParams ) {
+	function display( $valuesTable, $formattedValuesTable, $fieldDescriptions, $displayParams ) {
 		$text = '';
 		$delimiter = ( array_key_exists( 'delimiter', $displayParams ) ) ? $displayParams['delimiter'] : ',';
 		foreach ( $valuesTable as $i => $row ) {

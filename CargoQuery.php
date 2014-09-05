@@ -159,15 +159,12 @@ class CargoQuery {
 			return $queryResults;
 		}
 
-		// Format the data, according to the type.
-		if ( $format != 'template' ) {
-			self::formatQueryResults( $queryResults, $sqlQuery->mFieldDescriptions, $parser );
-		}
+		$formattedQueryResults = self::getFormattedQueryResults( $queryResults, $sqlQuery->mFieldDescriptions, $parser );
 
 		// Finally, do the display, based on the format.
 		$formatClass = self::getFormatClass( $format, $sqlQuery->mFieldDescriptions );
 		$formatObject = new $formatClass();
-		$text = $formatObject->display( $queryResults, $sqlQuery->mFieldDescriptions, $displayParams );
+		$text = $formatObject->display( $queryResults, $formattedQueryResults, $sqlQuery->mFieldDescriptions, $displayParams );
 
 		// If there are (seemingly) more results than what we showed,
 		// show a "View more" link that links to Special:ViewData.
@@ -180,7 +177,9 @@ class CargoQuery {
 		return $text;
 	}
 
-	static function formatQueryResults( &$queryResults, $fieldDescriptions, $parser ) {
+	static function getFormattedQueryResults( $queryResults, $fieldDescriptions, $parser ) {
+		// The assignment will do a copy.
+		$formattedQueryResults = $queryResults;
 		foreach ( $queryResults as $rowNum => $row ) {
 			foreach ( $row as $fieldName => $value ) {
 				if ( trim( $value ) == '' ) {
@@ -211,11 +210,11 @@ class CargoQuery {
 						$title = Title::newFromText( $value );
 						$text .= Linker::link( $title );
 					}
-					$queryResults[$rowNum][$fieldName] = $text;
+					$formattedQueryResults[$rowNum][$fieldName] = $text;
 				} elseif ( $type == 'URL' ) {
 					if ( array_key_exists( 'link text', $fieldDescription ) ) {
 						$text = Html::element( 'a', array( 'href' => $value ), $fieldDescription['link text'] );
-						$queryResults[$rowNum][$fieldName] = $text;
+						$formattedQueryResults[$rowNum][$fieldName] = $text;
 					} else {
 						// Otherwise, do nothing.
 					}
@@ -236,10 +235,11 @@ class CargoQuery {
 						$parser = $wgParser;
 					}
 					$parserOutput = $parser->parse( $value, $wgTitle, new ParserOptions(), false );
-					$queryResults[$rowNum][$fieldName] = $parserOutput->getText();
+					$formattedQueryResults[$rowNum][$fieldName] = $parserOutput->getText();
 				}
 			}
 		}
+		return $formattedQueryResults;
 	}
 
 }

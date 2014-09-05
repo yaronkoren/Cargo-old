@@ -63,6 +63,16 @@ class CargoUtils {
 		return '<div class="error">' . $errorString . '</div>';
 	}
 
+	public static function getTables() {
+		$tableNames = array();
+		$dbr = wfGetDB( DB_SLAVE );
+		$res = $dbr->select( 'cargo_tables', 'main_table' );
+		while ( $row = $dbr->fetchRow( $res ) ) {
+			$tableNames[] = $row[0];
+		}
+		return $tableNames;
+	}
+
 /*
 	static function pageHasCargoDeclaration( $title ) {
 		if ( $title->getNamespace() != NS_TEMPLATE ) {

@@ -18,7 +18,7 @@ class CargoViewData extends SpecialPage {
 	function execute( $query ) {
 		$this->setHeaders();
 		$out = $this->getOutput();
-		$out->addModuleStyles( 'ext.Cargo' );
+		$out->addModuleStyles( 'ext.cargo.main' );
 		list( $limit, $offset ) = wfCheckLimits();
 		$rep = new ViewDataPage();
 		return $rep->execute( $query );
@@ -80,14 +80,14 @@ class ViewDataPage extends QueryPage {
 		if ( $this->sqlQuery->mGroupBy != '' ) {
 			$selectOptions['GROUP BY'] = $this->sqlQuery->mGroupBy;
 		}
-		// "order by" is handled in getOrderFields().
+		// "order by" is handled elsewhere, in getOrderFields().
 
 		// Field aliases need to have quotes placed around them
 		// before actually running the query.
 		$realAliasedFieldNames = array();
 		foreach ( $this->sqlQuery->mAliasedFieldNames as $alias => $fieldName ) {
 			$realAliasedFieldNames['"' . $alias . '"'] = $fieldName;
-		}			
+		}
 
 		$queryInfo = array(
 			'tables' => $this->sqlQuery->mTableNames,
@@ -141,13 +141,11 @@ class ViewDataPage extends QueryPage {
 		for ( $i = 0; $i < $num && $row = $res->fetchObject(); $i++ ) {
 			$valuesTable[] = get_object_vars( $row );
 		}
-		if ( $this->format != 'template' ) {
-			CargoQuery::formatQueryResults( $valuesTable, $this->sqlQuery->mFieldDescriptions, null );
-		}
+		$formattedValuesTable = CargoQuery::getFormattedQueryResults( $valuesTable, $this->sqlQuery->mFieldDescriptions, null );
 		$formatClass = CargoQuery::getFormatClass( $this->format, $this->sqlQuery->mFieldDescriptions );
 		$formatObject = new $formatClass();
 		$this->displayParams['offset'] = $offset;
-		$html = $formatObject->display( $valuesTable, $this->sqlQuery->mFieldDescriptions, $this->displayParams );
+		$html = $formatObject->display( $valuesTable, $formattedValuesTable, $this->sqlQuery->mFieldDescriptions, $this->displayParams );
 		$out->addHTML( $html );
 		return;
 	}

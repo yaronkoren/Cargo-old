@@ -11,7 +11,7 @@ class CargoViewTable extends IncludableSpecialPage {
 
 	function execute( $query ) {
 		$out = $this->getOutput();
-		$out->addModuleStyles( 'ext.Cargo' );
+		$out->addModuleStyles( 'ext.cargo.main' );
 		$this->setHeaders();
 
 		$tableName = $query;
@@ -67,11 +67,11 @@ class CargoViewTable extends IncludableSpecialPage {
 
 		$queryResults = $sqlQuery->run();
 
-		CargoQuery::formatQueryResults( $queryResults, $sqlQuery->mFieldDescriptions, null );
+		$formattedQueryResults = CargoQuery::getFormattedQueryResults( $queryResults, $sqlQuery->mFieldDescriptions, null );
 
 		$displayParams = array();
 		$tableFormat = new CargoTableFormat();
-		$text = $tableFormat->display( $queryResults, $sqlQuery->mFieldDescriptions, $displayParams );
+		$text = $tableFormat->display( $queryResults, $formattedQueryResults, $sqlQuery->mFieldDescriptions, $displayParams );
 
 		// If there are (seemingly) more results than what we showed,
 		// show a "View more" link that links to Special:ViewData.
@@ -93,12 +93,7 @@ class CargoViewTable extends IncludableSpecialPage {
 	 * the Special:ViewTable page for each one.
 	 */
 	function displayListOfTables() {
-		$tableNames = array();
-		$dbr = wfGetDB( DB_SLAVE );
-		$res = $dbr->select( 'cargo_tables', 'main_table' );
-		while ( $row = $dbr->fetchRow( $res ) ) {
-			$tableNames[] = $row[0];
-		}
+		$tableNames = CargoUtils::getTables();
 		$viewTablePage = Title::makeTitleSafe( NS_SPECIAL, 'ViewTable' );
 		$viewTableText = $viewTablePage->getFullURL();
 		$text = "<p>The following tables are defined:</p>\n";

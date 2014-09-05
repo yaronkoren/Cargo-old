@@ -75,7 +75,7 @@ class CargoDeclare {
 						$paramKey = trim( $extraParamParts[0] );
 						$paramValue = trim( $extraParamParts[1] );
 						if ( $paramKey == 'allowed values' ) {
-							$fieldData['allowedValues'] = explode( ',', $paramValue );
+							$fieldData['allowedValues'] = array_map( 'trim', explode( ',', $paramValue ) );
 						} elseif ( $paramKey == 'size' ) {
 							$fieldData['size'] = $paramValue;
 						}
@@ -232,6 +232,8 @@ class CargoDeclare {
 			$cdb->tableName( $tableName ) . ' ( ' .
 			"_ID $intTypeString NOT NULL UNIQUE, " .
 			"_pageName $textTypeString NOT NULL, " .
+			"_pageTitle $textTypeString NOT NULL, " .
+			"_pageNamespace $intTypeString NOT NULL, " .
 			"_pageID $intTypeString NOT NULL";
 
 		foreach ( $tableFields as $fieldName => $fieldDescription ) {
@@ -263,6 +265,8 @@ class CargoDeclare {
 
 		$createIndexSQL = "CREATE INDEX page_id_$tableName ON " . $cdb->tableName( $tableName ) . " (_pageID)";
 		$createIndexSQL = "CREATE INDEX page_name_$tableName ON " . $cdb->tableName( $tableName ) . " (_pageName)";
+		$createIndexSQL = "CREATE INDEX page_title_$tableName ON " . $cdb->tableName( $tableName ) . " (_pageTitle)";
+		$createIndexSQL = "CREATE INDEX page_namespace_$tableName ON " . $cdb->tableName( $tableName ) . " (_pageNamespace)";
 		$createIndexSQL = "CREATE UNIQUE INDEX id_$tableName ON " . $cdb->tableName( $tableName ) . " (_ID)";
 		$cdb->query( $createIndexSQL );
 

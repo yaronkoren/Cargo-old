@@ -6,16 +6,16 @@ class CargoTableFormat extends CargoDisplayFormat {
 		return array();
 	}
 
-	function display( $valuesTable, $fieldDescriptions, $displayParams ) {
+	function display( $valuesTable, $formattedValuesTable, $fieldDescriptions, $displayParams ) {
 		global $wgOut;
-		$wgOut->addModuleStyles( 'ext.Cargo' );
+		$wgOut->addModuleStyles( 'ext.cargo.main' );
 
 		$text = '<table class="cargoTable"><tr>';
 		foreach( array_keys( $fieldDescriptions ) as $field ) {
 			$text .= Html::rawElement( 'th', null, $field );
 		}
 		$text .= "</tr>\n";
-		foreach ( $valuesTable as $i => $row ) {
+		foreach ( $formattedValuesTable as $i => $row ) {
 			$text .= '<tr>';
 			foreach( array_keys( $fieldDescriptions ) as $field ) {
 				$text .= Html::rawElement( 'td', null, $row[$field] );

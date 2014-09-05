@@ -19,7 +19,7 @@ class CargoTemplateFormat extends CargoDisplayFormat {
 		return $wikiText;
 	}
 
-	function display( $valuesTable, $fieldDescriptions, $displayParams ) {
+	function display( $valuesTable, $formattedValuesTable, $fieldDescriptions, $displayParams ) {
 		$text = '';
 		$templateName = $displayParams['template'];
 		foreach ( $valuesTable as $row ) {

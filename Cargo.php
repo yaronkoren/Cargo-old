@@ -21,6 +21,9 @@ $wgExtensionCredits['parserhook'][] = array(
 
 $dir = dirname( __FILE__ );
 
+// Script path.
+$cgScriptPath = $wgScriptPath . '/extensions/Cargo';
+
 $wgJobClasses['cargoPopulateTable'] = 'CargoPopulateTableJob';
 
 $wgHooks['ParserFirstCallInit'][] = 'cargoRegisterParserFunctions';
@@ -64,6 +67,7 @@ $wgAutoloadClasses['CargoULFormat'] = $dir . '/formats/CargoULFormat.php';
 $wgAutoloadClasses['CargoOLFormat'] = $dir . '/formats/CargoOLFormat.php';
 $wgAutoloadClasses['CargoTemplateFormat'] = $dir . '/formats/CargoTemplateFormat.php';
 $wgAutoloadClasses['CargoTableFormat'] = $dir . '/formats/CargoTableFormat.php';
+$wgAutoloadClasses['CargoCategoryFormat'] = $dir . '/formats/CargoCategoryFormat.php';
 
 // User right for recreating data.
 $wgAvailableRights[] = 'recreatedata';
@@ -74,10 +78,12 @@ $wgPageProps['CargoTableName'] = "The name of the database table that holds this
 $wgPageProps['CargoFields'] = 'The set of fields stored for this template';
 
 // ResourceLoader modules
-$wgResourceModules['ext.Cargo'] = array(
-	'styles' => 'Cargo.css',
-	'localBasePath' => __DIR__,
-	'remoteExtPath' => 'Cargo'
+$wgResourceModules += array(
+	'ext.cargo.main' => array(
+		'styles' => 'Cargo.css',
+		'localBasePath' => __DIR__,
+		'remoteExtPath' => 'Cargo'
+	),
 );
 
 function cargoRegisterParserFunctions( &$parser ) {
@@ -88,6 +94,8 @@ function cargoRegisterParserFunctions( &$parser ) {
 	return true;
 }
 
+$wgCargoDecimalMark = '.';
+$wgCargoDigitGroupingCharacter = ',';
 $wgCargoRecurringEventMaxInstances = 100;
 $wgCargoDBtype = null;
 $wgCargoDBserver = null;
@@ -102,4 +110,5 @@ $wgCargoDisplayFormats = array(
 	'ol' => 'CargoOLFormat',
 	'template' => 'CargoTemplateFormat',
 	'simpletable' => 'CargoTableFormat',
+	'category' => 'CargoCategoryFormat',
 );

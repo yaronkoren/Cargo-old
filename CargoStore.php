@@ -66,6 +66,10 @@ wfDebugLog('cargo', "CargoStore::run() - skipping 2.\n");
 				$tableName = $value;
 			} else {
 				$fieldName = $key;
+				// Since we don't know whether any empty
+				// value is meant to be blank or null, let's
+				// go with null.
+				if ( $value == '' ) $value = null;
 				$fieldValue = $value;
 				$tableFieldValues[$fieldName] = $fieldValue;
 			}
@@ -107,28 +111,50 @@ wfDebugLog('cargo', "CargoStore::run() - skipping 4.\n");
 
 		// First, though, let's do some processing:
 		// - remove invalid values, if any
-		// - put dates into correct format
-		foreach ( $tableFields as $fieldName => $typeDescription ) {
-			if ( array_key_exists( 'allowedValues', $typeDescription ) ) {
-				$allowedValues = $typeDescription['allowedValues'];
+		// - put dates and numbers into correct format
+		foreach ( $tableFields as $fieldName => $fieldDescription ) {
+			$curValue = $tableFieldValues[$fieldName];
+			// If it's null, skip this value.
+			if ( is_null( $curValue ) ) {
+				continue;
+			}
+
+			if ( array_key_exists( 'allowedValues', $fieldDescription ) ) {
+				$allowedValues = $fieldDescription['allowedValues'];
 				if ( !in_array( $tableFieldValues[$fieldName], $allowedValues ) ) {
 					$tableFieldValues[$fieldName] = null;
 				}
 			}
-			if ( $typeDescription['type'] == 'Date' ) {
+			if ( $fieldDescription['type'] == 'Date' ) {
 				// Put into YYYY-MM-DD format.
-				$curValue = $tableFieldValues[$fieldName];
 				if ( $curValue != '' ) {
 					$seconds = strtotime( $curValue );
 					$tableFieldValues[$fieldName] = date('Y-m-d', $seconds );
 				}
+			} elseif ( $fieldDescription['type'] == 'Integer' ) {
+				// Remove digit-grouping character.
+				global $wgCargoDigitGroupingCharacter;
+				$tableFieldValues[$fieldName] = str_replace( $wgCargoDigitGroupingCharacter, '', $curValue );
+			} elseif ( $fieldDescription['type'] == 'Float' ) {
+				// Remove digit-grouping character, and
+				// change decimal mark to '.' if it's
+				// anything else.
+				global $wgCargoDigitGroupingCharacter;
+				global $wgCargoDecimalMark;
+				$curValue = str_replace( $wgCargoDigitGroupingCharacter, '', $curValue );
+				$curValue = str_replace( $wgCargoDecimalMark, '.', $curValue );
+				$tableFieldValues[$fieldName] = $curValue;
 			}
 		}
 
 		// Add the "metadata" field values.
 		$pageName = $parser->getTitle()->getPrefixedText();
+		$pageTitle = $parser->getTitle()->getText();
+		$pageNamespace = $parser->getTitle()->getNamespace();
 		$pageID = $parser->getTitle()->getArticleID();
 		$tableFieldValues['_pageName'] = $pageName;
+		$tableFieldValues['_pageTitle'] = $pageTitle;
+		$tableFieldValues['_pageNamespace'] = $pageNamespace;
 		$tableFieldValues['_pageID'] = $pageID;
 
 		$cdb = CargoUtils::getDB();
@@ -140,10 +166,10 @@ wfDebugLog('cargo', "CargoStore::run() - skipping 4.\n");
 
 		// For each field that holds a list of values, also add its
 		// values to its own table; and rename the actual field.
-		foreach ( $tableFields as $fieldName => $typeDescription ) {
-			if ( array_key_exists( 'isList', $typeDescription ) ) {
+		foreach ( $tableFields as $fieldName => $fieldDescription ) {
+			if ( array_key_exists( 'isList', $fieldDescription ) ) {
 				$fieldTableName = $tableName . '__' . $fieldName;
-				$delimiter = $typeDescription['delimiter'];
+				$delimiter = $fieldDescription['delimiter'];
 				$individualValues = explode( $delimiter, $tableFieldValues[$fieldName] );
 				foreach ( $individualValues as $individualValue ) {
 					$individualValue = trim( $individualValue );

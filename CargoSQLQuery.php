@@ -590,7 +590,7 @@ class CargoSQLQuery {
 			$tableNameReplacements[] = "$1cargo__$tableName.";
 		}
 
-		return preg_replace( $tableNamePatterns, $tableNameReplacements, $string ); 
+		return preg_replace( $tableNamePatterns, $tableNameReplacements, $string );
 	}
 
 }
