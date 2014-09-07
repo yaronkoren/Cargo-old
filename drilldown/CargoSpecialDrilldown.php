@@ -562,6 +562,8 @@ END;
 	}
 
 	function printNumberRanges( $filter_name, $filter_values ) {
+		global $wgCargoDecimalMark, $wgCargoDigitGroupingCharacter;
+
 		// We generate $cur_url here, instead of passing it in, because
 		// if there's a previous value for this filter it may be
 		// removed.
@@ -580,7 +582,7 @@ END;
 		$text = '';
 		$filterValues = $this->generateFilterValuesFromNumbers( $numberArray );
 		foreach( $filterValues as $i => $curBucket ) {
-			if ( $curBucket['lowerNumber'] == '' || $curBucket['higherNumber'] == '' ) {
+			if ( $curBucket['lowerNumber'] == ' none' ) {
 				// @TODO - prevent this from happening in the
 				// first place.
 				continue;
@@ -590,9 +592,9 @@ END;
 				$text .= " &middot; ";
 			}
 			// number_format() adds in commas for each thousands place.
-			$curText = number_format( $curBucket['lowerNumber'] );
+			$curText = number_format( $curBucket['lowerNumber'], 0, $wgCargoDecimalMark, $wgCargoDigitGroupingCharacter );
 			if ( $curBucket['higherNumber'] != null ) {
-				$curText .= ' - ' . number_format( $curBucket['higherNumber'] );
+				$curText .= ' - ' . number_format( $curBucket['higherNumber'], 0, $wgCargoDecimalMark, $wgCargoDigitGroupingCharacter );
 			}
 			$curText .= ' (' . $curBucket['numValues'] . ') ';
 			$filterURL = $cur_url . "$filter_name=" . $curBucket['lowerNumber'];
@@ -666,7 +668,7 @@ END;
 			wfMessage( 'february' )->inContentLanguage()->text(),
 			wfMessage( 'march' )->inContentLanguage()->text(),
 			wfMessage( 'april' )->inContentLanguage()->text(),
-			// Needed to avoid using 3-letter abbreviation 
+			// Needed to avoid using 3-letter abbreviation
 			wfMessage( 'may_long' )->inContentLanguage()->text(),
 			wfMessage( 'june' )->inContentLanguage()->text(),
 			wfMessage( 'july' )->inContentLanguage()->text(),
@@ -803,7 +805,7 @@ END;
 					$header .= "\n\t" . '<span class="drilldown-header-value">~ \'' . $search_term . '\'</span> <a href="' . $remove_filter_url . '" title="' . wfMessage( 'cargo-drilldown-removefilter' )->text() . '"><img src="' . $cgScriptPath . '/drilldown/resources/filter-x.png" /> </a>';
 				}
 			} elseif ( $af->lower_date != null || $af->upper_date != null ) {
-				$header .= "\n\t<span class=\"drilldown-header-value\">" . $af->lower_date_string . " - " . $af->upper_date_string . "</span>";
+				$header .= "\n\t" . Html::element( 'span', array( 'class' => 'drilldown-header-value' ), $af->lower_date_string . " - " . $af->upper_date_string );
 			}
 		}
 		$header .= "</div>\n";
@@ -853,8 +855,9 @@ END;
 	 */
 	function linkParameters() {
 		$params = array();
-		if ( $this->show_single_cat )
+		if ( $this->show_single_cat ) {
 			$params['_single'] = null;
+		}
 		$params['_table'] = $this->tableName;
 		foreach ( $this->applied_filters as $i => $af ) {
 			if ( count( $af->values ) == 1 ) {

@@ -24,20 +24,19 @@ class CargoViewTable extends IncludableSpecialPage {
 		$out->setPageTitle( $pageTitle );
 
 		$cdb = CargoUtils::getDB();
-		$tableNames = array( $tableName );
 
 		// First, display a count.
 		try {
-			$res = $cdb->select( $tableNames, 'COUNT(*)' );
+			$res = $cdb->select( $tableName, 'COUNT(*)' );
 		} catch ( Exception $e ) {
-			$out->addHTML( "<div class=\"error\">Table \"$tableName\" not found in Cargo database.</div>\n" );
+			$out->addHTML( Html::element( 'div', array( 'class' => 'error' ), wfMessage( 'cargo-viewtable-tablenotfound', $tableName )->parse() ) . "\n" );
 			return;
 		}
 		$row = $cdb->fetchRow( $res );
-		$out->addWikiText( "This table has '''" . $row[0] . "''' rows altogether.\n" );
+		$out->addWikiText( wfMessage( 'cargo-viewtable-totalrows', "'''" . $row[0] . "'''" ) . "\n" );
 
 		$sqlQuery = new CargoSQLQuery();
-		$sqlQuery->mTableNames = $tableNames;
+		$sqlQuery->mTableNames = array( $tableName );
 
 		$tableSchemas = CargoQuery::getTableSchemas( array( $tableName ) );
 		$sqlQuery->mTableSchemas = $tableSchemas;
@@ -96,7 +95,7 @@ class CargoViewTable extends IncludableSpecialPage {
 		$tableNames = CargoUtils::getTables();
 		$viewTablePage = Title::makeTitleSafe( NS_SPECIAL, 'ViewTable' );
 		$viewTableText = $viewTablePage->getFullURL();
-		$text = "<p>The following tables are defined:</p>\n";
+		$text = Html::element( 'p', null, wfMessage( 'cargo-viewtable-tablelist' )->parse() ) . "\n";
 		$text .= "<ul>\n";
 		foreach ( $tableNames as $tableName ) {
 			$tableLink = Html::element( 'a', array( 'href' => "$viewTableText/$tableName" ), $tableName );
