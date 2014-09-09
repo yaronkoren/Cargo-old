@@ -58,11 +58,13 @@ class CargoDrilldown extends IncludableSpecialPage {
 		}
 
 		$tableSchemas = CargoQuery::getTableSchemas( array( $tableName ) );
-		//$filters = array_keys( $tableSchemas[$tableName] );
-		// Is all this necessary? Maybe we can just use the names
-		// directly.
 		$filters = array();
 		foreach( $tableSchemas[$tableName] as $fieldName => $fieldDescription ) {
+			// Skip "hidden" fields.
+			if ( array_key_exists( 'hidden', $fieldDescription ) ) {
+				continue;
+			}
+
 			$curFilter = new CargoFilter();
 			$curFilter->setName( $fieldName );
 			$curFilter->setTableName( $tableName );
@@ -416,9 +418,9 @@ END;
 	 * - though that one is in Javascript.
 	 */
 	function getNearestNiceNumber( $num, $previousNum, $nextNum ) {
-		if ( $previousNum == null ) {
+		if ( is_null( $previousNum ) ) {
 			$smallestDifference = $nextNum - $num;
-		} elseif ( $nextNum == null ) {
+		} elseif ( is_null( $nextNum ) ) {
 			$smallestDifference = $num - $previousNum;
 		} else {
 			$smallestDifference = min( $num - $previousNum, $nextNum - $num );
@@ -571,9 +573,14 @@ END;
 		$cur_url .= ( strpos( $cur_url, '?' ) ) ? '&' : '?';
 
 		$numberArray = array();
+		$numNoneValues = 0;
 		foreach ( $filter_values as $value => $num_instances ) {
-			for ( $i = 0; $i < $num_instances; $i++ ) {
-				$numberArray[] = $value;
+			if ( $value == ' none' ) {
+				$numNoneValues = $num_instances;
+			} else {
+				for ( $i = 0; $i < $num_instances; $i++ ) {
+					$numberArray[] = $value;
+				}
 			}
 		}
 		// Put into numerical order.
@@ -581,20 +588,30 @@ END;
 
 		$text = '';
 		$filterValues = $this->generateFilterValuesFromNumbers( $numberArray );
-		foreach( $filterValues as $i => $curBucket ) {
-			if ( $curBucket['lowerNumber'] == ' none' ) {
-				// @TODO - prevent this from happening in the
-				// first place.
-				continue;
-			}
 
+		// If there were any 'none' values, add them in to the
+		// beginning of the array.
+		if ( $numNoneValues > 0 ) {
+			$noneBucket = array(
+				'lowerNumber' => ' none',
+				'higherNumber' => null,
+				'numValues' => $numNoneValues
+			);
+			array_unshift( $filterValues, $noneBucket );
+		}
+
+		foreach( $filterValues as $i => $curBucket ) {
 			if ( $i > 0 ) {
 				$text .= " &middot; ";
 			}
-			// number_format() adds in commas for each thousands place.
-			$curText = number_format( $curBucket['lowerNumber'], 0, $wgCargoDecimalMark, $wgCargoDigitGroupingCharacter );
-			if ( $curBucket['higherNumber'] != null ) {
-				$curText .= ' - ' . number_format( $curBucket['higherNumber'], 0, $wgCargoDecimalMark, $wgCargoDigitGroupingCharacter );
+			if ( $curBucket['lowerNumber'] == ' none' ) {
+				$curText = $this->printFilterValue( null, ' none' );
+			} else {
+				// number_format() adds in commas for each thousands place.
+				$curText = number_format( $curBucket['lowerNumber'], 0, $wgCargoDecimalMark, $wgCargoDigitGroupingCharacter );
+				if ( $curBucket['higherNumber'] != null ) {
+					$curText .= ' - ' . number_format( $curBucket['higherNumber'], 0, $wgCargoDecimalMark, $wgCargoDigitGroupingCharacter );
+				}
 			}
 			$curText .= ' (' . $curBucket['numValues'] . ') ';
 			$filterURL = $cur_url . "$filter_name=" . $curBucket['lowerNumber'];
@@ -842,6 +859,7 @@ END;
 			}
 			foreach ( $this->remaining_filters as $rf ) {
 				if ( $rf->name == $f->name ) {
+//if ( in_array( $rf->name, array( 'Circulation2', 'Monthly_unique_visitors', 'Country', 'Language' ) ) )
 					$header .= $this->printUnappliedFilterLine( $rf, $cur_url );
 				}
 			}
