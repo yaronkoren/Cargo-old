@@ -43,6 +43,11 @@ class CargoViewTable extends IncludableSpecialPage {
 
 		$aliasedFieldNames = array( wfMessage( 'nstab-main' )->parse() => '_pageName' );
 		foreach( $tableSchemas[$tableName] as $fieldName => $fieldDescription ) {
+			// Skip "hidden" fields.
+			if ( array_key_exists( 'hidden', $fieldDescription ) ) {
+				continue;
+			}
+
 			$fieldAlias = str_replace( '_', ' ', $fieldName );
 			// Special handling for URLs, to avoid them
 			// overwhelming the page.

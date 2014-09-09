@@ -68,16 +68,18 @@ class CargoDeclare {
 					$extraParamsString = $matches[2];
 					$extraParams = explode( ';', $extraParamsString );
 					foreach ( $extraParams as $extraParam ) {
-						$extraParamParts = explode( '=', $extraParam );
-						if ( count( $extraParamParts ) != 2 ) {
-							continue;
-						}
-						$paramKey = trim( $extraParamParts[0] );
-						$paramValue = trim( $extraParamParts[1] );
-						if ( $paramKey == 'allowed values' ) {
-							$fieldData['allowedValues'] = array_map( 'trim', explode( ',', $paramValue ) );
-						} elseif ( $paramKey == 'size' ) {
-							$fieldData['size'] = $paramValue;
+						$extraParamParts = explode( '=', $extraParam, 2 );
+						if ( count( $extraParamParts ) == 1 ) {
+							$paramKey = trim( $extraParamParts[0] );
+							$fieldData[$paramKey] = true;
+						} else {
+							$paramKey = trim( $extraParamParts[0] );
+							$paramValue = trim( $extraParamParts[1] );
+							if ( $paramKey == 'allowed values' ) {
+								$fieldData['allowedValues'] = array_map( 'trim', explode( ',', $paramValue ) );
+							} else {
+								$fieldData[$paramKey] = $paramValue;
+							}
 						}
 					}
 				}
