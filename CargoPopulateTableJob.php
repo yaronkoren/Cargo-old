@@ -25,16 +25,24 @@ class CargoPopulateTableJob extends Job {
 			return false;
 		}
 
+		$article = new Article( $this->title );
+
+		// If it was requested, delete all the existing rows for
+		// this page in this Cargo table. This is only necessary
+		// if the table wasn't just dropped and recreated.
+		if ( $this->params['replaceOldRows'] == true ) {
+			$cdb = CargoUtils::getDB();
+			$cdb->delete( $this->params['dbTableName'], array( '_pageID' => $article->getID() ) );
+		}
+
 		// All we need to do here is set some global variables based
 		// on the parameters of this job, then parse the page -
 		// the #cargo_store function will take care of the rest.
 		CargoStore::$settings['origin'] = 'template';
-		CargoStore::$settings['templateID'] = $this->params['templateID'];
 		CargoStore::$settings['dbTableName'] = $this->params['dbTableName'];
 
 		// @TODO - is there a "cleaner" way to get a page to be parsed?
 		global $wgParser;
-		$article = new Article( $this->title );
 		$wgParser->parse( $article->getContent(), $this->title, new ParserOptions() );
 
 		wfProfileOut( __METHOD__ );

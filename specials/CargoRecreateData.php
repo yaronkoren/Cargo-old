@@ -8,14 +8,18 @@
  */
 
 class CargoRecreateData extends IncludableSpecialPage {
+	var $mTemplateTitle;
 	var $mTableName;
+	var $mIsDeclared;
 
-	function __construct( $tableName ) {
+	function __construct( $templateTitle, $tableName, $isDeclared ) {
 		parent::__construct( 'RecreateData', 'recreatedata' );
+		$this->mTemplateTitle = $templateTitle;
 		$this->mTableName = $tableName;
+		$this->mIsDeclared = $isDeclared;
 	}
 
-	function execute( $templateTitle ) {
+	function execute() {
 		$out = $this->getOutput();
 
 		if ( ! $this->getUser()->isAllowed( 'recreatedata' ) ) {
@@ -29,7 +33,7 @@ class CargoRecreateData extends IncludableSpecialPage {
 			$out->setPageTitle( wfMessage( 'cargo-createdatatable' )->parse() );
 		}
 
-		if ( empty( $templateTitle ) ) {
+		if ( empty( $this->mTemplateTitle ) ) {
 			// No template.
 			// TODO - show an error message.
 			return true;
@@ -38,8 +42,8 @@ class CargoRecreateData extends IncludableSpecialPage {
 		$formSubmitted = $this->getRequest()->getText( 'submitted' ) == 'yes';
 		if ( $formSubmitted ) {
 			// Recreate the data!
-			$this->recreateData( $templateTitle );
-			$this->getOutput()->redirect( $templateTitle->getFullURL() );
+			$this->recreateData();
+			$this->getOutput()->redirect( $this->mTemplateTitle->getFullURL() );
 			return true;
 		}
 
@@ -57,22 +61,7 @@ class CargoRecreateData extends IncludableSpecialPage {
 		return true;
 	}
 
-	/**
-	 * Recreates the data.
-	 */
-	function recreateData( $templateTitle ) {
-		$templatePageID = $templateTitle->getArticleID();
-		$result = CargoDeclare::recreateDBTablesForTemplate( $templatePageID );
-		if ( !$result ) {
-			return;
-		}
-		// Now create a job, CargoPopulateTable, for each page
-		// that calls this template.
-		$jobParams = array(
-			'templateID' => $templatePageID,
-			'dbTableName' => $this->mTableName
-		);
-
+	function callPopulateTableJobsForTemplate( $templateTitle, $jobParams ) {
 		// We need to break this up into batches, to avoid running out
 		// of memory for large page sets.
 		// @TODO For *really* large page sets, it might make sense
@@ -87,6 +76,58 @@ class CargoRecreateData extends IncludableSpecialPage {
 			Job::batchInsert( $jobs );
 			$offset += 500;
 		} while ( count( $titlesWithThisTemplate ) >= 500 );
+	}
+
+	/**
+	 * Recreates the data.
+	 */
+	function recreateData() {
+		$templatePageID = $this->mTemplateTitle->getArticleID();
+
+		// If this template calls #cargo_declare (as opposed to
+		// #cargo_attach), drop and re-generate the Cargo DB table
+		// for it.`
+		if ( $this->mIsDeclared ) {
+			$result = CargoDeclare::recreateDBTablesForTemplate( $templatePageID );
+			if ( !$result ) {
+				return;
+			}
+		}
+
+		// Now create a job, CargoPopulateTable, for each page
+		// that calls this template.
+		$jobParams = array(
+			'dbTableName' => $this->mTableName,
+			'replaceOldRows' => !$this->mIsDeclared
+		);
+
+		$this->callPopulateTableJobsForTemplate( $this->mTemplateTitle, $jobParams );
+
+		// If this template calls #cargo_declare, see if any templates
+		// have attached themselves to this table, and if so, call
+		// this job for their pages as well.
+		if ( $this->mIsDeclared ) {
+			$dbr = wfGetDB( DB_SLAVE );
+			$res = $dbr->select( 'page_props',
+				array(
+					'pp_page'
+				),
+				array(
+					'pp_value' => $this->mTableName,
+					'pp_propname' => 'CargoAttachedTable'
+				)
+			);
+			while ( $row = $dbr->fetchRow( $res ) ) {
+				$templateID = $row['pp_page'];
+				$attachedTemplateTitle = Title::newFromID( $templateID );
+				$jobParams = array(
+					'dbTableName' => $this->mTableName,
+					'replaceOldRows' => false
+				);
+
+				$this->callPopulateTableJobsForTemplate( $attachedTemplateTitle, $jobParams );
+			}
+		}
 	}
 
 	/**

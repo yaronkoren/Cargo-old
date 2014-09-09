@@ -8,7 +8,7 @@
 
 if ( !defined( 'MEDIAWIKI' ) ) die();
 
-define( 'CARGO_VERSION', '0.1' );
+define( 'CARGO_VERSION', '0.3' );
 
 $wgExtensionCredits['parserhook'][] = array(
 	'path' => __FILE__,
@@ -47,6 +47,7 @@ $wgAPIModules['cargoquery'] = 'CargoQueryAPI';
 $wgAutoloadClasses['CargoHooks'] = $dir . '/Cargo.hooks.php';
 $wgAutoloadClasses['CargoUtils'] = $dir . '/CargoUtils.php';
 $wgAutoloadClasses['CargoDeclare'] = $dir . '/CargoDeclare.php';
+$wgAutoloadClasses['CargoAttach'] = $dir . '/CargoAttach.php';
 $wgAutoloadClasses['CargoStore'] = $dir . '/CargoStore.php';
 $wgAutoloadClasses['CargoQuery'] = $dir . '/CargoQuery.php';
 $wgAutoloadClasses['CargoSQLQuery'] = $dir . '/CargoSQLQuery.php';
@@ -112,6 +113,7 @@ $wgResourceModules += array(
 
 function cargoRegisterParserFunctions( &$parser ) {
 	$parser->setFunctionHook( 'cargo_declare', array( 'CargoDeclare', 'run' ) );
+	$parser->setFunctionHook( 'cargo_attach', array( 'CargoAttach', 'run' ) );
 	$parser->setFunctionHook( 'cargo_store', array( 'CargoStore', 'run' ) );
 	$parser->setFunctionHook( 'cargo_query', array( 'CargoQuery', 'run' ) );
 	$parser->setFunctionHook( 'recurring_event', array( 'CargoRecurringEvent', 'run' ) );
@@ -141,4 +143,4 @@ $wgCargoDrilldownUseTabs = false;
 $wgCargoDrilldownSmallestFontSize = -1;
 $wgCargoDrilldownLargestFontSize = -1;
 $wgCargoDrilldownMinValuesForComboBox = 40;
-$wgCargoDrilldownNumRangesForNumbers = 6;
+$wgCargoDrilldownNumRangesForNumbers = 5;

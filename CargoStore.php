@@ -37,9 +37,8 @@ class CargoStore {
 	 */
 	public static function run( &$parser ) {
 		// This function does actual DB modifications - so only proceed
-		// is this is called via either a page save or as a result of
-		// a template that this page calls, and that includes a
-		// #cargo_declare call, getting resaved.
+		// is this is called via either a page save or a "recreate
+		// data" action for a template that this page calls.
 		if ( count( self::$settings ) == 0 ) {
 wfDebugLog('cargo', "CargoStore::run() - skipping.\n");
 			return;
@@ -79,24 +78,18 @@ wfDebugLog('cargo', "CargoStore::run() - skipping 2.\n");
 			return;
 		}
 
-		$templatePageID = self::getTemplateIDForDBTable( $tableName );
-
 		if ( self::$settings['origin'] == 'template' ) {
-			// It came from a template save - make sure it passes
-			// various criteria.
+			// It came from a template "recreate data" action -
+			// make sure it passes various criteria.
 			if ( self::$settings['dbTableName'] != $tableName ) {
 wfDebugLog('cargo', "CargoStore::run() - skipping 3.\n");
-				return;
-			}
-			if ( self::$settings['templateID'] != $templatePageID ) {
-wfDebugLog('cargo', "CargoStore::run() - skipping 4.\n");
 				return;
 			}
 		}
 
 		// Get the declaration of the table.
 		$dbr = wfGetDB( DB_SLAVE );
-		$res = $dbr->select( 'cargo_tables', 'table_schema', array( 'template_id' => $templatePageID ) );
+		$res = $dbr->select( 'cargo_tables', 'table_schema', array( 'main_table' => $tableName ) );
 		$row = $dbr->fetchRow( $res );
 		$tableFieldsString = $row['table_schema'];
 		$tableFields = unserialize( $tableFieldsString );
@@ -113,8 +106,11 @@ wfDebugLog('cargo', "CargoStore::run() - skipping 4.\n");
 		// - remove invalid values, if any
 		// - put dates and numbers into correct format
 		foreach ( $tableFields as $fieldName => $fieldDescription ) {
+			// If it's null or not set, skip this value.
+			if ( !array_key_exists( $fieldName, $tableFieldValues ) ) {
+				continue;
+			}
 			$curValue = $tableFieldValues[$fieldName];
-			// If it's null, skip this value.
 			if ( is_null( $curValue ) ) {
 				continue;
 			}

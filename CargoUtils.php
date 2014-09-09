@@ -89,9 +89,19 @@ class CargoUtils {
 	}
 */
 
-	static function getDeclaredTableName( $title ) {
-		$templatePageID = $title->getArticleID();
-		return self::getPageProp( $templatePageID, 'CargoTableName' );
+	/**
+	 * Get the Cargo table for the passed-in template specified via
+	 * either #cargo_declare or #cargo_attach, if the template has a
+	 * call to either one.
+	 */
+	static function getTableNameForTemplate( $templateTitle ) {
+		$templatePageID = $templateTitle->getArticleID();
+		$declaredTableName = self::getPageProp( $templatePageID, 'CargoTableName' );
+		if ( !is_null( $declaredTableName ) ) {
+			return array( $declaredTableName, true );
+		}
+		$attachedTableName = self::getPageProp( $templatePageID, 'CargoAttachedTable' );
+		return array( $attachedTableName, false );
 	}
 
 	static function tableExists( $tableName ) {

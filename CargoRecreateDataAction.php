@@ -23,17 +23,18 @@ class CargoRecreateDataAction {
 	public static function show( $action, Article $article ) {
 		$title = $article->getTitle();
 
-		$tableName = CargoUtils::getDeclaredTableName( $title );
-
 		// These tabs should only exist for template pages, that
-		// use (or used) #cargo_declare.
+		// either call (or called) #cargo_declare, or call
+		// #cargo_attach.
+		list( $tableName, $isDeclared ) = CargoUtils::getTableNameForTemplate( $title );
+
 		if ( $tableName == '' ) {
 			return true;
 		}
 
 		if ( $action == 'recreatedata' ) {
-			$recreateDataPage = new CargoRecreateData( $tableName );
-			$recreateDataPage->execute( $title );
+			$recreateDataPage = new CargoRecreateData( $title, $tableName, $isDeclared );
+			$recreateDataPage->execute();
 			return false;
 		}
 
@@ -52,10 +53,10 @@ class CargoRecreateDataAction {
 			return true;
 		}
 
-		// Make sure that this is a template page, that it has (or
-		// had) a #cargo_declare call, and that the user is allowed
-		// to recreate its data.
-		$tableName = CargoUtils::getDeclaredTableName( $title );
+		// Make sure that this is a template page, that it either
+		// has (or had) a #cargo_declare call or has a #cargo_attach
+		// call, and that the user is allowed to recreate its data.
+		list( $tableName, $isDeclared ) = CargoUtils::getTableNameForTemplate( $title );
 		if ( $tableName == '' ) {
 			return true;
 		}
