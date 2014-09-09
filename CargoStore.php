@@ -191,8 +191,6 @@ wfDebugLog('cargo', "CargoStore::run() - skipping 4.\n");
 		// Insert the current data into the main table.
 		$cdb->insert( $tableName, $tableFieldValues );
 
-		$cdb->close();
-
 		// Finally, add a record of this to the cargo_pages table, if
 		// necessary.
 		$dbr = wfGetDB( DB_MASTER );

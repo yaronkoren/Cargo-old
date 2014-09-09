@@ -37,7 +37,6 @@ class CargoHooks {
 			// Now, delete from the "main" table.
 			$cdb->delete( $curMainTable, array( '_pageID' => $pageID ) );
 		}
-		$cdb->close();
 
 		// Finally, delete from cargo_pages.
 		$dbr->delete( 'cargo_pages', array( 'page_id' => $pageID ) );
@@ -77,7 +76,6 @@ class CargoHooks {
 			$curMainTable = $row['table_name'];
 			$cdb->update( $curMainTable, array( '_pageName' => $newPageName ), array( '_pageID' => $oldid ) );
 		}
-		$cdb->close();
 
 		return true;
 	}

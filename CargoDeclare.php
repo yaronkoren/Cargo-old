@@ -292,7 +292,6 @@ class CargoDeclare {
 			$cdb->query( $createIndexSQL );
 			$fieldTableNames[] = $tableName . '__' . $fieldName;
 		}
-		$cdb->close();
 
 		// Finally, store all the info in the cargo_tables table.
 		$dbr->insert( 'cargo_tables', array( 'template_id' => $templatePageID, 'main_table' => $tableName, 'field_tables' => serialize( $fieldTableNames ), 'table_schema' => $tableFieldsString ) );

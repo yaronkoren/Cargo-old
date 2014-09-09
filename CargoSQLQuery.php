@@ -573,7 +573,6 @@ class CargoSQLQuery {
 			}
 			$resultArray[] = $resultsRow;
 		}
-		$cdb->close();
 
 		return $resultArray;
 	}
