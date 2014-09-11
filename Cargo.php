@@ -8,7 +8,7 @@
 
 if ( !defined( 'MEDIAWIKI' ) ) die();
 
-define( 'CARGO_VERSION', '0.3' );
+define( 'CARGO_VERSION', '0.4' );
 
 $wgExtensionCredits['parserhook'][] = array(
 	'path' => __FILE__,

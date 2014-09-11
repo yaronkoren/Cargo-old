@@ -59,6 +59,8 @@ class CargoViewTable extends IncludableSpecialPage {
 
 			if ( array_key_exists( 'isList', $fieldDescription ) ) {
 				$aliasedFieldNames[$fieldAlias] = $fieldName . '__full';
+			} elseif ( $fieldDescription['type'] == 'Coordinates' ) {
+				$aliasedFieldNames[$fieldAlias] = $fieldName . '__full';
 			} else {
 				$aliasedFieldNames[$fieldAlias] = $fieldName;
 			}

@@ -245,7 +245,10 @@ class CargoDeclare {
 				$size = null;
 			}
 
-			if ( array_key_exists( 'isList', $fieldDescription ) ) {
+			$isList = array_key_exists( 'isList', $fieldDescription );
+			$fieldType = $fieldDescription['type'];
+
+			if ( $isList || $fieldType == 'Coordinates' ) {
 				// No field will be created with this name -
 				// instead, we'll have one called
 				// fieldName + '__full', and a separate table
@@ -256,7 +259,15 @@ class CargoDeclare {
 				$createSQL .= $textTypeString;
 			} else {
 				$createSQL .= ", $fieldName ";
-				$createSQL .= self::fieldTypeToSQLType( $fieldDescription['type'], $wgDBtype, $size );
+				$createSQL .= self::fieldTypeToSQLType( $fieldType, $wgDBtype, $size );
+			}
+
+			if ( !$isList && $fieldType == 'Coordinates' ) {
+				$floatTypeString = self::fieldTypeToSQLType( 'Float', $wgDBtype );
+				$createSQL .= ', ' . $fieldName . '__lat ';
+				$createSQL .= $floatTypeString;
+				$createSQL .= ', ' . $fieldName . '__lon ';
+				$createSQL .= $floatTypeString;
 			}
 		}
 		$createSQL .= ' )';
@@ -284,11 +295,19 @@ class CargoDeclare {
 			// table.
 			$fieldTableName = $tableName . '__' . $fieldName;
 			$cdb->dropTable( $fieldTableName );
+			$fieldType = $fieldDescription['type'];
 			$createSQL = "CREATE TABLE " .
 				$cdb->tableName( $fieldTableName ) . ' ( ' .
-				"_rowID $intTypeString, " .
-				'_value ' . self::fieldTypeToSQLType( $fieldDescription['type'], $wgDBtype, $size ) .
-				' )';
+				"_rowID $intTypeString, ";
+			if ( $fieldType == 'Coordinates' ) {
+				$floatTypeString = self::fieldTypeToSQLType( 'Float', $wgDBtype );
+				$createSQL .= '_value ' . $floatTypeString . ', ';
+				$createSQL .= '_lat ' . $floatTypeString . ', ';
+				$createSQL .= '_lon ' . $floatTypeString;
+			} else {
+				$createSQL .= '_value ' . self::fieldTypeToSQLType( $fieldType, $wgDBtype, $size );
+			}
+			$createSQL .= ' )';
 			$cdb->query( $createSQL );
 			$createIndexSQL = "CREATE INDEX row_id_$fieldTableName ON " . $cdb->tableName( $fieldTableName ) . " (_rowID)";
 			$cdb->query( $createIndexSQL );

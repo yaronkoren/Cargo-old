@@ -37,6 +37,7 @@ class CargoSQLQuery {
 		$sqlQuery->setOrderBy( $orderByStr );
 		$sqlQuery->setDescriptionsForFields();
 		$sqlQuery->handleVirtualFields();
+		$sqlQuery->handleVirtualCoordinateFields();
 		$sqlQuery->setMWJoinConds();
 		$sqlQuery->mGroupBy = $groupByStr;
 		$sqlQuery->mQueryLimit = $wgCargoDefaultQueryLimit;
@@ -365,7 +366,7 @@ class CargoSQLQuery {
 		// "fields" - "translate" it, where the translation (i.e.
 		//     the true field) depends on whether or not the values
 		//     table is included.
-		// "order by" - same as "field".
+		// "order by" - same as "fields".
 
 		// First, create an array of the virtual fields in the current
 		// set of tables.
@@ -514,6 +515,70 @@ class CargoSQLQuery {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Similar to handleVirtualFields(), but handles coordinates fields
+	 * instead of fields that hold lists. This handling is much simpler.
+	 */
+	function handleVirtualCoordinateFields() {
+		// Coordinate fields can be found in the "fields" and "where"
+		// clauses. The following handling is done:
+		// "fields" - "translate" it, where the translation (i.e.
+		//     the true field) depends on whether or not the values
+		//     table is included.
+		// "where" - make sure that "NEAR" is specified. If it is,
+		//     translate the clause accordingly.
+
+		// First, create an array of the coordinate fields in the
+		// current set of tables.
+		$coordinateFields = array();
+		foreach ( $this->mTableSchemas as $tableName => $tableSchema ) {
+			foreach ( $tableSchema as $fieldName => $fieldDescription ) {
+				if ( $fieldDescription['type'] == 'Coordinates' ) {
+					$coordinateFields[] = array(
+						'fieldName' => $fieldName,
+						'tableName' => $tableName
+					);
+				}
+			}
+		}
+
+		// "fields"
+		foreach ( $this->mAliasedFieldNames as $alias => $fieldName ) {
+			$fieldDescription = $this->mFieldDescriptions[$alias];
+
+			if ( strpos( $fieldName, '.' ) !== false ) {
+				// This could probably be done better with
+				// regexps.
+				list( $tableName, $fieldName ) = explode( '.', $fieldName, 2 );
+			} else {
+				$tableName = $fieldDescription['tableName'];
+			}
+
+			// We have to do this roundabout checking, instead
+			// of just looking at the type of each field alias,
+			// because we want to find only the *virtual*
+			// coordinate fields.
+			$isCoordinateField = false;
+			foreach ( $coordinateFields as $coordinateField ) {
+				if ( $fieldName == $coordinateField['fieldName'] && $tableName == $coordinateField['tableName'] ) {
+					$isCoordinateField = true;
+					break;
+				}
+			}
+			if ( !$isCoordinateField ) {
+				continue;
+			}
+
+			// Since the field name is an alias, it should get
+			// translated to its "full" equivalent.
+			$fieldName .= '__full';
+			$this->mAliasedFieldNames[$alias] = $fieldName;
+		}
+
+		// "where"
+		// @TODO - do this.
 	}
 
 	function addTablePrefixesToAll() {
