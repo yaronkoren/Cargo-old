@@ -14,7 +14,7 @@
     "cargo-viewtable-totalrows": "This table has $1 rows altogether.",
     "drilldown": "Drilldown",
     "cargo-drilldown-choosetable": "Choose a table",
-    "cargo-drilldown-docu": "Click on one or more items below to narrow your results.",
+    "cargo-drilldown-docu": "Click on the filter values below to narrow your results.",
     "cargo-drilldown-filterbyvalue": "Filter by this value",
     "cargo-drilldown-or": "or",
     "cargo-drilldown-removefilter": "Remove this filter",
