@@ -578,7 +578,82 @@ class CargoSQLQuery {
 		}
 
 		// "where"
-		// @TODO - do this.
+		// @TODO - add handling for "HOLDS POINT NEAR"
+		$matches = array();
+		foreach ( $coordinateFields as $coordinateField ) {
+			$fieldName = $coordinateField['fieldName'];
+			$tableName = $coordinateField['tableName'];
+			$pattern1 = "/\b$tableName\.$fieldName(\s*NEAR\s*)\(([^)]*)\)/";
+			$foundMatch = preg_match( $pattern1, $this->mWhere, $matches);
+			if ( !$foundMatch ) {
+				$pattern2 = "/\b$fieldName(\s*NEAR\s*)\(([^)]*)\)/";
+				$foundMatch2 = preg_match( $pattern2, $this->mWhere, $matches);
+			}
+			if ( $foundMatch || $foundMatch2 ) {
+				// If no "NEAR", throw an error.
+				if ( count( $matches ) != 3 ) {
+					throw new MWException( "Error: operator for the virtual coordinates field '$tableName.$fieldName' must be 'NEAR'." );
+				}
+				$coordinatesAndDistance = explode( ',', $matches[2] );
+				if ( count( $coordinatesAndDistance ) != 3 ) {
+					throw new MWException( "Error: value for the 'NEAR' operator must be of the form \"(latitude, longitude, distance)\"." );
+				}
+				list( $latitude, $longitude, $distance ) = $coordinatesAndDistance;
+				$distanceComponents = explode( ' ', trim( $distance ) );
+				if ( count( $distanceComponents ) != 2 ) {
+					throw new MWException( "Error: the third argument for the 'NEAR' operator, representing the distance, must be of the form \"number unit\"." );
+				}
+				list( $distanceNumber, $distanceUnit ) = $distanceComponents;
+				$distanceNumber = trim( $distanceNumber );
+				$distanceUnit = trim( $distanceUnit );
+				list( $latDistance, $longDistance ) = self::distanceToDegrees( $distanceNumber, $distanceUnit, $latitude );
+				// There are much better ways to do this, but
+				// for now, just make a "bounding box" instead
+				// of a bounding circle.
+				$newWhere = "$tableName.{$fieldName}__lat >= " . max( $latitude - $latDistance, -90 ) .
+					" AND $tableName.{$fieldName}__lat <= " . min( $latitude + $latDistance, 90 ) .
+					" AND $tableName.{$fieldName}__lon >= " . max( $longitude - $longDistance, -180 ) .
+					" AND $tableName.{$fieldName}__lon <= " . min( $longitude + $longDistance, 180 );
+
+				if ( $foundMatch ) {
+					$this->mWhere = preg_replace( $pattern1, $newWhere, $this->mWhere );
+				} elseif ( $foundMatch2 ) {
+					$this->mWhere = preg_replace( $pattern2, $newWhere, $this->mWhere );
+				}
+			}
+		}
+	}
+
+	static function distanceToDegrees( $distanceNumber, $distanceUnit, $latString ) {
+		if ( in_array( $distanceUnit, array( 'kilometers', 'kilometres', 'km' ) ) ) {
+			$distanceInKM = $distanceNumber;
+		} elseif ( in_array( $distanceUnit, array( 'miles', 'mi' ) ) ) {
+			$distanceInKM = $distanceNumber * 1.60934;
+		} else {
+			throw new MWException( "Error: distance for 'NEAR' operator must be in either miles or kilometers (\"$distanceUnit\" specified)." );
+		}
+		// The calculation of distance to degrees latitude is
+		// essentially the same wherever you are on the globe, although
+		// the longitude calculation is more complicated.
+		$latDistance = $distanceInKM / 111;
+
+		// Copied from CargoStore::parseCoordinatesString().
+                $latIsNegative = false;
+                if ( strpos( $latString, 'S' ) > 0 ) {
+                        $latIsNegative = true;
+                }
+                $latString = str_replace( array( 'N', 'S' ), '', $latString );
+                if ( is_numeric( $latString ) ) {
+                        $latNum = floatval( $latString );
+                } else {
+                        $latNum = CargoStore::coordinatePartToNumber( $latString );
+                }
+                if ( $latIsNegative ) $latNum *= -1;
+
+		$lengthOfOneDegreeLongitude = cos( deg2rad( $latNum ) ) * 111.321;
+		$longDistance = $distanceInKM / $lengthOfOneDegreeLongitude;
+
+		return array( $latDistance, $longDistance );
 	}
 
 	function addTablePrefixesToAll() {
