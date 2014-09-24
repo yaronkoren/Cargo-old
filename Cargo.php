@@ -25,6 +25,7 @@ $dir = dirname( __FILE__ );
 $cgScriptPath = $wgScriptPath . '/extensions/Cargo';
 
 $wgJobClasses['cargoPopulateTable'] = 'CargoPopulateTableJob';
+$wgJobClasses['cargoRecreateTables'] = 'CargoRecreateTablesJob';
 
 $wgHooks['ParserFirstCallInit'][] = 'cargoRegisterParserFunctions';
 $wgHooks['PageContentSave'][] = 'CargoHooks::onPageContentSave';
@@ -53,6 +54,7 @@ $wgAutoloadClasses['CargoQuery'] = $dir . '/CargoQuery.php';
 $wgAutoloadClasses['CargoSQLQuery'] = $dir . '/CargoSQLQuery.php';
 $wgAutoloadClasses['CargoRecurringEvent'] = $dir . '/CargoRecurringEvent.php';
 $wgAutoloadClasses['CargoPopulateTableJob'] = $dir . '/CargoPopulateTableJob.php';
+$wgAutoloadClasses['CargoRecreateTablesJob'] = $dir . '/CargoRecreateTablesJob.php';
 $wgAutoloadClasses['CargoRecreateDataAction'] = $dir . '/CargoRecreateDataAction.php';
 $wgAutoloadClasses['CargoRecreateData'] = $dir . '/specials/CargoRecreateData.php';
 $wgSpecialPages['ViewTable'] = 'CargoViewTable';
