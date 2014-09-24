@@ -257,6 +257,17 @@ wfDebugLog('cargo', "CargoStore::run() - skipping 3.\n");
 				$curValue = str_replace( $wgCargoDigitGroupingCharacter, '', $curValue );
 				$curValue = str_replace( $wgCargoDecimalMark, '.', $curValue );
 				$tableFieldValues[$fieldName] = $curValue;
+			} elseif ( $fieldDescription['type'] == 'Boolean' ) {
+				// True = 1, "yes"
+				// False = 0, "no"
+				$msgForNo = wfMessage( 'htmlform-no' )->text();
+				if ( $curValue == '' ) {
+					// Do nothing.
+				} elseif ( $curValue == 0 || strtolower( $curValue ) == strtolower( $msgForNo ) ) {
+					$tableFieldValues[$fieldName] = '0';
+				} else {
+					$tableFieldValues[$fieldName] = '1';
+				}
 			}
 		}
 
@@ -320,6 +331,10 @@ wfDebugLog('cargo', "CargoStore::run() - skipping 3.\n");
 
 		// Insert the current data into the main table.
 		$cdb->insert( $tableName, $tableFieldValues );
+		// This close() call, for some reason, is necessary for the
+		// subsequent SQL to be called correctly, when jobs are run
+		// in the standard way.
+		$cdb->close();
 
 		// Finally, add a record of this to the cargo_pages table, if
 		// necessary.
