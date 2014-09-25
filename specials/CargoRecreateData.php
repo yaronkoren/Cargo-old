@@ -61,18 +61,20 @@ class CargoRecreateData extends IncludableSpecialPage {
 		return true;
 	}
 
-	function addPopulateTableJobsForTemplate( &$jobs, $templateTitle, $jobParams ) {
+	function callPopulateTableJobsForTemplate( $templateTitle, $jobParams ) {
 		// We need to break this up into batches, to avoid running out
 		// of memory for large page sets.
 		// @TODO For *really* large page sets, it might make sense
 		// to create a job for each batch.
 		$offset = 0;
 		do {
+			$jobs = array();
 			$titlesWithThisTemplate = $templateTitle->getTemplateLinksTo( array( 'LIMIT' => 500, 'OFFSET' => $offset ) );
 			foreach ( $titlesWithThisTemplate as $titleWithThisTemplate ) {
 				$jobs[] = new CargoPopulateTableJob( $titleWithThisTemplate, $jobParams );
 			}
 			$offset += 500;
+			JobQueueGroup::singleton()->push( $jobs );
 		} while ( count( $titlesWithThisTemplate ) >= 500 );
 	}
 
@@ -80,13 +82,12 @@ class CargoRecreateData extends IncludableSpecialPage {
 	 * Recreates the data.
 	 */
 	function recreateData() {
-		$jobs = array();
-
 		// If this template calls #cargo_declare (as opposed to
 		// #cargo_attach), drop and re-generate the Cargo DB table
 		// for it.`
 		if ( $this->mIsDeclared ) {
-			$jobs[] = new CargoRecreateTablesJob( $this->mTemplateTitle );
+			$job = new CargoRecreateTablesJob( $this->mTemplateTitle );
+			JobQueueGroup::singleton()->push( $job );
 		}
 
 		// Now create a job, CargoPopulateTable, for each page
@@ -96,7 +97,7 @@ class CargoRecreateData extends IncludableSpecialPage {
 			'replaceOldRows' => !$this->mIsDeclared
 		);
 
-		$this->addPopulateTableJobsForTemplate( $jobs, $this->mTemplateTitle, $jobParams );
+		$this->callPopulateTableJobsForTemplate( $this->mTemplateTitle, $jobParams );
 
 		// If this template calls #cargo_declare, see if any templates
 		// have attached themselves to this table, and if so, call
@@ -120,11 +121,9 @@ class CargoRecreateData extends IncludableSpecialPage {
 					'replaceOldRows' => false
 				);
 
-				$this->addPopulateTableJobsForTemplate( $jobs, $attachedTemplateTitle, $jobParams );
+				$this->callPopulateTableJobsForTemplate( $attachedTemplateTitle, $jobParams );
 			}
 		}
-
-		JobQueueGroup::singleton()->push( $jobs );
 	}
 
 	/**
