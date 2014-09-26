@@ -1,4 +1,8 @@
 <?php
+/**
+ * @author Yaron Koren
+ * @ingroup Cargo
+ */
 
 class CargoTableFormat extends CargoDisplayFormat {
 
@@ -12,13 +16,13 @@ class CargoTableFormat extends CargoDisplayFormat {
 
 		$text = '<table class="cargoTable"><tr>';
 		foreach( array_keys( $fieldDescriptions ) as $field ) {
-			$text .= Html::rawElement( 'th', null, $field );
+			$text .= Html::rawElement( 'th', null, $field ) . "\n";
 		}
 		$text .= "</tr>\n";
 		foreach ( $formattedValuesTable as $i => $row ) {
-			$text .= '<tr>';
+			$text .= "<tr>\n";
 			foreach( array_keys( $fieldDescriptions ) as $field ) {
-				$text .= Html::rawElement( 'td', null, $row[$field] );
+				$text .= Html::rawElement( 'td', null, $row[$field] ) . "\n";
 			}
 			$text .= "</tr>\n";
 		}

@@ -3,7 +3,10 @@
  * Defines a class, CargoAppliedFilter, that adds a value or a value range
  * onto a CargoFilter instance.
  *
+ * Based heavily on SD_AppliedFilter.php in the Semantic Drilldown extension.
+ *
  * @author Yaron Koren
+ * @ingroup Cargo
  */
 
 class CargoAppliedFilter {

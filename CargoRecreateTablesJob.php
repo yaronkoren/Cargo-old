@@ -1,11 +1,12 @@
 <?php
-
 /**
  * Background job to recreate the database table(s) for one template using the
  * data from the call(s) to that template in one page.
  *
  * @author Yaron Koren
+ * @ingroup Cargo
  */
+
 class CargoRecreateTablesJob extends Job {
 	function __construct( $title, $params = '', $id = 0 ) {
 		parent::__construct( 'cargoRecreateTables', $title, $params, $id );

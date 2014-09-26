@@ -108,10 +108,10 @@ class CargoDeclare {
 		$parserOutput->setProperty( 'CargoFields', serialize( $cargoFields ) );
 
 		// Link to the Special:ViewTable page for this table.
+		$text = wfMessage( 'cargo-definestable', $tableName )->text();
 		$vt = SpecialPage::getTitleFor( 'ViewTable' );
 		$pageName = $vt->getPrefixedText() . "/$tableName";
 		$viewTableMsg = wfMessage( 'ViewTable' )->parse();
-		$text = wfMessage( 'cargo-definestable', $tableName )->text();
 		$text .= " [[$pageName|$viewTableMsg]].";
 
 		return $text;

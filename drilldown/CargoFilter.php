@@ -2,7 +2,10 @@
 /**
  * Defines a class, CargoFilter, that holds the information in a filter.
  *
+ * Based heavily on SD_Filter.php in the Semantic Drilldown extension.
+ *
  * @author Yaron Koren
+ * @ingroup Cargo
  */
 
 class CargoFilter {

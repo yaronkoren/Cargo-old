@@ -5,6 +5,7 @@
  * Based heavily on SD_BrowseData.php in the Semantic Drilldown extension.
  *
  * @author Yaron Koren
+ * @ingroup Cargo
  */
 
 class CargoDrilldown extends IncludableSpecialPage {

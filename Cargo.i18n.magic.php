@@ -1,6 +1,6 @@
 <?php
 /**
- *
+ * @ingroup Cargo
  */
 
 $magicWords = array();

@@ -79,7 +79,7 @@ class CargoRecreateData extends IncludableSpecialPage {
 	}
 
 	/**
-	 * Recreates the data.
+	 * Calls jobs to drop and recreate the table(s) for this template.
 	 */
 	function recreateData() {
 		// If this template calls #cargo_declare (as opposed to

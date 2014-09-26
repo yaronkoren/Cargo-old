@@ -1,11 +1,12 @@
 <?php
-
 /**
  * Background job to populate the database table for one template using the
  * data from the call(s) to that template in one page.
  *
+ * @ingroup Cargo
  * @author Yaron Koren
  */
+
 class CargoPopulateTableJob extends Job {
 	function __construct( $title, $params = '', $id = 0 ) {
 		parent::__construct( 'cargoPopulateTable', $title, $params, $id );

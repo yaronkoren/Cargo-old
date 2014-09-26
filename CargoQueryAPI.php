@@ -1,12 +1,11 @@
 <?php
 /**
+ * Adds and handles the 'cargoquery' action to the MediaWiki API.
+ *
  * @ingroup Cargo
  * @author Yaron Koren
  */
 
-/**
- * Adds and handles the 'cargoquery' action to the MediaWiki API.
- */
 class CargoQueryAPI extends ApiBase {
 
 	public function __construct( $query, $moduleName ) {

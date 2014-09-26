@@ -4,6 +4,7 @@
  * drill-down functionality.
  *
  * @author Yaron Koren
+ * @ingroup Cargo
  */
 
 class CargoDrilldownUtils {

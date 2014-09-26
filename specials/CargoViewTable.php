@@ -1,4 +1,11 @@
 <?php
+/**
+ * Defines a special page that shows the contents of a single table in
+ * the Cargo database.
+ *
+ * @author Yaron Koren
+ * @ingroup Cargo
+ */
 
 class CargoViewTable extends IncludableSpecialPage {
 
