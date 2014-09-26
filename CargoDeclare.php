@@ -111,7 +111,8 @@ class CargoDeclare {
 		$vt = SpecialPage::getTitleFor( 'ViewTable' );
 		$pageName = $vt->getPrefixedText() . "/$tableName";
 		$viewTableMsg = wfMessage( 'ViewTable' )->parse();
-		$text = "This template defines the table \"$tableName\". [[$pageName|$viewTableMsg]].";
+		$text = wfMessage( 'cargo-definestable', $tableName )->text();
+		$text .= " [[$pageName|$viewTableMsg]].";
 
 		return $text;
 	}
