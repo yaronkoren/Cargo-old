@@ -743,7 +743,7 @@ END;
 			$results_line = $this->printNumberRanges( $filter_name, $filter_values );
 		} elseif ( count( $filter_values ) >= 300 ) {
 			// If it's really big, don't show anything.
-			$results_line = "Too many results!";
+			$results_line = wfMessage( 'cargo-drilldown-toomanyvalues' )->text();
 			$normal_filter = false;
 		} elseif ( count( $filter_values ) >= $wgCargoDrilldownMinValuesForComboBox ) {
 			$results_line = $this->printComboBoxInput( $filter_name, 0, $filter_values );

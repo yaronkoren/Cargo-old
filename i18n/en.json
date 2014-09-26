@@ -20,5 +20,6 @@
     "cargo-drilldown-removefilter": "Remove this filter",
     "cargo-drilldown-resetfilters": "Reset filters",
     "cargo-drilldown-addanothervalue": "Click arrow to add another value",
-    "cargo-drilldown-novalues": "There are no values for this filter"
+    "cargo-drilldown-novalues": "There are no values for this filter",
+    "cargo-drilldown-toomanyvalues": "Too many values; not displaying."
 }
