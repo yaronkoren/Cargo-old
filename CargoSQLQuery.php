@@ -624,6 +624,12 @@ class CargoSQLQuery {
 		}
 	}
 
+	/**
+	 * Returns the number of degrees of both latitude and longitude that
+	 * correspond to the passed-in distance (in either kilometers or
+	 * miles), based on the passed-in latitude. (Longitude doesn't matter
+	 * when doing this conversion, but latitude does.)
+	 */
 	static function distanceToDegrees( $distanceNumber, $distanceUnit, $latString ) {
 		if ( in_array( $distanceUnit, array( 'kilometers', 'kilometres', 'km' ) ) ) {
 			$distanceInKM = $distanceNumber;
@@ -637,18 +643,19 @@ class CargoSQLQuery {
 		// the longitude calculation is more complicated.
 		$latDistance = $distanceInKM / 111;
 
-		// Copied from CargoStore::parseCoordinatesString().
-                $latIsNegative = false;
-                if ( strpos( $latString, 'S' ) > 0 ) {
-                        $latIsNegative = true;
-                }
-                $latString = str_replace( array( 'N', 'S' ), '', $latString );
-                if ( is_numeric( $latString ) ) {
-                        $latNum = floatval( $latString );
-                } else {
-                        $latNum = CargoStore::coordinatePartToNumber( $latString );
-                }
-                if ( $latIsNegative ) $latNum *= -1;
+		// Convert the latitude string to a latitude number - code is
+		// copied from CargoStore::parseCoordinatesString().
+		$latIsNegative = false;
+		if ( strpos( $latString, 'S' ) > 0 ) {
+			$latIsNegative = true;
+		}
+		$latString = str_replace( array( 'N', 'S' ), '', $latString );
+		if ( is_numeric( $latString ) ) {
+			$latNum = floatval( $latString );
+		} else {
+			$latNum = CargoStore::coordinatePartToNumber( $latString );
+		}
+		if ( $latIsNegative ) $latNum *= -1;
 
 		$lengthOfOneDegreeLongitude = cos( deg2rad( $latNum ) ) * 111.321;
 		$longDistance = $distanceInKM / $lengthOfOneDegreeLongitude;
@@ -656,11 +663,13 @@ class CargoSQLQuery {
 		return array( $latDistance, $longDistance );
 	}
 
+	/**
+	 * Adds the "cargo" table prefix for every element in the SQL query
+	 * except for 'tables' and 'join on' - for 'tables', the prefix is
+	 * prepended automatically by the MediaWiki query, while for
+	 * 'join on' the prefixes are added when the object is created.
+	 */
 	function addTablePrefixesToAll() {
-		// We need to do the replacement for every element except
-		// 'tables' and 'join on' - for 'tables', the prefix is
-		// prepended automatically by the MediaWiki query, while for
-		// 'join on' the prefixes are added when the object is created.
 		foreach ( $this->mAliasedFieldNames as $alias => $fieldName ) {
 			$this->mAliasedFieldNames[$alias] = self::addTablePrefixes( $fieldName );
 		}
