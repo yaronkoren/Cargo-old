@@ -119,10 +119,10 @@ class CargoDrilldown extends IncludableSpecialPage {
 			}
 		}
 
-		$wgOut->addHTML( "\n			<div class=\"drilldown-results\">\n" );
+		$wgOut->addHTML( "\n\t\t\t\t<div class=\"drilldown-results\">\n" );
 		$rep = new CargoDrilldownPage( $tableName, $applied_filters, $remaining_filters, $offset, $limit );
 		$num = $rep->execute( $query );
-		$wgOut->addHTML( "\n			</div> <!-- drilldown-results -->\n" );
+		$wgOut->addHTML( "\n\t\t\t</div> <!-- drilldown-results -->\n" );
 
 		// This has to be set last, because otherwise the QueryPage
 		// code will overwrite it.
@@ -222,7 +222,7 @@ END;
 END;
 		}
 		$cdb = CargoUtils::getDB();
-		foreach ( $tables as $i => $table ) {
+		foreach ( $tables as $table ) {
 			$res = $cdb->select( $table, 'COUNT(*)' );
 			$row = $cdb->fetchRow( $res );
 			$tableRows = $row[0];
@@ -233,7 +233,7 @@ END;
 			} else {
 				$text .= '						<li class="tableName">';
 				$tableURL = $this->makeBrowseURL( $table );
-				$text .= "<a href=\"$tableURL\" title=\"$chooseTableText\">$tableStr</a>";
+				$text .= Html::element( 'a', array( 'href' => $tableURL, 'title' => $chooseTableText ), $tableStr );
 			}
 			$text .= "</li>\n";
 		}
@@ -364,10 +364,10 @@ END;
 				}
 			}
 			if ( $found_match ) {
-				$results_line .= "\n				$filter_text";
+				$results_line .= "\n\t\t\t\t$filter_text";
 			} else {
 				$filter_url = $this->makeBrowseURL( $this->tableName, $applied_filters );
-				$results_line .= "\n						" . '<a href="' . $filter_url . '" title="' . wfMessage( 'cargo-drilldown-filterbyvalue' )->text() . '">' . $filter_text . '</a>';
+				$results_line .= "\n\t\t\t\t\t\t" . Html::element( 'a', array( 'href' => $filter_url, 'title' => wfMessage( 'cargo-drilldown-filterbyvalue' )->text() ), $filter_text );
 			}
 			foreach ( $applied_filters as $af2 ) {
 				if ( $af->filter->name == $af2->filter->name ) {
@@ -404,9 +404,9 @@ END;
 				} else {
 					$font_size = ( $wgCargoDrilldownSmallestFontSize + $wgCargoDrilldownLargestFontSize ) / 2;
 				}
-				$results_line .= "\n						" . '<a href="' . $filter_url . '" title="' . wfMessage( 'cargo-drilldown-filterbyvalue' )->text() . '" style="font-size: ' . $font_size . 'px">' . $filter_text . '</a>';
+				$results_line .= "\n\t\t\t\t\t\t" . '<a href="' . $filter_url . '" title="' . wfMessage( 'cargo-drilldown-filterbyvalue' )->text() . '" style="font-size: ' . $font_size . 'px">' . $filter_text . '</a>';
 			} else {
-				$results_line .= "\n						" . '<a href="' . $filter_url . '" title="' . wfMessage( 'cargo-drilldown-filterbyvalue' )->text() . '">' . $filter_text . '</a>';
+				$results_line .= "\n\t\t\t\t\t\t" . Html::element( 'a', array( 'href' => $filter_url, 'title' => wfMessage( 'cargo-drilldown-filterbyvalue' )->text() ), $filter_text );
 			}
 		}
 		return $results_line;
@@ -459,12 +459,11 @@ END;
 	function generateIndividualFilterValuesFromNumbers( $uniqueValues ) {
 		$propertyValues = array();
 		foreach ( $uniqueValues as $uniqueValue => $numInstances ) {
-			$curBucket = array(
+			$propertyValues[] = array(
 				'lowerNumber' => $uniqueValue,
 				'higherNumber' => null,
 				'numValues' => $numInstances
 			);
-			$propertyValues[] = $curBucket;
 		}
 		return $propertyValues;
 	}
@@ -789,7 +788,7 @@ END;
 			$header .= str_replace( '_', ' ', $this->tableName );
 		}
 		foreach ( $this->applied_filters as $i => $af ) {
-			$header .= ( $i == 0 ) ? " > " : "\n					<span class=\"drilldown-header-value\">&</span> ";
+			$header .= ( $i == 0 ) ? " > " : "\n\t\t\t\t\t<span class=\"drilldown-header-value\">&</span> ";
 			$filter_label = str_replace( '_', ' ', $af->filter->name );
 			// add an "x" to remove this filter, if it has more
 			// than one value
@@ -979,6 +978,6 @@ END;
 	}
 
 	function closeList() {
-		return "\n			<br style=\"clear: both\" />\n";
+		return "\n\t\t\t<br style=\"clear: both\" />\n";
 	}
 }

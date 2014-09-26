@@ -25,17 +25,13 @@ class CargoUtils {
 				'host' => $dbServer,
 				'user' => $dbUsername,
 				'password' => $dbPassword,
-				// Both 'dbname' and 'dbName' have been
-				// used in different versions.
 				'dbname' => $dbName,
-				'dbName' => $dbName,
 				'flags' => $dbFlags,
 				'tablePrefix' => $dbTablePrefix,
 			)
 		);
 		return $db;
 	}
-
 
 	/**
 	 * Gets a page property for the specified page ID and property name.
@@ -72,22 +68,6 @@ class CargoUtils {
 		}
 		return $tableNames;
 	}
-
-/*
-	static function pageHasCargoDeclaration( $title ) {
-		if ( $title->getNamespace() != NS_TEMPLATE ) {
-			return false;
-		}
-
-		$templatePageID = $title->getArticleID();
-		$tableName = self::getPageProp( $templatePageID, 'CargoTableName' );
-		if ( $tableName == '' ) {
-			return false;
-		}
-
-		return true;
-	}
-*/
 
 	/**
 	 * Get the Cargo table for the passed-in template specified via
