@@ -96,11 +96,13 @@ class CargoHooks {
 		if ( $updater === null ) {
 			global $wgExtNewTables, $wgDBtype;
 			//if ( $wgDBtype == 'mysql' ) {
-				$wgExtNewTables[] = array( 'cargo', "$dir/Cargo.sql" );
+				$wgExtNewTables[] = array( 'cargo_tables', "$dir/Cargo.sql" );
+				$wgExtNewTables[] = array( 'cargo_pages', "$dir/Cargo.sql" );
 			//}
 		} else {
 			//if ( $updater->getDB()->getType() == 'mysql' ) {
-				$updater->addExtensionUpdate( array( 'addTable', 'cargo', "$dir/Cargo.sql", true ) );
+				$updater->addExtensionUpdate( array( 'addTable', 'cargo_tables', "$dir/Cargo.sql", true ) );
+				$updater->addExtensionUpdate( array( 'addTable', 'cargo_pages', "$dir/Cargo.sql", true ) );
 			//}
 		}
 		return true;
