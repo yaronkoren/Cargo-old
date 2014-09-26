@@ -50,10 +50,11 @@ class CargoAttach {
 		$parserOutput->setProperty( 'CargoAttachedTable', $tableName );
 
 		// Link to the Special:ViewTable page for this table.
+		$text = wfMessage( 'cargo-addsrows', $tableName )->text();
 		$vt = SpecialPage::getTitleFor( 'ViewTable' );
 		$pageName = $vt->getPrefixedText() . "/$tableName";
 		$viewTableMsg = wfMessage( 'ViewTable' )->parse();
-		$text = "This template adds rows to the table \"$tableName\". [[$pageName|$viewTableMsg]].";
+		$text .= " [[$pageName|$viewTableMsg]].";
 
 		return $text;
 	}
