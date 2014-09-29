@@ -24,8 +24,12 @@ class CargoTemplateFormat extends CargoDisplayFormat {
 	}
 
 	function display( $valuesTable, $formattedValuesTable, $fieldDescriptions, $displayParams ) {
-		$text = '';
+		if ( !array_key_exists( 'template', $displayParams ) ) {
+			throw new MWException( "Error: 'template' parameter must be set." );
+		}
+
 		$templateName = $displayParams['template'];
+		$text = '';
 		foreach ( $valuesTable as $row ) {
 			$text .= $this->displayRow( $templateName, $row, $fieldDescriptions );
 		}

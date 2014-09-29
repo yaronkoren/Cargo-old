@@ -12,7 +12,7 @@ class CargoULFormat extends CargoListFormat {
 
 	function display( $valuesTable, $formattedValuesTable, $fieldDescriptions, $displayParams ) {
 		$text = "<ul>\n";
-		foreach ( $valuesTable as $i => $row ) {
+		foreach ( $formattedValuesTable as $i => $row ) {
 			$text .= '<li>' . $this->displayRow( $row, $fieldDescriptions ) . "</li>\n";
 		}
 		$text .= "</ul>\n";

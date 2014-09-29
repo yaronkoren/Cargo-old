@@ -17,7 +17,7 @@ class CargoOLFormat extends CargoListFormat {
 			$offset = 0;
 		}
 		$text = "<ol start='" . ( $offset + 1 ) . "'>\n";
-		foreach ( $valuesTable as $i => $row ) {
+		foreach ( $formattedValuesTable as $i => $row ) {
 			$text .= '<li>' . $this->displayRow( $row, $fieldDescriptions ) . "</li>\n";
 		}
 		$text .= "</ol>\n";
