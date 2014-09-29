@@ -36,6 +36,8 @@ $wgHooks['LoadExtensionSchemaUpdates'][] = 'CargoHooks::describeDBSchema';
 $wgHooks['SkinTemplateTabs'][] = 'CargoRecreateDataAction::displayTab';
 $wgHooks['SkinTemplateNavigation'][] = 'CargoRecreateDataAction::displayTab2';
 $wgHooks['UnknownAction'][] = 'CargoRecreateDataAction::show';
+$wgHooks['BaseTemplateToolbox'][] = 'CargoPageValuesAction::addLink';
+$wgHooks['UnknownAction'][] = 'CargoPageValuesAction::show';
 
 $wgMessagesDirs['Cargo'] = $dir . '/i18n';
 $wgExtensionMessagesFiles['Cargo'] = $dir . '/Cargo.i18n.php';
@@ -61,6 +63,9 @@ $wgSpecialPages['ViewTable'] = 'CargoViewTable';
 $wgAutoloadClasses['CargoViewTable'] = $dir . '/specials/CargoViewTable.php';
 $wgSpecialPages['ViewData'] = 'CargoViewData';
 $wgAutoloadClasses['CargoViewData'] = $dir . '/specials/CargoViewData.php';
+$wgAutoloadClasses['CargoPageValuesAction'] = $dir . '/CargoPageValuesAction.php';
+$wgSpecialPages['PageValues'] = 'CargoPageValues';
+$wgAutoloadClasses['CargoPageValues'] = $dir . '/specials/CargoPageValues.php';
 $wgAutoloadClasses['CargoQueryAPI'] = $dir . '/CargoQueryAPI.php';
 
 // Display formats
