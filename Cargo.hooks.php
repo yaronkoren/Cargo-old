@@ -40,6 +40,9 @@ class CargoHooks {
 
 		// Finally, delete from cargo_pages.
 		$dbr->delete( 'cargo_pages', array( 'page_id' => $pageID ) );
+
+		// This call is needed to get deletions to actually happen.
+		$cdb->close();
 	}
 
 	/**
