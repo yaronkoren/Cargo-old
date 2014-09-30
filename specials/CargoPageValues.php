@@ -85,20 +85,20 @@ class CargoPageValues extends IncludableSpecialPage {
 	/**
 	 * Based on MediaWiki's InfoAction::addRow()
 	 */
-        function printRow( $name, $value ) {
-                return Html::rawElement( 'tr', array(),
-                        Html::rawElement( 'td', array( 'style' => 'vertical-align: top;' ), $name ) .
-                        Html::rawElement( 'td', array(), $value )
-                );
-        }
+	function printRow( $name, $value ) {
+		return Html::rawElement( 'tr', array(),
+			Html::rawElement( 'td', array( 'style' => 'vertical-align: top;' ), $name ) .
+			Html::rawElement( 'td', array(), $value )
+		);
+	}
 
 	/**
 	 * Based on MediaWiki's InfoAction::addTable()
 	 */
-        function printTable( $tableContents ) {
-                return Html::rawElement( 'table', array( 'class' => 'wikitable mw-page-info' ),
-                        $tableContents ) . "\n";
-        }
+	function printTable( $tableContents ) {
+		return Html::rawElement( 'table', array( 'class' => 'wikitable mw-page-info' ),
+			$tableContents ) . "\n";
+	}
 
 	/**
 	 * Don't list this in Special:SpecialPages.

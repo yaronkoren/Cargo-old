@@ -965,7 +965,7 @@ END;
 
 		$valuesTable = array();
 		$formattedValuesTable = array();
-		while ( $row = $dbr->fetchRow( $res )  ) {
+		while ( $row = $dbr->fetchRow( $res ) ) {
 			$valuesTable[] = array( 'title' => $row['title'] );
 		}
 		$fieldDescriptions = array( 'title' => array( 'type' => 'Page' ) );
