@@ -791,8 +791,8 @@ END;
 		foreach ( $this->applied_filters as $i => $af ) {
 			$header .= ( $i == 0 ) ? " > " : "\n\t\t\t\t\t<span class=\"drilldown-header-value\">&</span> ";
 			$filter_label = str_replace( '_', ' ', $af->filter->name );
-			// add an "x" to remove this filter, if it has more
-			// than one value
+			// Add an "x" to remove this filter, if it has more
+			// than one value.
 			if ( count( $this->applied_filters[$i]->values ) > 1 ) {
 				$temp_filters_array = $this->applied_filters;
 				array_splice( $temp_filters_array, $i, 1 );
@@ -859,7 +859,6 @@ END;
 			}
 			foreach ( $this->remaining_filters as $rf ) {
 				if ( $rf->name == $f->name ) {
-//if ( in_array( $rf->name, array( 'Circulation2', 'Monthly_unique_visitors', 'Country', 'Language' ) ) )
 					$header .= $this->printUnappliedFilterLine( $rf, $cur_url );
 				}
 			}

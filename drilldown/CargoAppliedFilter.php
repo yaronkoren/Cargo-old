@@ -97,20 +97,20 @@ class CargoAppliedFilter {
 				$notOperatorSql = ( $wgDBtype == 'postgres' ? "not" : "!" );
 				$sql .= "($notOperatorSql ($checkNullOrEmptySql ";
 				foreach ( $this->filter->possible_applied_filters as $paf ) {
-					$sql .= " OR ";
-					$sql .= $paf->checkSQL();
+					$sql .= " OR " . $paf->checkSQL();
 				}
 				$sql .= "))";
 			} elseif ( $fv->is_none ) {
 				$checkNullOrEmptySql = ( $wgDBtype == 'postgres' ? '' : "$value_field = '' OR ") . "$value_field IS NULL";
 				$sql .= "($checkNullOrEmptySql) ";
 			} elseif ( $fv->is_numeric ) {
-				if ( $fv->lower_limit && $fv->upper_limit )
+				if ( $fv->lower_limit && $fv->upper_limit ) {
 					$sql .= "($value_field >= {$fv->lower_limit} AND $value_field <= {$fv->upper_limit}) ";
-				elseif ( $fv->lower_limit )
+				} elseif ( $fv->lower_limit ) {
 					$sql .= "$value_field > {$fv->lower_limit} ";
-				elseif ( $fv->upper_limit )
+				} elseif ( $fv->upper_limit ) {
 					$sql .= "$value_field < {$fv->upper_limit} ";
+				}
 			} elseif ( $this->filter->fieldDescription['type'] == 'Date' ) {
 				$date_field = $this->filter->name;
 				if ( $fv->time_period == 'day' ) {
@@ -166,8 +166,7 @@ class CargoAppliedFilter {
 			if ( $this->filter->fieldDescription['type'] == 'Date' && $this->filter->getTimePeriod() == 'month' ) {
 				$value_string = CargoUtils::monthToString( $row[1] ) . " " . $row[0];
 			} else {
-				// why is trim() necessary here???
-				$value_string = str_replace( '_', ' ', trim( $row[0] ) );
+				$value_string = $row[0];
 			}
 			$possible_values[] = $value_string;
 		}
