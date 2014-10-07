@@ -19,7 +19,7 @@ class CargoRecreateData extends IncludableSpecialPage {
 		$this->mIsDeclared = $isDeclared;
 	}
 
-	function execute() {
+	function execute( $query = null ) {
 		$out = $this->getOutput();
 
 		if ( ! $this->getUser()->isAllowed( 'recreatedata' ) ) {
@@ -43,7 +43,7 @@ class CargoRecreateData extends IncludableSpecialPage {
 		if ( $formSubmitted ) {
 			// Recreate the data!
 			$this->recreateData();
-			$this->getOutput()->redirect( $this->mTemplateTitle->getFullURL() );
+			$out->redirect( $this->mTemplateTitle->getFullURL() );
 			return true;
 		}
 
@@ -57,7 +57,9 @@ class CargoRecreateData extends IncludableSpecialPage {
 
 		$text .= Html::input( 'submitButton', wfMessage( 'ok' )->parse(), 'submit' );
 		$text .= "\n</form>";
-		$this->getOutput()->addHTML( $text );
+
+		$out->addHTML( $text );
+
 		return true;
 	}
 
