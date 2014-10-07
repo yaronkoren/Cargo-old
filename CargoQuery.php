@@ -234,8 +234,8 @@ class CargoQuery {
 						global $wgParser;
 						$parser = $wgParser;
 					}
-					$parserOutput = $parser->parse( $value, $wgTitle, new ParserOptions(), false );
-					$formattedQueryResults[$rowNum][$fieldName] = $parserOutput->getText();
+					$value = $parser->internalParse( $value );
+					$formattedQueryResults[$rowNum][$fieldName] = $value;
 				}
 			}
 		}
