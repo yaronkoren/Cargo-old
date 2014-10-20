@@ -229,12 +229,19 @@ class CargoQuery {
 					// but those seem less likely.
 					$value = htmlspecialchars_decode( $value );
 					// Parse it as if it's wikitext.
+					// The exact call depends on whether
+					// we're in a special page or not.
 					global $wgTitle;
 					if ( is_null( $parser ) ) {
 						global $wgParser;
 						$parser = $wgParser;
 					}
-					$value = $parser->internalParse( $value );
+					if ( $wgTitle->getNamespace() == NS_SPECIAL ) {
+						$parserOutput = $parser->parse( $value, $wgTitle, new ParserOptions(), false );
+						$value = $parserOutput->getText();
+					} else {
+						$value = $parser->internalParse( $value );
+					}
 					$formattedQueryResults[$rowNum][$fieldName] = $value;
 				}
 			}
