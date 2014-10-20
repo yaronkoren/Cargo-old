@@ -16,7 +16,7 @@ class CargoPageValues extends IncludableSpecialPage {
 		$this->mTitle = $title;
 	}
 
-	function execute() {
+	function execute( $subpage = false ) {
 		$out = $this->getOutput();
 
 		$this->setHeaders();
@@ -24,12 +24,10 @@ class CargoPageValues extends IncludableSpecialPage {
 		$pageName = $this->mTitle->getPrefixedText();
 		$out->setPageTitle( wfMessage( 'cargo-pagevaluesfor', $pageName )->text() );
 
-		$pageID = $this->mTitle->getArticleID();
-
 		$text = '';
 
 		$dbr = wfGetDB( DB_MASTER );
-		$res = $dbr->select( 'cargo_pages', 'table_name', array( 'page_id' => $pageID ) );
+		$res = $dbr->select( 'cargo_pages', 'table_name', array( 'page_id' => $this->mTitle->getArticleID() ) );
 		while ( $row = $dbr->fetchRow( $res ) ) {
 			$tableName = $row['table_name'];
 			$queryResults = $this->getRowsForPageInTable( $tableName );
