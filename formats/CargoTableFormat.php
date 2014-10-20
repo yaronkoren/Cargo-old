@@ -21,7 +21,12 @@ class CargoTableFormat extends CargoDisplayFormat {
 			$backgroundColor = ( $i % 2 == 0 ) ? '#fff' : '#eee';
 			$text .= "<tr style=\"background: $backgroundColor\">\n";
 			foreach( array_keys( $fieldDescriptions ) as $field ) {
-				$text .= Html::rawElement( 'td', array( 'style' => 'padding: 5px; border: #ccc 1px solid;' ), $row[$field] ) . "\n";
+				if ( array_key_exists( $field, $row ) ) {
+					$value = $row[$field];
+				} else {
+					$value = null;
+				}
+				$text .= Html::rawElement( 'td', array( 'style' => 'padding: 5px; border: #ccc 1px solid;' ), $value ) . "\n";
 			}
 			$text .= "</tr>\n";
 		}

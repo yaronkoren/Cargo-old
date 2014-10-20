@@ -14,6 +14,9 @@ class CargoListFormat extends CargoDisplayFormat {
 		$startParenthesisAdded = false;
 		$firstField = true;
 		foreach ( $fieldDescriptions as $fieldName => $fieldDescription ) {
+			if ( !array_key_exists( $fieldName, $row ) ) {
+				continue;
+			}
 			$fieldValue = $row[$fieldName];
 			if ( trim( $fieldValue ) == '' ) {
 				continue;

@@ -16,7 +16,9 @@ class CargoTemplateFormat extends CargoDisplayFormat {
 		// mess up values that contain '='.
 		$fieldNum = 1;
 		foreach ( $fieldDescriptions as $fieldName => $fieldDescription ) {
-			$wikiText .= '|' . $fieldNum . '=' . $row[$fieldName];
+			if ( array_key_exists( $fieldName, $row ) ) {
+				$wikiText .= '|' . $fieldNum . '=' . $row[$fieldName];
+			}
 			$fieldNum++;
 		}
 		$wikiText .= '}}' . "\n";
