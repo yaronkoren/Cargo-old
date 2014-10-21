@@ -9,7 +9,7 @@
 class CargoUtils {
 
 	public static function getDB() {
-		global $wgDBserver, $wgDBname, $wgDBuser, $wgDBpassword, $wgDBprefix, $wgDBtype;
+		global $wgDBserver, $wgDBname, $wgDBuser, $wgDBpassword, $wgDBtype;
 		global $wgCargoDBserver, $wgCargoDBname, $wgCargoDBuser, $wgCargoDBpassword, $wgCargoDBtype;
 
 		$dbType = is_null( $wgCargoDBtype ) ? $wgDBtype : $wgCargoDBtype;
