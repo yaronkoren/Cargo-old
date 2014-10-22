@@ -32,7 +32,7 @@ class CargoPageValuesAction {
 		return true;
 	}
 
-	public static function addLink( $skinTemplate, $toolbox) {
+	public static function addLink( $skinTemplate, &$toolbox) {
 		$toolbox['cargo-pagevalues'] = array(
 			'text' => $skinTemplate->getSkin()->getContext()->msg( 'pagevalues' )->text(),
 			'href' => $skinTemplate->getSkin()->getTitle()->getLocalUrl( array( 'action' => 'pagevalues' ) ),
