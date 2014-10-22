@@ -231,12 +231,15 @@ class CargoQuery {
 					// Parse it as if it's wikitext.
 					// The exact call depends on whether
 					// we're in a special page or not.
-					global $wgTitle;
+					global $wgTitle, $wgRequest;
 					if ( is_null( $parser ) ) {
 						global $wgParser;
 						$parser = $wgParser;
 					}
-					if ( $wgTitle->getNamespace() == NS_SPECIAL ) {
+					if ( $wgTitle->isSpecialPage() ||
+						// The 'pagevalues' action is
+						// also a Cargo special page.
+						$wgRequest->getVal( 'action' ) == 'pagevalues' ) {
 						$parserOutput = $parser->parse( $value, $wgTitle, new ParserOptions(), false );
 						$value = $parserOutput->getText();
 					} else {
