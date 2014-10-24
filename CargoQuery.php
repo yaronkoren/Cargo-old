@@ -135,7 +135,7 @@ class CargoQuery {
 
 		// Add format-specific params.
 		foreach ( $displayParams as $key => $value ) {
-				$queryStringParams[$key] = $value;
+			$queryStringParams[$key] = $value;
 		}
 
 		return Html::rawElement( 'p', null, Linker::link( $vd, wfMessage( 'moredotdotdot' )->parse(), array(), $queryStringParams ) );
@@ -183,6 +183,10 @@ class CargoQuery {
 		foreach ( $queryResults as $rowNum => $row ) {
 			foreach ( $row as $fieldName => $value ) {
 				if ( trim( $value ) == '' ) {
+					continue;
+				}
+
+				if ( !array_key_exists( $fieldName, $fieldDescriptions ) ) {
 					continue;
 				}
 
