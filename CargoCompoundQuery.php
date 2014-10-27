@@ -22,16 +22,6 @@ class CargoCompoundQuery {
 		$params = func_get_args();
 		array_shift( $params ); // we already know the $parser...
 
-		$tablesStr = null;
-		$fieldsStr = null;
-		$whereStr = null;
-		$joinOnStr = null;
-		$groupByStr = null;
-		$orderByStr = null;
-		$limitStr = null;
-		$format = 'auto'; // default
-		$displayParams = array();
-
 		// Split up the parameters into query params and other params -
 		// we do that just by looking for the string "tables=";
 		// hopefully that will never show up in non-query params.
@@ -50,6 +40,16 @@ class CargoCompoundQuery {
 		$sqlQueries = array();
 		$querySpecificParams = array();
 		foreach ( $queryParams as $param ) {
+			$tablesStr = null;
+			$fieldsStr = null;
+			$whereStr = null;
+			$joinOnStr = null;
+			$groupByStr = null;
+			$orderByStr = null;
+			$limitStr = null;
+			$format = 'auto'; // default
+			$displayParams = array();
+
 			$queryClauses = explode( ';', $param );
 			$displayParamsForThisQuery = array();
 			foreach( $queryClauses as $clause ) {
@@ -152,7 +152,7 @@ class CargoCompoundQuery {
 		// Finally, do the display, based on the format.
 		$formatClass = CargoQuery::getFormatClass( $format, $allFieldDescriptions );
 		$formatObject = new $formatClass();
-		$text = $formatObject->display( $queryResults, $formattedQueryResults, $allFieldDescriptions, $displayParams );
+		$text = $formatObject->display( $allQueryResults, $formattedQueryResults, $allFieldDescriptions, $displayParams );
 
 		// Don't show a "view more" link.
 		// @TODO - is such a thing possible for a compound query,
