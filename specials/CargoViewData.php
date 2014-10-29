@@ -143,7 +143,7 @@ class ViewDataPage extends QueryPage {
 		}
 		$formattedValuesTable = CargoQuery::getFormattedQueryResults( $valuesTable, $this->sqlQuery->mFieldDescriptions, null );
 		$formatClass = CargoQuery::getFormatClass( $this->format, $this->sqlQuery->mFieldDescriptions );
-		$formatObject = new $formatClass();
+		$formatObject = new $formatClass( $out );
 		$this->displayParams['offset'] = $offset;
 		$html = $formatObject->display( $valuesTable, $formattedValuesTable, $this->sqlQuery->mFieldDescriptions, $this->displayParams );
 		$out->addHTML( $html );

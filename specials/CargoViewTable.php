@@ -83,7 +83,8 @@ class CargoViewTable extends IncludableSpecialPage {
 		$formattedQueryResults = CargoQuery::getFormattedQueryResults( $queryResults, $sqlQuery->mFieldDescriptions, null );
 
 		$displayParams = array();
-		$tableFormat = new CargoTableFormat();
+
+		$tableFormat = new CargoTableFormat( $this->getOutput() );
 		$text = $tableFormat->display( $queryResults, $formattedQueryResults, $sqlQuery->mFieldDescriptions, $displayParams );
 
 		// If there are (seemingly) more results than what we showed,
