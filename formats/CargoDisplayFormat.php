@@ -14,4 +14,8 @@ class CargoDisplayFormat {
 		return array();
 	}
 
+	function isDeferred() {
+		return false;
+	}
+
 }

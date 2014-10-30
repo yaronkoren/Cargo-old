@@ -11,6 +11,7 @@ class CargoSQLQuery {
 	var $mTableNames;
 	var $mFieldsStr;
 	var $mWhere;
+	var $mJoinOnStr;
 	var $mCargoJoinConds;
 	var $mJoinConds;
 	var $mAliasedFieldNames;
@@ -105,6 +106,9 @@ class CargoSQLQuery {
 	 * structured and does not contain the necessary table prefixes yet.
 	 */
 	function setCargoJoinConds( $joinOnStr ) {
+		// This string is needed for "deferred" queries.
+		$this->mJoinOnStr = $joinOnStr;
+
 		$this->mCargoJoinConds = array();
 
 		if ( trim( $joinOnStr ) == '' ) {

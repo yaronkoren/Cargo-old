@@ -8,7 +8,7 @@
 
 if ( !defined( 'MEDIAWIKI' ) ) die();
 
-define( 'CARGO_VERSION', '0.5' );
+define( 'CARGO_VERSION', '0.6' );
 
 $wgExtensionCredits['parserhook'][] = array(
 	'path' => __FILE__,
@@ -66,6 +66,8 @@ $wgSpecialPages['ViewTable'] = 'CargoViewTable';
 $wgAutoloadClasses['CargoViewTable'] = $dir . '/specials/CargoViewTable.php';
 $wgSpecialPages['ViewData'] = 'CargoViewData';
 $wgAutoloadClasses['CargoViewData'] = $dir . '/specials/CargoViewData.php';
+$wgSpecialPages['CalendarData'] = 'CargoCalendarData';
+$wgAutoloadClasses['CargoCalendarData'] = $dir . '/specials/CargoCalendarData.php';
 $wgAutoloadClasses['CargoPageValuesAction'] = $dir . '/CargoPageValuesAction.php';
 $wgSpecialPages['PageValues'] = 'CargoPageValues';
 $wgAutoloadClasses['CargoPageValues'] = $dir . '/specials/CargoPageValues.php';
@@ -81,6 +83,7 @@ $wgAutoloadClasses['CargoTableFormat'] = $dir . '/formats/CargoTableFormat.php';
 $wgAutoloadClasses['CargoMapsFormat'] = $dir . '/formats/CargoMapsFormat.php';
 $wgAutoloadClasses['CargoGoogleMapsFormat'] = $dir . '/formats/CargoGoogleMapsFormat.php';
 $wgAutoloadClasses['CargoOpenLayersFormat'] = $dir . '/formats/CargoOpenLayersFormat.php';
+$wgAutoloadClasses['CargoCalendarFormat'] = $dir . '/formats/CargoCalendarFormat.php';
 $wgAutoloadClasses['CargoCategoryFormat'] = $dir . '/formats/CargoCategoryFormat.php';
 
 // Drilldown
@@ -131,6 +134,20 @@ $wgResourceModules += array(
 		'localBasePath' => __DIR__,
 		'remoteExtPath' => 'Cargo'
 	),
+	'ext.cargo.calendar' => array(
+		'styles' => array(
+			'libs/fullcalendar.css',
+			'libs/ext.cargo.calendar.css',
+		),
+		'scripts' => array(
+			'libs/moment.js',
+			'libs/fullcalendar.js',
+			'libs/ext.cargo.calendar.js',
+		),
+		'position' => 'top',
+		'localBasePath' => __DIR__,
+		'remoteExtPath' => 'Cargo'
+	),
 );
 
 function cargoRegisterParserFunctions( &$parser ) {
@@ -162,6 +179,7 @@ $wgCargoDisplayFormats = array(
 	'simpletable' => 'CargoTableFormat',
 	'googlemaps' => 'CargoGoogleMapsFormat',
 	'openlayers' => 'CargoOpenLayersFormat',
+	'calendar' => 'CargoCalendarFormat',
 	'category' => 'CargoCategoryFormat',
 );
 

@@ -153,6 +153,16 @@ class CargoQuery {
 
 		$sqlQuery = CargoSQLQuery::newFromValues( $tablesStr, $fieldsStr, $whereStr, $joinOnStr, $groupByStr, $orderByStr, $limitStr );
 
+		$formatClass = self::getFormatClass( $format, $sqlQuery->mFieldDescriptions );
+		$formatObject = new $formatClass( $parser->getOutput() );
+
+		// Let the format run the query itself, if it wants to.
+		if ( $formatObject->isDeferred() ) {
+			$text = $formatObject->queryAndDisplay( array( $sqlQuery ), $displayParams );
+			$text = $parser->insertStripItem( $text, $parser->mStripState );
+			return $text;
+		}
+
 		$queryResults = $sqlQuery->run();
 
 		if ( is_null( $format ) ) {
@@ -162,8 +172,6 @@ class CargoQuery {
 		$formattedQueryResults = self::getFormattedQueryResults( $queryResults, $sqlQuery->mFieldDescriptions, $parser );
 
 		// Finally, do the display, based on the format.
-		$formatClass = self::getFormatClass( $format, $sqlQuery->mFieldDescriptions );
-		$formatObject = new $formatClass( $parser->getOutput() );
 		$text = $formatObject->display( $queryResults, $formattedQueryResults, $sqlQuery->mFieldDescriptions, $displayParams );
 
 		// If there are (seemingly) more results than what we showed,

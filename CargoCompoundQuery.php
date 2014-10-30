@@ -107,6 +107,14 @@ class CargoCompoundQuery {
 	}
 
 	public static function getOrDisplayQueryResultsFromStrings( $sqlQueries, $querySpecificParams, $format = null, $displayParams = null, $parser = null ) {
+		$formatClass = CargoQuery::getFormatClass( $format, array() );
+		$formatObject = new $formatClass( $parser->getOutput() );
+		if ( $formatObject->isDeferred() ) {
+			$text = $formatObject->queryAndDisplay( $sqlQueries, $displayParams, $querySpecificParams );
+			$text = $parser->insertStripItem( $text, $parser->mStripState );
+			return $text;
+		}
+
 		$allQueryResults = array();
 		$formattedQueryResults = array();
 		$allFieldDescriptions = array();
@@ -149,8 +157,6 @@ class CargoCompoundQuery {
 		}
 
 		// Finally, do the display, based on the format.
-		$formatClass = CargoQuery::getFormatClass( $format, $allFieldDescriptions );
-		$formatObject = new $formatClass( $parser->getOutput() );
 		$text = $formatObject->display( $allQueryResults, $formattedQueryResults, $allFieldDescriptions, $displayParams );
 
 		// Don't show a "view more" link.
