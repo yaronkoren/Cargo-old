@@ -163,7 +163,7 @@ class CargoQuery {
 
 		// Finally, do the display, based on the format.
 		$formatClass = self::getFormatClass( $format, $sqlQuery->mFieldDescriptions );
-		$formatObject = new $formatClass();
+		$formatObject = new $formatClass( $parser->getOutput() );
 		$text = $formatObject->display( $queryResults, $formattedQueryResults, $sqlQuery->mFieldDescriptions, $displayParams );
 
 		// If there are (seemingly) more results than what we showed,
