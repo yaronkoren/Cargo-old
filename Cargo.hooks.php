@@ -8,6 +8,13 @@
 
 class CargoHooks {
 
+	static function setGlobalJSVariables( &$vars ) {
+		global $wgCargoMapClusteringMinimum;
+
+		$vars['wgCargoMapClusteringMinimum'] = $wgCargoMapClusteringMinimum;
+		return true;
+	}
+
 	/**
 	 * @TODO - move this to a different class, like CargoUtils?
 	 */

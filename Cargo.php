@@ -8,7 +8,7 @@
 
 if ( !defined( 'MEDIAWIKI' ) ) die();
 
-define( 'CARGO_VERSION', '0.4' );
+define( 'CARGO_VERSION', '0.5' );
 
 $wgExtensionCredits['parserhook'][] = array(
 	'path' => __FILE__,
@@ -28,6 +28,7 @@ $wgJobClasses['cargoPopulateTable'] = 'CargoPopulateTableJob';
 $wgJobClasses['cargoRecreateTables'] = 'CargoRecreateTablesJob';
 
 $wgHooks['ParserFirstCallInit'][] = 'cargoRegisterParserFunctions';
+$wgHooks['MakeGlobalVariablesScript'][] = 'CargoHooks::setGlobalJSVariables';
 $wgHooks['PageContentSave'][] = 'CargoHooks::onPageContentSave';
 $wgHooks['TitleMoveComplete'][] = 'CargoHooks::onTitleMoveComplete';
 $wgHooks['ArticleDeleteComplete'][] = 'CargoHooks::onArticleDeleteComplete';
@@ -76,6 +77,9 @@ $wgAutoloadClasses['CargoULFormat'] = $dir . '/formats/CargoULFormat.php';
 $wgAutoloadClasses['CargoOLFormat'] = $dir . '/formats/CargoOLFormat.php';
 $wgAutoloadClasses['CargoTemplateFormat'] = $dir . '/formats/CargoTemplateFormat.php';
 $wgAutoloadClasses['CargoTableFormat'] = $dir . '/formats/CargoTableFormat.php';
+$wgAutoloadClasses['CargoMapsFormat'] = $dir . '/formats/CargoMapsFormat.php';
+$wgAutoloadClasses['CargoGoogleMapsFormat'] = $dir . '/formats/CargoGoogleMapsFormat.php';
+$wgAutoloadClasses['CargoOpenLayersFormat'] = $dir . '/formats/CargoOpenLayersFormat.php';
 $wgAutoloadClasses['CargoCategoryFormat'] = $dir . '/formats/CargoCategoryFormat.php';
 
 // Drilldown
@@ -117,6 +121,15 @@ $wgResourceModules += array(
 		'localBasePath' => __DIR__,
 		'remoteExtPath' => 'Cargo'
 	),
+	'ext.cargo.maps' => array(
+		'scripts' => array(
+			'libs/ext.cargo.maps.js',
+			'libs/markerclusterer.js',
+		),
+		'position' => 'top',
+		'localBasePath' => __DIR__,
+		'remoteExtPath' => 'Cargo'
+	),
 );
 
 function cargoRegisterParserFunctions( &$parser ) {
@@ -145,8 +158,13 @@ $wgCargoDisplayFormats = array(
 	'ol' => 'CargoOLFormat',
 	'template' => 'CargoTemplateFormat',
 	'simpletable' => 'CargoTableFormat',
+	'googlemaps' => 'CargoGoogleMapsFormat',
+	'openlayers' => 'CargoOpenLayersFormat',
 	'category' => 'CargoCategoryFormat',
 );
+
+$wgCargoMapClusteringMinimum = 80;
+
 $wgCargoDrilldownUseTabs = false;
 // Set these to a positive number for cloud-style display.
 $wgCargoDrilldownSmallestFontSize = -1;

@@ -268,7 +268,7 @@ class CargoSQLQuery {
 					if ( $tableName != null ) {
 						list( $tableName, $fieldName ) = explode( '__', $tableName, 2 );
 					} else {
-						// We'll assum that there's
+						// We'll assume that there's
 						// exactly one "field table" in
 						// the list of tables -
 						// otherwise a standalone call
@@ -286,6 +286,10 @@ class CargoSQLQuery {
 				}
 				if ( $tableName != null ) {
 					$description = $this->mTableSchemas[$tableName][$fieldName];
+				} elseif ( substr( $fieldName, -5 ) == '__lat' || substr( $fieldName, -5 ) == '__lon' ) {
+					// Special handling for lat/lon
+					// helper fields.
+					$description = array( 'type' => 'Coordinates part', 'tableName' => '' );
 				} else {
 					// Go through all the fields, until we
 					// find the one matching this one.
@@ -573,8 +577,13 @@ class CargoSQLQuery {
 
 			// Since the field name is an alias, it should get
 			// translated to its "full" equivalent.
-			$fieldName .= '__full';
-			$this->mAliasedFieldNames[$alias] = $fieldName;
+			$fullFieldName = $fieldName . '__full';
+			$this->mAliasedFieldNames[$alias] = $fullFieldName;
+
+			// Add in the 'lat' and 'lon' fields as well - we'll
+			// need them, if a map is being displayed.
+			$this->mAliasedFieldNames[$fieldName . '  lat'] = $fieldName . '__lat';
+			$this->mAliasedFieldNames[$fieldName . '  lon'] = $fieldName . '__lon';
 		}
 
 		// "where"
