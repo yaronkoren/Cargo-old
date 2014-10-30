@@ -12,5 +12,6 @@ $magicWords['en'] = array(
 	'cargo_store' => array( 0, 'cargo_store' ),
 	'cargo_query' => array( 0, 'cargo_query' ),
 	'cargo_compound_query' => array( 0, 'cargo_compound_query' ),
+	'cargo_display_map' => array( 0, 'cargo_display_map' ),
 	'recurring_event' => array( 0, 'recurring_event' ),
 );

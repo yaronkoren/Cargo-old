@@ -57,6 +57,7 @@ $wgAutoloadClasses['CargoQuery'] = $dir . '/CargoQuery.php';
 $wgAutoloadClasses['CargoCompoundQuery'] = $dir . '/CargoCompoundQuery.php';
 $wgAutoloadClasses['CargoSQLQuery'] = $dir . '/CargoSQLQuery.php';
 $wgAutoloadClasses['CargoRecurringEvent'] = $dir . '/CargoRecurringEvent.php';
+$wgAutoloadClasses['CargoDisplayMap'] = $dir . '/CargoDisplayMap.php';
 $wgAutoloadClasses['CargoPopulateTableJob'] = $dir . '/CargoPopulateTableJob.php';
 $wgAutoloadClasses['CargoRecreateTablesJob'] = $dir . '/CargoRecreateTablesJob.php';
 $wgAutoloadClasses['CargoRecreateDataAction'] = $dir . '/CargoRecreateDataAction.php';
@@ -139,6 +140,7 @@ function cargoRegisterParserFunctions( &$parser ) {
 	$parser->setFunctionHook( 'cargo_query', array( 'CargoQuery', 'run' ) );
 	$parser->setFunctionHook( 'cargo_compound_query', array( 'CargoCompoundQuery', 'run' ) );
 	$parser->setFunctionHook( 'recurring_event', array( 'CargoRecurringEvent', 'run' ) );
+	$parser->setFunctionHook( 'cargo_display_map', array( 'CargoDisplayMap', 'run' ) );
 	return true;
 }
 
