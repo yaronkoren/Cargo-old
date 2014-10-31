@@ -18,7 +18,6 @@ class CargoViewTable extends IncludableSpecialPage {
 
 	function execute( $query ) {
 		$out = $this->getOutput();
-		$out->addModuleStyles( 'ext.cargo.main' );
 		$this->setHeaders();
 
 		$tableName = $query;

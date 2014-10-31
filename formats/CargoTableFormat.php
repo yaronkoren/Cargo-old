@@ -11,22 +11,23 @@ class CargoTableFormat extends CargoDisplayFormat {
 	}
 
 	function display( $valuesTable, $formattedValuesTable, $fieldDescriptions, $displayParams ) {
-		$text = '<table style="border-collapse: collapse;">';
+		$this->mOutput->addModuleStyles( 'ext.cargo.main' );
+
+		$text = '<table class="cargoTable">';
 		$text .= '<tr>';
 		foreach( array_keys( $fieldDescriptions ) as $field ) {
 			$text .= Html::rawElement( 'th', null, $field ) . "\n";
 		}
 		$text .= "</tr>\n";
 		foreach ( $formattedValuesTable as $i => $row ) {
-			$backgroundColor = ( $i % 2 == 0 ) ? '#fff' : '#eee';
-			$text .= "<tr style=\"background: $backgroundColor\">\n";
+			$text .= "<tr>\n";
 			foreach( array_keys( $fieldDescriptions ) as $field ) {
 				if ( array_key_exists( $field, $row ) ) {
 					$value = $row[$field];
 				} else {
 					$value = null;
 				}
-				$text .= Html::rawElement( 'td', array( 'style' => 'padding: 5px; border: #ccc 1px solid;' ), $value ) . "\n";
+				$text .= Html::rawElement( 'td', null, $value ) . "\n";
 			}
 			$text .= "</tr>\n";
 		}
