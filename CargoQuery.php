@@ -204,64 +204,68 @@ class CargoQuery {
 				} else {
 					$type = null;
 				}
-				if ( $type == 'Page' ) {
-					$text = '';
-					if ( array_key_exists( 'isList', $fieldDescription ) ) {
-						// There's probably an easier
-						// way to do this, using
-						// array_map().
-						$delimiter = $fieldDescription['delimiter'];
-						$fieldValues = explode( $delimiter, $value );
-						foreach( $fieldValues as $i => $fieldValue ) {
-							if ( trim( $fieldValue ) == '' ) continue;
-							if ( $i > 0 ) $text .= "$delimiter ";
-							$title = Title::newFromText( $fieldValue );
-							$text .= Linker::link( $title );
-						}
-					} else {
-						$title = Title::newFromText( $value );
-						$text .= Linker::link( $title );
+
+				$text = '';
+				if ( array_key_exists( 'isList', $fieldDescription ) ) {
+					// There's probably an easier way to do
+					// this, using array_map().
+					$delimiter = $fieldDescription['delimiter'];
+					$fieldValues = explode( $delimiter, $value );
+					foreach( $fieldValues as $i => $fieldValue ) {
+						if ( trim( $fieldValue ) == '' ) continue;
+						if ( $i > 0 ) $text .= "$delimiter ";
+						$text .= self::formatFieldValue( $fieldValue, $type, $fieldDescription, $parser );
 					}
+				} else {
+					$text = self::formatFieldValue( $value, $type, $fieldDescription, $parser );
+				}
+				if ( $text != '' ) {
 					$formattedQueryResults[$rowNum][$fieldName] = $text;
-				} elseif ( $type == 'URL' ) {
-					if ( array_key_exists( 'link text', $fieldDescription ) ) {
-						$text = Html::element( 'a', array( 'href' => $value ), $fieldDescription['link text'] );
-						$formattedQueryResults[$rowNum][$fieldName] = $text;
-					} else {
-						// Otherwise, do nothing.
-					}
-				} elseif ( $type == 'Wikitext' || $type == '' ) {
-					// This is here in case the value was
-					// set using {{PAGENAME}}, which for
-					// some reason HTML-encodes some of its
-					// characters - see
-					// https://www.mediawiki.org/wiki/Help:Magic_words#Page_names
-					// Of course, Text and Page fields could
-					// be set using {{PAGENAME}} as well,
-					// but those seem less likely.
-					$value = htmlspecialchars_decode( $value );
-					// Parse it as if it's wikitext.
-					// The exact call depends on whether
-					// we're in a special page or not.
-					global $wgTitle, $wgRequest;
-					if ( is_null( $parser ) ) {
-						global $wgParser;
-						$parser = $wgParser;
-					}
-					if ( $wgTitle->isSpecialPage() ||
-						// The 'pagevalues' action is
-						// also a Cargo special page.
-						$wgRequest->getVal( 'action' ) == 'pagevalues' ) {
-						$parserOutput = $parser->parse( $value, $wgTitle, new ParserOptions(), false );
-						$value = $parserOutput->getText();
-					} else {
-						$value = $parser->internalParse( $value );
-					}
-					$formattedQueryResults[$rowNum][$fieldName] = $value;
 				}
 			}
 		}
 		return $formattedQueryResults;
+	}
+
+	public static function formatFieldValue( $value, $type, $fieldDescription, $parser ) {
+		if ( $type == 'Page' ) {
+			$title = Title::newFromText( $value );
+			return Linker::link( $title );
+		} elseif ( $type == 'URL' ) {
+			if ( array_key_exists( 'link text', $fieldDescription ) ) {
+				return Html::element( 'a', array( 'href' => $value ), $fieldDescription['link text'] );
+			} else {
+				// Otherwise, do nothing.
+				return null;
+			}
+		} elseif ( $type == 'Wikitext' || $type == '' ) {
+			// This decode() call is here in case the value was
+			// set using {{PAGENAME}}, which for some reason
+			// HTML-encodes some of its characters - see
+			// https://www.mediawiki.org/wiki/Help:Magic_words#Page_names
+			// Of course, Text and Page fields could be set using
+			// {{PAGENAME}} as well, but those seem less likely.
+			$value = htmlspecialchars_decode( $value );
+			// Parse it as if it's wikitext./ The exact call
+			// depends on whether we're in a special page or not.
+			global $wgTitle, $wgRequest;
+			if ( is_null( $parser ) ) {
+				global $wgParser;
+				$parser = $wgParser;
+			}
+			if ( $wgTitle->isSpecialPage() ||
+				// The 'pagevalues' action is also a Cargo
+				// special page.
+				$wgRequest->getVal( 'action' ) == 'pagevalues' ) {
+				$parserOutput = $parser->parse( $value, $wgTitle, new ParserOptions(), false );
+				$value = $parserOutput->getText();
+			} else {
+				$value = $parser->internalParse( $value );
+			}
+			return $value;
+		}
+		// If it's not any of these specially-handled types, just
+		// return null.
 	}
 
 }
