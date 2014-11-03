@@ -41,7 +41,7 @@ class CargoCalendarData extends SpecialPage {
 
 			$dateFields = array();
 			foreach( $sqlQuery->mFieldDescriptions as $field => $description ) {
-				if ( $description['type'] == 'Date' ) {
+				if ( $description['type'] == 'Date' || $description['type'] == 'Datetime' ) {
 					$dateFields[] = $field;
 				}
 			}
