@@ -244,6 +244,12 @@ wfDebugLog('cargo', "CargoStore::run() - skipping 3.\n");
 					$seconds = strtotime( $curValue );
 					$tableFieldValues[$fieldName] = date('Y-m-d', $seconds );
 				}
+			} elseif ( $fieldDescription['type'] == 'Datetime' ) {
+				// Put into YYYY-MM-DD hh::mi:ss AM format.
+				if ( $curValue != '' ) {
+					$seconds = strtotime( $curValue );
+					$tableFieldValues[$fieldName] = date('Y-m-d G:i:s', $seconds );
+				}
 			} elseif ( $fieldDescription['type'] == 'Integer' ) {
 				// Remove digit-grouping character.
 				global $wgCargoDigitGroupingCharacter;

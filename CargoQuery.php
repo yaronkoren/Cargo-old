@@ -244,6 +244,26 @@ class CargoQuery {
 				// Otherwise, do nothing.
 				return null;
 			}
+		} elseif ( $type == 'Date' || $type == 'Datetime' ) {
+			global $wgAmericanDates;
+			$seconds = strtotime( $value );
+			if ( $wgAmericanDates ) {
+				// We use MediaWiki's representation of month
+				// names, instead of PHP's, because its i18n
+				// support is of course far superior.
+				$dateText = CargoDrilldownUtils::monthToString( date( 'm', $seconds ) );
+				$dateText .= ' ' . date( 'j, Y' );
+			} else {
+				$dateText = date( 'Y-m-d', $seconds );
+			}
+			if ( $type == 'Date' ) {
+				return $dateText;
+			}
+
+			// It's a Datetime - add time as well.
+			// @TODO - have some variable for 24-hour time display?
+			$timeText = date( 'g:i:s A', $seconds );
+			return "$dateText $timeText";
 		} elseif ( $type == 'Wikitext' || $type == '' ) {
 			// This decode() call is here in case the value was
 			// set using {{PAGENAME}}, which for some reason

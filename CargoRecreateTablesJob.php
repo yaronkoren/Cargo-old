@@ -211,6 +211,25 @@ class CargoRecreateTablesJob extends Job {
 					// accompanying handling.
 					return 'TEXT';
 			}
+		} elseif ( $fieldType == 'Datetime' ) {
+			// Some DB types have a datetime type that includes
+			// the time zone, but MySQL unfortunately doesn't,
+			// so the best solution for time zones is probably
+			// to have a separate field for them.
+			switch ( $dbType ) {
+				case "mssql":
+					return 'Datetime2';
+				case "mysql":
+					return 'Datetime';
+				case "postgres":
+				case "oracle":
+					return 'Timestamp';
+				case "sqlite":
+					// Should really be 'REAL', with
+					// accompanying handling.
+					return 'TEXT';
+
+			}
 		} else { // 'Text', 'Page', etc.
 			if ( $size == null ) {
 				$size = 300;
