@@ -231,6 +231,12 @@ class CargoQuery {
 		if ( $type == 'Page' ) {
 			$title = Title::newFromText( $value );
 			return Linker::link( $title );
+		} elseif ( $type == 'File' ) {
+			// 'File' values are basically pages in the File:
+			// namespace; they are displayed as thumbnails within
+			// queries.
+			$title = Title::newFromText( $value, NS_FILE );
+			return Linker::makeThumbLinkObj( $title, wfLocalFile( $title ), $value, '' );
 		} elseif ( $type == 'URL' ) {
 			if ( array_key_exists( 'link text', $fieldDescription ) ) {
 				return Html::element( 'a', array( 'href' => $value ), $fieldDescription['link text'] );
