@@ -4,6 +4,7 @@
     },
     "cargo-desc": "Allows for storing and querying the parameters of infobox-style templates.",
     "cargo-definestable": "This template defines the table \"$1\".",
+    "cargo-tablenotcreated": "This table has not been created yet.",
     "cargo-addsrows": "This template adds rows to the table \"$1\".",
     "recreatedata": "Recreate data",
     "cargo-createdatatable": "Create data table",
