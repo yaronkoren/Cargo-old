@@ -35,10 +35,7 @@ class CargoTemplateFormat extends CargoDisplayFormat {
 		foreach ( $valuesTable as $row ) {
 			$text .= $this->displayRow( $templateName, $row, $fieldDescriptions );
 		}
-		global $wgParser;
-		global $wgTitle;
-		$parserOutput = $wgParser->parse( $text, $wgTitle, new ParserOptions() );
-		return $parserOutput->getText();
+		return CargoQuery::smartParse( $text, $this->mParser );
 	}
 
 }

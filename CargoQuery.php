@@ -154,7 +154,7 @@ class CargoQuery {
 		$sqlQuery = CargoSQLQuery::newFromValues( $tablesStr, $fieldsStr, $whereStr, $joinOnStr, $groupByStr, $orderByStr, $limitStr );
 
 		$formatClass = self::getFormatClass( $format, $sqlQuery->mFieldDescriptions );
-		$formatObject = new $formatClass( $parser->getOutput() );
+		$formatObject = new $formatClass( $parser->getOutput(), $parser );
 
 		// Let the format run the query itself, if it wants to.
 		if ( $formatObject->isDeferred() ) {
@@ -265,33 +265,41 @@ class CargoQuery {
 			$timeText = date( 'g:i:s A', $seconds );
 			return "$dateText $timeText";
 		} elseif ( $type == 'Wikitext' || $type == '' ) {
-			// This decode() call is here in case the value was
-			// set using {{PAGENAME}}, which for some reason
-			// HTML-encodes some of its characters - see
-			// https://www.mediawiki.org/wiki/Help:Magic_words#Page_names
-			// Of course, Text and Page fields could be set using
-			// {{PAGENAME}} as well, but those seem less likely.
-			$value = htmlspecialchars_decode( $value );
-			// Parse it as if it's wikitext./ The exact call
-			// depends on whether we're in a special page or not.
-			global $wgTitle, $wgRequest;
-			if ( is_null( $parser ) ) {
-				global $wgParser;
-				$parser = $wgParser;
-			}
-			if ( $wgTitle->isSpecialPage() ||
-				// The 'pagevalues' action is also a Cargo
-				// special page.
-				$wgRequest->getVal( 'action' ) == 'pagevalues' ) {
-				$parserOutput = $parser->parse( $value, $wgTitle, new ParserOptions(), false );
-				$value = $parserOutput->getText();
-			} else {
-				$value = $parser->internalParse( $value );
-			}
-			return $value;
+			return self::smartParse( $value, $parser );
 		}
 		// If it's not any of these specially-handled types, just
 		// return null.
+	}
+
+	/**
+	 * Parse a piece of wikitext differently depending on whether
+	 * we're in a special or regular page.
+	 * @TODO - move this utility function out of the CargoQuery class?
+	 */
+	public static function smartParse( $value, $parser ) {
+		// This decode() call is here in case the value was
+		// set using {{PAGENAME}}, which for some reason
+		// HTML-encodes some of its characters - see
+		// https://www.mediawiki.org/wiki/Help:Magic_words#Page_names
+		// Of course, Text and Page fields could be set using
+		// {{PAGENAME}} as well, but those seem less likely.
+		$value = htmlspecialchars_decode( $value );
+		// Parse it as if it's wikitext./ The exact call
+		// depends on whether we're in a special page or not.
+		global $wgTitle, $wgRequest;
+		if ( is_null( $parser ) ) {
+			global $wgParser;
+			$parser = $wgParser;
+		}
+		if ( $wgTitle->isSpecialPage() ||
+			// The 'pagevalues' action is also a Cargo special page.
+			$wgRequest->getVal( 'action' ) == 'pagevalues' ) {
+			$parserOutput = $parser->parse( $value, $wgTitle, new ParserOptions(), false );
+			$value = $parserOutput->getText();
+		} else {
+			$value = $parser->internalParse( $value );
+		}
+		return $value;
 	}
 
 }

@@ -6,8 +6,9 @@
 
 class CargoDisplayFormat {
 
-	function __construct( $output ) {
+	function __construct( $output, $parser = null ) {
 		$this->mOutput = $output;
+		$this->mParser = $parser;
 	}
 
 	function allowedParameters() {
