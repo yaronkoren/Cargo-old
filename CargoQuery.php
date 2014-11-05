@@ -60,7 +60,7 @@ class CargoQuery {
 			}
 			$key = trim( $parts[0] );
 			$value = trim( $parts[1] );
-			if ( $key == 'tables' ) {
+			if ( $key == 'tables' || $key == 'table' ) {
 				$tablesStr = $value;
 			} elseif ( $key == 'fields' ) {
 				$fieldsStr = $value;
