@@ -13,7 +13,7 @@ class CargoEmbeddedFormat extends CargoDisplayFormat {
 	function displayRow( $row ) {
 		$pageName = reset( $row );
 		$wikiText =<<<END
-<p style="font-size: small; color: #555; text-align: right;">$pageName</p>
+<p style="font-size: small; text-align: right;">[[$pageName]]</p>
 {{:$pageName}}
 
 
