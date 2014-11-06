@@ -8,7 +8,7 @@
 
 class CargoStore {
 
-	static $settings = array();
+	public static $settings = array();
 
 	/**
 	 * Gets the template page where this table is defined -
@@ -318,7 +318,7 @@ wfDebugLog('cargo', "CargoStore::run() - skipping 3.\n");
 						$fieldValues['_lat'] = $latitude;
 						$fieldValues['_lon'] = $longitude;
 					}
-					$res3 = $cdb->insert( $fieldTableName, $fieldValues );
+					$cdb->insert( $fieldTableName, $fieldValues );
 				}
 
 				// Now rename the field.

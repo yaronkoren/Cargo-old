@@ -47,8 +47,6 @@ class CargoCompoundQuery {
 			$groupByStr = null;
 			$orderByStr = null;
 			$limitStr = null;
-			$format = 'auto'; // default
-			$displayParams = array();
 
 			$queryClauses = explode( ';', $param );
 			$displayParamsForThisQuery = array();
@@ -81,6 +79,8 @@ class CargoCompoundQuery {
 			$querySpecificParams[] = $displayParamsForThisQuery;
 		}
 
+		$format = 'auto'; // default
+		$displayParams = array();
 		foreach ( $otherParams as $param ) {
 			$parts = explode( '=', $param, 2 );
 			

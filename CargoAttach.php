@@ -20,7 +20,6 @@ class CargoAttach {
 		array_shift( $params ); // we already know the $parser...
 
 		$tableName = null;
-		$cargoFields = array();
 		foreach ( $params as $param ) {
 			$parts = explode( '=', $param, 2 );
 			

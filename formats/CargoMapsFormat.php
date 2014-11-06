@@ -6,7 +6,7 @@
 
 class CargoMapsFormat extends CargoDisplayFormat {
 
-	static $mappingService = "OpenLayers";
+	public static $mappingService = "OpenLayers";
 	static $mapNumber = 1;
 
 	function allowedParameters() {
@@ -66,7 +66,6 @@ class CargoMapsFormat extends CargoDisplayFormat {
 		$valuesForMap = array();
 		foreach ( $formattedValuesTable as $i => $valuesRow ) {
 			$displayedValuesForRow = array();
-			$iconURL = null;
 			foreach ( $valuesRow as $fieldName => $fieldValue ) {
 				if ( !array_key_exists( $fieldName, $fieldDescriptions ) ) {
 					continue;

@@ -505,8 +505,10 @@ class CargoSQLQuery {
 			$tableName = $virtualField['tableName'];
 			$pattern1 = "/\b$tableName\.$fieldName\b/";
 			$foundMatch = preg_match( $pattern1, $this->mOrderBy, $matches);
+			$pattern2 = "/\b$fieldName\b/";
+			$foundMatch2 = false;
+
 			if ( !$foundMatch ) {
-				$pattern2 = "/\b$fieldName\b/";
 				$foundMatch2 = preg_match( $pattern2, $this->mOrderBy, $matches);
 			}
 			if ( $foundMatch || $foundMatch2 ) {
@@ -743,6 +745,7 @@ class CargoSQLQuery {
 		// Create arrays for doing replacements of table names within
 		// the SQL by their "real" equivalents.
 		$tableNamePatterns = array();
+		$tableNameReplacements = array();
 		foreach ( $this->mTableNames as $tableName ) {
 			// Is there a way to do this with just one regexp?
 			$tableNamePatterns[] = "/^$tableName\./";

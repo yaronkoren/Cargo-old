@@ -11,6 +11,7 @@ class CargoListFormat extends CargoDisplayFormat {
 	}
 
 	function displayRow( $row, $fieldDescriptions ) {
+		$text = '';
 		$startParenthesisAdded = false;
 		$firstField = true;
 		foreach ( $fieldDescriptions as $fieldName => $fieldDescription ) {

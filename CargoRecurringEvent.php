@@ -32,7 +32,6 @@ class CargoRecurringEvent {
 		$timeString = null;
 		$delimiter = '; '; // default
 		$includedDates = array();
-		$excludedDates = array();
 		$excludedDatesJD = array();
 
 		foreach ( $params as $param ) {

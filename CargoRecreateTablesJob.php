@@ -118,11 +118,15 @@ class CargoRecreateTablesJob extends Job {
 		//$cdb->ignoreErrors( false );
 
 		$createIndexSQL = "CREATE INDEX page_id_$tableName ON " . $cdb->tableName( $tableName ) . " (_pageID)";
-		$createIndexSQL = "CREATE INDEX page_name_$tableName ON " . $cdb->tableName( $tableName ) . " (_pageName)";
-		$createIndexSQL = "CREATE INDEX page_title_$tableName ON " . $cdb->tableName( $tableName ) . " (_pageTitle)";
-		$createIndexSQL = "CREATE INDEX page_namespace_$tableName ON " . $cdb->tableName( $tableName ) . " (_pageNamespace)";
-		$createIndexSQL = "CREATE UNIQUE INDEX id_$tableName ON " . $cdb->tableName( $tableName ) . " (_ID)";
 		$cdb->query( $createIndexSQL );
+		$createIndexSQL2 = "CREATE INDEX page_name_$tableName ON " . $cdb->tableName( $tableName ) . " (_pageName)";
+		$cdb->query( $createIndexSQL2 );
+		$createIndexSQL3 = "CREATE INDEX page_title_$tableName ON " . $cdb->tableName( $tableName ) . " (_pageTitle)";
+		$cdb->query( $createIndexSQL3 );
+		$createIndexSQL4 = "CREATE INDEX page_namespace_$tableName ON " . $cdb->tableName( $tableName ) . " (_pageNamespace)";
+		$cdb->query( $createIndexSQL4 );
+		$createIndexSQL5 = "CREATE UNIQUE INDEX id_$tableName ON " . $cdb->tableName( $tableName ) . " (_ID)";
+		$cdb->query( $createIndexSQL5 );
 
 		// Now also create tables for each of the 'list' fields,
 		// if there are any.

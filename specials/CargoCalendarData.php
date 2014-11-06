@@ -35,7 +35,6 @@ class CargoCalendarData extends SpecialPage {
 		$endDate = $req->getVal( 'end' );
 
 		$displayedArray = array();
-		$sqlQueries = array();
 		foreach ( $tableArray as $i => $table ) {
 			$sqlQuery = CargoSQLQuery::newFromValues( $table, $fieldsArray[$i], $whereArray[$i], $joinOnArray[$i], $groupByArray[$i], $orderByArray[$i], $limitStr );
 
