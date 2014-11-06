@@ -32,8 +32,6 @@ class CargoDrilldown extends IncludableSpecialPage {
 		// Should this be a user setting?
 		$numResultsPerPage = 250;
 		list( $limit, $offset ) = wfCheckLimits( $numResultsPerPage, 'limit' );
-		$filters = array();
-
 		// Get information on current table and the filters
 		// that have already been applied from the query string.
 		$tableName = str_replace( '_', ' ', $wgRequest->getVal( '_table' ) );
@@ -73,7 +71,7 @@ class CargoDrilldown extends IncludableSpecialPage {
 			$filters[] = $curFilter;
 		}
 
-		$filters_used = array();
+		$filter_used = array();
 		foreach ( $filters as $i => $filter ) {
 			$filter_used[] = false;
 		}
@@ -319,6 +317,7 @@ END;
 	 */
 	function printAppliedFilterLine( $af ) {
 		$results_line = "";
+		$current_filter_values = array();
 		foreach ( $this->applied_filters as $af2 ) {
 			if ( $af->filter->name == $af2->filter->name )
 				$current_filter_values = $af2->values;
@@ -504,8 +503,6 @@ END;
 
 		$propertyValues = array();
 		$separatorValue = $numberArray[0];
-		$startIndexOfBucket = 0;
-		$endIndexOfBucket;
 
 		// Make sure there are at least, on average, five numbers per
 		// bucket.
@@ -722,7 +719,6 @@ END;
 	function printUnappliedFilterLine( $f, $cur_url = null ) {
 		global $wgCargoDrilldownMinValuesForComboBox;
 
-		$found_results_for_filter = false;
 		if ( $f->fieldDescription['type'] == 'Date' ) {
 			$filter_values = $f->getTimePeriodValues( $this->applied_filters );
 		} else {
@@ -730,9 +726,6 @@ END;
 		}
 		if ( !is_array( $filter_values ) ) {
 			return $this->printFilterLine( $f->name, false, false, $filter_values );
-		}
-		if ( count( $filter_values ) > 0 ) {
-			$found_results_for_filter = true;
 		}
 
 		$filter_name = urlencode( str_replace( ' ', '_', $f->name ) );
@@ -834,7 +827,6 @@ END;
 		$header .= "				<div class=\"drilldown-filters\">\n";
 		$cur_url = $this->makeBrowseURL( $this->tableName, $this->applied_filters );
 		$cur_url .= ( strpos( $cur_url, '?' ) ) ? '&' : '?';
-		$num_printed_values = 0;
 		$tableSchemas = CargoQuery::getTableSchemas( array( $this->tableName ) );
 		$tableSchema = $tableSchemas[$this->tableName];
 		foreach ( $tableSchema as $fieldName => $fieldDescription ) {
@@ -963,13 +955,12 @@ END;
 		global $wgParser;
 
 		$valuesTable = array();
-		$formattedValuesTable = array();
 		while ( $row = $dbr->fetchRow( $res ) ) {
 			$valuesTable[] = array( 'title' => $row['title'] );
 		}
 		$fieldDescriptions = array( 'title' => array( 'type' => 'Page' ) );
 		$formattedValuesTable = CargoQuery::getFormattedQueryResults( $valuesTable, $fieldDescriptions, $wgParser );
-		$formatObject = new CargoCategoryFormat();
+		$formatObject = new CargoCategoryFormat( $out );
 		$html = $formatObject->display( $valuesTable, $formattedValuesTable, $fieldDescriptions, $displayParams = array() );
 		$out->addHTML( $html );
 	}

@@ -20,6 +20,7 @@ class CargoFilterValue {
 	var $month = null;
 	var $day = null;
 	var $end_year = null;
+	var $time_period = null;
 
 	static function create( $actual_val, $filter = null ) {
 		$fv = new CargoFilterValue();

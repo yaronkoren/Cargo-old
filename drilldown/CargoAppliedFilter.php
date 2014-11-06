@@ -29,11 +29,11 @@ class CargoAppliedFilter {
 		}
 		if ( $lower_date != null ) {
 			$af->lower_date = $lower_date;
-			$af->lower_date_string = CargoUtils::monthToString( $lower_date['month'] ) . " " . $lower_date['day'] . ", " . $lower_date['year'];
+			$af->lower_date_string = CargoDrilldownUtils::monthToString( $lower_date['month'] ) . " " . $lower_date['day'] . ", " . $lower_date['year'];
 		}
 		if ( $upper_date != null ) {
 			$af->upper_date = $upper_date;
-			$af->upper_date_string = CargoUtils::monthToString( $upper_date['month'] ) . " " . $upper_date['day'] . ", " . $upper_date['year'];
+			$af->upper_date_string = CargoDrilldownUtils::monthToString( $upper_date['month'] ) . " " . $upper_date['day'] . ", " . $upper_date['year'];
 		}
 		if ( ! is_array( $values ) ) {
 			$values = array( $values );
@@ -164,7 +164,7 @@ class CargoAppliedFilter {
 		$res = $cdb->select( $tableName, "DISTINCT " . $value_field );
 		while ( $row = $cdb->fetchRow( $res ) ) {
 			if ( $this->filter->fieldDescription['type'] == 'Date' && $this->filter->getTimePeriod() == 'month' ) {
-				$value_string = CargoUtils::monthToString( $row[1] ) . " " . $row[0];
+				$value_string = CargoDrilldownUtils::monthToString( $row[1] ) . " " . $row[0];
 			} else {
 				$value_string = $row[0];
 			}
