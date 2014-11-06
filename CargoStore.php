@@ -157,10 +157,10 @@ class CargoStore {
 		// is this is called via either a page save or a "recreate
 		// data" action for a template that this page calls.
 		if ( count( self::$settings ) == 0 ) {
-wfDebugLog('cargo', "CargoStore::run() - skipping.\n");
+			wfDebugLog('cargo', "CargoStore::run() - skipping.\n");
 			return;
 		} elseif ( !array_key_exists( 'origin', self::$settings ) ) {
-wfDebugLog('cargo', "CargoStore::run() - skipping 2.\n");
+			wfDebugLog('cargo', "CargoStore::run() - skipping 2.\n");
 			return;
 		}
 
@@ -199,7 +199,7 @@ wfDebugLog('cargo', "CargoStore::run() - skipping 2.\n");
 			// It came from a template "recreate data" action -
 			// make sure it passes various criteria.
 			if ( self::$settings['dbTableName'] != $tableName ) {
-wfDebugLog('cargo', "CargoStore::run() - skipping 3.\n");
+				wfDebugLog('cargo', "CargoStore::run() - skipping 3.\n");
 				return;
 			}
 		}
@@ -208,6 +208,12 @@ wfDebugLog('cargo', "CargoStore::run() - skipping 3.\n");
 		$dbr = wfGetDB( DB_SLAVE );
 		$res = $dbr->select( 'cargo_tables', 'table_schema', array( 'main_table' => $tableName ) );
 		$row = $dbr->fetchRow( $res );
+		if ( $row == '' ) {
+			// This table probably has not been created yet -
+			// just exit silently.
+			wfDebugLog('cargo', "CargoStore::run() - skipping 4.\n");
+			return;
+		}
 		$tableFieldsString = $row['table_schema'];
 		$tableFields = unserialize( $tableFieldsString );
 
