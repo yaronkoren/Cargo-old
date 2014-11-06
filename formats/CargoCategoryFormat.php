@@ -47,69 +47,7 @@ class CargoCategoryFormat extends CargoListFormat {
 			}
 			$prev_first_char = $cur_first_char;
 
-			$result .= '<li>';
-			$first_col = true;
-
-/*
-			if ( $this->mTemplate !== '' ) { // build template code
-				$this->hasTemplates = true;
-				$wikitext = ( $this->mUserParam ) ? "|userparam=$this->mUserParam":'';
-				$i = 1; // explicitly number parameters for more robust parsing (values may contain "=")
-
-				foreach ( $row as $field ) {
-					$wikitext .= '|' . $i++ . '=';
-					$first_value = true;
-
-					while ( ( $text = $field->getNextText( SMW_OUTPUT_WIKI, $this->getLinker( $first_col ) ) ) !== false ) {
-						if ( $first_value ) $first_value = false; else $wikitext .= $this->mDelim . ' ';
-						$wikitext .= $text;
-					}
-
-					$first_col = false;
-				}
-
-				$wikitext .= "|#=$rowindex";
-				$result .= '{{' . $this->mTemplate . $wikitext . '}}';
-				// str_replace('|', '&#x007C;', // encode '|' for use in templates (templates fail otherwise) -- this is not the place for doing this, since even DV-Wikitexts contain proper "|"!
-			} else {  // build simple list
-*/
-				$first_col = true;
-				$found_values = false; // has anything but the first column been printed?
-
-/*
-				foreach( array_keys( $fieldDescriptions ) as $field ) {
-					$first_value = true;
-					$text = $row[$field];
-
-					//while ( ( $text = $field false ) {
-						if ( !$first_col && !$found_values ) { // first values after first column
-							$result .= ' (';
-							$found_values = true;
-						} elseif ( $found_values || !$first_value ) {
-							// any value after '(' or non-first values on first column
-							$result .= ', ';
-						}
-
-						if ( $first_value ) { // first value in any column, print header
-							$first_value = false;
-
-							//if ( $showHeaders ) {
-							//	$result .= $field . ' ';
-							//}
-						}
-
-						$result .= $text; // actual output value
-					//}
-
-					$first_col = false;
-				}
-*/
-				$result .= self::displayRow( $row, $fieldDescriptions );
-
-				if ( $found_values ) $result .= ')';
-			//}
-
-			$result .= '</li>';
+			$result .= '<li>' . self::displayRow( $row, $fieldDescriptions ) . "</li>\n";
 
 			// end list if we're at the end of the column
 			// or the page
@@ -118,15 +56,6 @@ class CargoCategoryFormat extends CargoListFormat {
 			}
 
 			$rowindex++;
-		}
-
-		if ( $result === '' ) {
-
-			$res->addErrors( array(
-				$this->msg( 'smw-qp-empty-data' )->inContentLanguage()->text()
-			) );
-
-			return $result;
 		}
 
 		$result .= "</ul>\n</div> <!-- end column -->";
