@@ -68,7 +68,45 @@ class CargoHooks {
 		CargoStore::$settings['origin'] = 'page save';
 		global $wgParser;
 		$title = $wikiPage->getTitle();
-		$wgParser->parse( $content->getNativeData(), $title, new ParserOptions() );
+
+		// Special handling for the Approved Revs extension.
+		$pageText = null;
+		$approvedText = null;
+		if ( class_exists( 'ApprovedRevs' ) ) {
+			$approvedText = ApprovedRevs::getApprovedContent( $title );
+		}
+		if ( $approvedText != null ) {
+			$pageText = $approvedText;
+		} else {
+			$pageText = $content->getNativeData();
+		}
+
+		$wgParser->parse( $pageText, $title, new ParserOptions() );
+		return true;
+	}
+
+	/**
+	 * Called by a hook in the Approved Revs extension.
+	 */
+	public static function onARRevisionApproved( $parser, $title, $revID ) {
+		$pageID = $title->getArticleID();
+		self::deletePageFromSystem( $pageID );
+		// In an unexpected surprise, it turns out that simply adding
+		// this setting will be enough to get the correct revision of
+		// this page to be saved by Cargo, since the page will be
+		// parsed right after this.
+		CargoStore::$settings['origin'] = 'page save';
+		return true;
+	}
+
+	/**
+	 * Called by a hook in the Approved Revs extension.
+	 */
+	public static function onARRevisionUnapproved( $parser, $title ) {
+		$pageID = $title->getArticleID();
+		self::deletePageFromSystem( $pageID );
+		// This is all we need - see onARRevisionApproved(), above.
+		CargoStore::$settings['origin'] = 'page save';
 		return true;
 	}
 

@@ -44,7 +44,18 @@ class CargoPopulateTableJob extends Job {
 
 		// @TODO - is there a "cleaner" way to get a page to be parsed?
 		global $wgParser;
-		$wgParser->parse( $article->getContent(), $this->title, new ParserOptions() );
+		// Special handling for the Approved Revs extension.
+		$pageText = null;
+		$approvedText = null;
+		if ( class_exists( 'ApprovedRevs' ) ) {
+			$approvedText = ApprovedRevs::getApprovedContent( $this->title );
+		}
+		if ( $approvedText != null ) {
+			$pageText = $approvedText;
+		} else {
+			$pageText = $article->getContent();
+		}
+		$wgParser->parse( $pageText, $this->title, new ParserOptions() );
 
 		wfProfileOut( __METHOD__ );
 		return true;
