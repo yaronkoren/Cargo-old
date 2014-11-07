@@ -88,8 +88,15 @@ class CargoRecreateData extends IncludableSpecialPage {
 		// #cargo_attach), drop and re-generate the Cargo DB table
 		// for it.`
 		if ( $this->mIsDeclared ) {
-			$job = new CargoRecreateTablesJob( $this->mTemplateTitle );
-			JobQueueGroup::singleton()->push( $job );
+			// Call this directly, instead of as a job; so that
+			// the re-creation of the table(s) always happens
+			// before any of the rows are added.
+			// Hopefully this will not ever cause the session to
+			// time out.
+
+			//$job = new CargoRecreateTablesJob( $this->mTemplateTitle );
+			//JobQueueGroup::singleton()->push( $job );
+			CargoRecreateTablesJob::recreateDBTablesForTemplate( $this->mTemplateTitle->getArticleID() );
 		}
 
 		// Now create a job, CargoPopulateTable, for each page

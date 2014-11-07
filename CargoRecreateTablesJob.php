@@ -26,6 +26,10 @@ class CargoRecreateTablesJob extends Job {
 			return false;
 		}
 
+		$templatePageID = $this->title->getArticleID();
+		self::recreateDBTablesForTemplate( $templatePageID );
+	}
+
 
 	/**
 	 * Drop, and then create again, the database table(s) holding the
@@ -33,8 +37,7 @@ class CargoRecreateTablesJob extends Job {
 	 * Why "tables"? Because every field that holds a list of values gets
 	 * its own helper table.
 	 */
-	//public static function recreateDBTablesForTemplate( $templatePageID ) {
-		$templatePageID = $this->title->getArticleID();
+	public static function recreateDBTablesForTemplate( $templatePageID ) {
 		global $wgDBtype;
 
 		$tableFieldsString = CargoUtils::getPageProp( $templatePageID, 'CargoFields' );
