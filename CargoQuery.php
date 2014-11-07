@@ -154,6 +154,10 @@ class CargoQuery {
 		$sqlQuery = CargoSQLQuery::newFromValues( $tablesStr, $fieldsStr, $whereStr, $joinOnStr, $groupByStr, $orderByStr, $limitStr );
 
 		$formatClass = self::getFormatClass( $format, $sqlQuery->mFieldDescriptions );
+		if ( $parser == null ) {
+			global $wgParser;
+			$parser = $wgParser;
+		}
 		$formatObject = new $formatClass( $parser->getOutput(), $parser );
 
 		// Let the format run the query itself, if it wants to.
