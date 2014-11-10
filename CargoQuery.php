@@ -256,7 +256,7 @@ class CargoQuery {
 				// names, instead of PHP's, because its i18n
 				// support is of course far superior.
 				$dateText = CargoDrilldownUtils::monthToString( date( 'm', $seconds ) );
-				$dateText .= ' ' . date( 'j, Y' );
+				$dateText .= ' ' . date( 'j, Y', $seconds );
 			} else {
 				$dateText = date( 'Y-m-d', $seconds );
 			}
