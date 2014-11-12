@@ -85,6 +85,7 @@ $wgAutoloadClasses['CargoOutlineFormat'] = $dir . '/formats/CargoOutlineFormat.p
 $wgAutoloadClasses['CargoTreeFormat'] = $dir . '/formats/CargoTreeFormat.php';
 $wgAutoloadClasses['CargoEmbeddedFormat'] = $dir . '/formats/CargoEmbeddedFormat.php';
 $wgAutoloadClasses['CargoTableFormat'] = $dir . '/formats/CargoTableFormat.php';
+$wgAutoloadClasses['CargoDynamicTableFormat'] = $dir . '/formats/CargoDynamicTableFormat.php';
 $wgAutoloadClasses['CargoMapsFormat'] = $dir . '/formats/CargoMapsFormat.php';
 $wgAutoloadClasses['CargoGoogleMapsFormat'] = $dir . '/formats/CargoGoogleMapsFormat.php';
 $wgAutoloadClasses['CargoOpenLayersFormat'] = $dir . '/formats/CargoOpenLayersFormat.php';
@@ -153,6 +154,18 @@ $wgResourceModules += array(
 		'localBasePath' => __DIR__,
 		'remoteExtPath' => 'Cargo'
 	),
+	'ext.cargo.datatables' => array(
+		'styles' => array(
+			'libs/DataTables/css/jquery.dataTables.css',
+		),
+		'scripts' => array(
+			'libs/DataTables/js/jquery.dataTables.js',
+			'libs/ext.cargo.datatables.js',
+		),
+		'position' => 'top',
+		'localBasePath' => __DIR__,
+		'remoteExtPath' => 'Cargo'
+	),
 );
 
 function cargoRegisterParserFunctions( &$parser ) {
@@ -185,6 +198,7 @@ $wgCargoDisplayFormats = array(
 	'outline' => 'CargoOutlineFormat',
 	'tree' => 'CargoTreeFormat',
 	'simpletable' => 'CargoTableFormat',
+	'dynamic table' => 'CargoDynamicTableFormat',
 	'googlemaps' => 'CargoGoogleMapsFormat',
 	'openlayers' => 'CargoOpenLayersFormat',
 	'calendar' => 'CargoCalendarFormat',
