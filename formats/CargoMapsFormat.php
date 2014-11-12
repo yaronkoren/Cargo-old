@@ -26,7 +26,7 @@ class CargoMapsFormat extends CargoDisplayFormat {
 	public static function getImageURL( $imageName ) {
 		$title = Title::makeTitle( NS_FILE, $imageName );
 
-		if ( $title ==  null || !$title->exists() ) {
+		if ( $title == null || !$title->exists() ) {
 			return null;
 		}
 
@@ -53,7 +53,6 @@ class CargoMapsFormat extends CargoDisplayFormat {
 		}
 
 		// Add necessary JS scripts.
-		//global $wgOut;
 		$scripts = $this->getScripts();
 		$scriptsHTML = '';
 		foreach ( $scripts as $script ) {
