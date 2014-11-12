@@ -100,7 +100,7 @@ class CargoQuery {
 
 		if ( array_key_exists( $format, $wgCargoDisplayFormats ) ) {
 		} elseif ( count( $fieldDescriptions ) > 1 ) {
-			$format = 'simpletable';
+			$format = 'table';
 		} else {
 			$format = 'list';
 		}
