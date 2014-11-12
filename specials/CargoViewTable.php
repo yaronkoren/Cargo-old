@@ -95,7 +95,7 @@ class CargoViewTable extends IncludableSpecialPage {
 			}
 			// Remove the comma at the end.
 			$fieldsStr = trim( $fieldsStr, ',' );
-			$text .= CargoQuery::viewMoreResultsLink( $tableName, $fieldsStr, null, null, null, $sqlQuery->mOrderBy, $sqlQuery->mQueryLimit, 'simpletable', $displayParams );
+			$text .= CargoQuery::viewMoreResultsLink( $tableName, $fieldsStr, null, null, null, $sqlQuery->mOrderBy, $sqlQuery->mQueryLimit, 'table', $displayParams );
 		}
 
 		$out->addHTML( $text );
