@@ -18,47 +18,47 @@ class CargoDynamicTableFormat extends CargoDisplayFormat {
 		$this->mOutput->addModules( 'ext.cargo.datatables' );
 
 		$text =<<<END
-				<table class="cargoDynamicTable display" cellspacing="0" width="100%">
-					<thead>
-						<tr>
+	<table class="cargoDynamicTable display" cellspacing="0" width="100%">
+		<thead>
+			<tr>
 
 END;
 		foreach ( $fieldDescriptions as $fieldName => $fieldDescription ) {
-			$text .= "\t\t\t\t\t\t\t" . Html::element( 'th', null, $fieldName );
+			$text .= "\t\t\t\t" . Html::element( 'th', null, $fieldName );
 		}
 
 		$text .=<<<END
-						</tr>
-					</thead>
+			</tr>
+		</thead>
 
-					<tfoot>
-						<tr>
+		<tfoot>
+			<tr>
 
 END;
 
 		foreach ( $fieldDescriptions as $fieldName => $fieldDescription ) {
-			$text .= "\t\t\t\t\t\t\t" . Html::element( 'th', null, $fieldName );
+			$text .= "\t\t\t\t" . Html::element( 'th', null, $fieldName );
 		}
 
 		$text .=<<<END
-						</tr>
-					</tfoot>
+			</tr>
+		</tfoot>
 
-					<tbody>
+		<tbody>
 
 END;
 
 		foreach ( $formattedValuesTable as $row ) {
-			$text .= "\t\t\t\t\t\t<tr>\n";
+			$text .= "\t\t\t<tr>\n";
 			foreach ( $row as $value ) {
-				$text .= "\t\t\t\t\t\t\t<td>$value</td>\n";
+				$text .= "\t\t\t\t<td>$value</td>\n";
 			}
-			$text .= "\t\t\t\t\t\t</tr>\n";
+			$text .= "\t\t\t</tr>\n";
 		}
 
 		$text .=<<<END
-					</tbody>
-				</table>
+		</tbody>
+	</table>
 
 END;
 
