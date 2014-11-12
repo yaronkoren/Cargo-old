@@ -22,12 +22,18 @@ class CargoOutlineRow {
 		$this->mDisplayFields = array();
 	}
 
-	function addOutlineFieldValues( $fieldName, $values ) {
-		$this->mOutlineFields[$fieldName] = $values;
+	function addOutlineFieldValues( $fieldName, $values, $formattedValues ) {
+		$this->mOutlineFields[$fieldName] = array(
+			'unformatted' => $values,
+			'formatted' => $displayValues
+		);
 	}
 
-	function addOutlineFieldValue( $fieldName, $value ) {
-		$this->mOutlineFields[$fieldName] = array( $value );
+	function addOutlineFieldValue( $fieldName, $value, $formattedValue ) {
+		$this->mOutlineFields[$fieldName] = array(
+			'unformatted' => array( $value ),
+			'formatted' => array( $formattedValue )
+		);
 	}
 
 	function addDisplayFieldValue( $fieldName, $value ) {
@@ -38,7 +44,11 @@ class CargoOutlineRow {
 		if ( !array_key_exists( $fieldName, $this->mOutlineFields ) ) {
 			throw new MWException( "Error: the outline field '$fieldName' must be among this query's fields." );
 		}
-		return $this->mOutlineFields[$fieldName];
+		return $this->mOutlineFields[$fieldName]['unformatted'];
+	}
+
+	function getFormattedOutlineFieldValues( $fieldName ) {
+		return $this->mOutlineFields[$fieldName]['formatted'];
 	}
 }
 
@@ -48,22 +58,25 @@ class CargoOutlineRow {
 class CargoOutlineTree {
 	var $mTree;
 	var $mUnsortedRows;
+	var $mFormattedValue;
 
-	function __construct( $rows = array() ) {
+	function __construct( $rows = array(), $formattedValue = null ) {
 		$this->mTree = array();
 		$this->mUnsortedRows = $rows;
+		$this->mFormattedValue = $formattedValue;
 	}
 
 	function addRow( $row ) {
 		$this->mUnsortedRows[] = $row;
 	}
 
-	function categorizeRow( $vals, $row ) {
-		foreach ( $vals as $val ) {
+	function categorizeRow( $vals, $row, $formattedVals ) {
+		foreach ( $vals as $i => $val ) {
 			if ( array_key_exists( $val, $this->mTree ) ) {
 				$this->mTree[$val]->mUnsortedRows[] = $row;
 			} else {
-				$this->mTree[$val] = new CargoOutlineTree( array( $row ) );
+				$formattedVal = $formattedVals[$i];
+				$this->mTree[$val] = new CargoOutlineTree( array( $row ), $formattedVal );
 			}
 		}
 	}
@@ -72,7 +85,8 @@ class CargoOutlineTree {
 		if ( count( $this->mUnsortedRows ) > 0 ) {
 			foreach ( $this->mUnsortedRows as $row ) {
 				$fieldValues = $row->getOutlineFieldValues( $field );
-				$this->categorizeRow( $fieldValues, $row );
+				$formattedFieldValues = $row->getFormattedOutlineFieldValues( $field );
+				$this->categorizeRow( $fieldValues, $row, $formattedFieldValues );
 			}
 			$this->mUnsortedRows = null;
 		} else {
@@ -118,7 +132,8 @@ class CargoOutlineFormat extends CargoListFormat {
 			$fontWeight = 'regular';
 		}
 		foreach ( $outlineTree->mTree as $key => $node ) {
-			$text .= "<p style=\"font-size: $fontSize; font-weight: $fontWeight;\">$key</p>\n";
+			$formattedValue = $node->mFormattedValue;
+			$text .= "<p style=\"font-size: $fontSize; font-weight: $fontWeight;\">$formattedValue</p>\n";
 			$text .= $this->printTree( $node, $level + 1 );
 		}
 		if ( $level > 0 ) $text .= "</ul>\n";
@@ -129,7 +144,7 @@ class CargoOutlineFormat extends CargoListFormat {
 		if ( !array_key_exists( 'outline fields', $displayParams ) ) {
 			throw new MWException( "Error: 'outline fields' parameter must be set for 'outline' format." );
 		}
-		$outlineFields = explode( ',', $displayParams['outline fields'] );
+		$outlineFields = explode( ',', str_replace( '_', ' ', $displayParams['outline fields'] ) );
 		$this->mOutlineFields = array_map( 'trim', $outlineFields );
 		$this->mFieldDescriptions = $fieldDescriptions;
 
@@ -137,18 +152,19 @@ class CargoOutlineFormat extends CargoListFormat {
 		// and all its sorted-on fields, and add it to the initial
 		// 'tree'.
 		$outlineTree = new CargoOutlineTree();
-		foreach ( $formattedValuesTable as $queryResultsRow ) {
+		foreach ( $valuesTable as $rowNum => $queryResultsRow ) {
 			$coRow = new CargoOutlineRow();
 			foreach ( $queryResultsRow as $fieldName => $value ) {
+				$formattedValue = $formattedValuesTable[$rowNum][$fieldName];
 				if ( in_array( $fieldName, $this->mOutlineFields ) ) {
 					if ( array_key_exists( 'isList', $fieldDescriptions[$fieldName] ) ) {
 						$delimiter = $fieldDescriptions[$fieldName]['delimiter'];
-						$coRow->addOutlineFieldValues( $fieldName, array_map( 'trim', explode( $delimiter, $value ) ) );
+						$coRow->addOutlineFieldValues( $fieldName, array_map( 'trim', explode( $delimiter, $value ) ) , array_map( 'trim', explode( $delimiter, $formattedValue ) ) );
 					} else {
-						$coRow->addOutlineFieldValue( $fieldName, $value );
+						$coRow->addOutlineFieldValue( $fieldName, $value, $formattedValue );
 					}
 				} else {
-					$coRow->addDisplayFieldValue( $fieldName, $value );
+					$coRow->addDisplayFieldValue( $fieldName, $formattedValue );
 				}
 			}
 			$outlineTree->addRow( $coRow );
