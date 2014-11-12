@@ -242,6 +242,7 @@ class CargoSQLQuery {
 				// regexps.
 				list( $tableName, $fieldName ) = explode( '.', $fieldName, 2 );
 			}
+			$description = array();
 			// If it's a pre-defined field, we probably know the
 			// type.
 			if ( $fieldName == '_ID' || $fieldName == '_rowID' || $fieldName == '_pageID' ) {
