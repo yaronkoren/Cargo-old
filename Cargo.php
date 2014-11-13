@@ -189,21 +189,6 @@ $wgCargoDBuser = null;
 $wgCargoDBpassword = null;
 $wgCargoDefaultQueryLimit = 100;
 $wgCargoMaxQueryLimit = 5000;
-$wgCargoDisplayFormats = array(
-	'list' => 'CargoListFormat',
-	'ul' => 'CargoULFormat',
-	'ol' => 'CargoOLFormat',
-	'template' => 'CargoTemplateFormat',
-	'embedded' => 'CargoEmbeddedFormat',
-	'outline' => 'CargoOutlineFormat',
-	'tree' => 'CargoTreeFormat',
-	'table' => 'CargoTableFormat',
-	'dynamic table' => 'CargoDynamicTableFormat',
-	'googlemaps' => 'CargoGoogleMapsFormat',
-	'openlayers' => 'CargoOpenLayersFormat',
-	'calendar' => 'CargoCalendarFormat',
-	'category' => 'CargoCategoryFormat',
-);
 
 $wgCargoMapClusteringMinimum = 80;
 

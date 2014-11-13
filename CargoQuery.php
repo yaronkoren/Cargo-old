@@ -96,15 +96,38 @@ class CargoQuery {
 	 * of the the function to call for that format.
 	 */
 	static function getFormatClass( $format, $fieldDescriptions ) {
-		global $wgCargoDisplayFormats;
+		$formatClasses = array(
+			'list' => 'CargoListFormat',
+			'ul' => 'CargoULFormat',
+			'ol' => 'CargoOLFormat',
+			'template' => 'CargoTemplateFormat',
+			'embedded' => 'CargoEmbeddedFormat',
+			'outline' => 'CargoOutlineFormat',
+			'tree' => 'CargoTreeFormat',
+			'table' => 'CargoTableFormat',
+			'dynamic table' => 'CargoDynamicTableFormat',
+			'googlemaps' => 'CargoGoogleMapsFormat',
+			'openlayers' => 'CargoOpenLayersFormat',
+			'calendar' => 'CargoCalendarFormat',
+			'category' => 'CargoCategoryFormat',
+		);
 
-		if ( array_key_exists( $format, $wgCargoDisplayFormats ) ) {
-		} elseif ( count( $fieldDescriptions ) > 1 ) {
+		if ( array_key_exists( $format, $formatClasses ) ) {
+			return $formatClasses[$format];
+		}
+
+		$formatClass = null;
+		wfRunHooks( 'CargoGetFormatClass', array( $format, &$formatClass ) );
+		if ( $formatClass != null ) {
+			return $formatClass;
+		}
+
+		if ( count( $fieldDescriptions ) > 1 ) {
 			$format = 'table';
 		} else {
 			$format = 'list';
 		}
-		return $wgCargoDisplayFormats[$format];
+		return $formatClasses[$format];
 	}
 
 	/**
