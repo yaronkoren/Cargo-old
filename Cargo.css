@@ -1,3 +1,8 @@
+span.cargoFieldName {
+	font-style: italic;
+	color: #777;
+}
+
 table.cargoTable {
 	border-collapse: collapse;
 }

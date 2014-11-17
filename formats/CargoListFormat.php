@@ -6,6 +6,11 @@
 
 class CargoListFormat extends CargoDisplayFormat {
 
+	function __construct( $output, $parser = null ) {
+		parent::__construct( $output, $parser );
+		$this->mOutput->addModules( 'ext.cargo.main' );
+	}
+
 	function allowedParameters() {
 		return array( 'delimiter' );
 	}
@@ -32,7 +37,7 @@ class CargoListFormat extends CargoDisplayFormat {
 				} else {
 					$text .= ', ';
 				}
-				$text .= "<em>$fieldName:</em> $fieldValue";
+				$text .= "<span class=\"cargoFieldName\">$fieldName:</span> $fieldValue";
 			}
 		}
 		if ( $startParenthesisAdded ) {
