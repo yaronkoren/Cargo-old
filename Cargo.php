@@ -77,6 +77,7 @@ $wgAutoloadClasses['CargoQueryAPI'] = $dir . '/CargoQueryAPI.php';
 
 // Display formats
 $wgAutoloadClasses['CargoDisplayFormat'] = $dir . '/formats/CargoDisplayFormat.php';
+$wgAutoloadClasses['CargoDeferredFormat'] = $dir . '/formats/CargoDeferredFormat.php';
 $wgAutoloadClasses['CargoListFormat'] = $dir . '/formats/CargoListFormat.php';
 $wgAutoloadClasses['CargoULFormat'] = $dir . '/formats/CargoULFormat.php';
 $wgAutoloadClasses['CargoOLFormat'] = $dir . '/formats/CargoOLFormat.php';
