@@ -56,7 +56,7 @@ class CargoDrilldown extends IncludableSpecialPage {
 			$tableName = $tableNames[0];
 		}
 
-		$tableSchemas = CargoQuery::getTableSchemas( array( $tableName ) );
+		$tableSchemas = CargoUtils::getTableSchemas( array( $tableName ) );
 		$filters = array();
 		foreach( $tableSchemas[$tableName] as $fieldName => $fieldDescription ) {
 			// Skip "hidden" fields.
@@ -827,7 +827,7 @@ END;
 		$header .= "				<div class=\"drilldown-filters\">\n";
 		$cur_url = $this->makeBrowseURL( $this->tableName, $this->applied_filters );
 		$cur_url .= ( strpos( $cur_url, '?' ) ) ? '&' : '?';
-		$tableSchemas = CargoQuery::getTableSchemas( array( $this->tableName ) );
+		$tableSchemas = CargoUtils::getTableSchemas( array( $this->tableName ) );
 		$tableSchema = $tableSchemas[$this->tableName];
 		foreach ( $tableSchema as $fieldName => $fieldDescription ) {
 			// Some field types shouldn't get a filter at all.

@@ -69,6 +69,29 @@ class CargoUtils {
 		return $tableNames;
 	}
 
+	static function getTableSchemas( $tableNames ) {
+		$mainTableNames = array();
+		foreach( $tableNames as $tableName ) {
+			if ( strpos( $tableName, '__' ) !== false ) {
+				// We just want the first part of it.
+				$tableNameParts = explode( '__', $tableName );
+				$tableName = $tableNameParts[0];
+			}
+			if ( !in_array( $tableName, $mainTableNames ) ) {
+				$mainTableNames[] = $tableName;
+			}
+		}
+		$tableSchemas = array();
+		$dbr = wfGetDB( DB_SLAVE );
+		$res = $dbr->select( 'cargo_tables', array( 'main_table', 'table_schema' ), array( 'main_table' => $mainTableNames ) );
+		while ( $row = $dbr->fetchRow( $res ) ) {
+			$tableName = $row['main_table'];
+			$tableFieldsString = $row['table_schema'];
+			$tableSchemas[$tableName] = unserialize( $tableFieldsString );
+		}
+		return $tableSchemas;
+	}
+
 	/**
 	 * Get the Cargo table for the passed-in template specified via
 	 * either #cargo_declare or #cargo_attach, if the template has a
@@ -125,6 +148,36 @@ class CargoUtils {
 		$returnValues[] = $curReturnValue;
 		
 		return $returnValues;
+	}
+
+	/**
+	 * Parse a piece of wikitext differently depending on whether
+	 * we're in a special or regular page.
+	 */
+	public static function smartParse( $value, $parser ) {
+		// This decode() call is here in case the value was
+		// set using {{PAGENAME}}, which for some reason
+		// HTML-encodes some of its characters - see
+		// https://www.mediawiki.org/wiki/Help:Magic_words#Page_names
+		// Of course, Text and Page fields could be set using
+		// {{PAGENAME}} as well, but those seem less likely.
+		$value = htmlspecialchars_decode( $value );
+		// Parse it as if it's wikitext./ The exact call
+		// depends on whether we're in a special page or not.
+		global $wgTitle, $wgRequest;
+		if ( is_null( $parser ) ) {
+			global $wgParser;
+			$parser = $wgParser;
+		}
+		if ( $wgTitle->isSpecialPage() ||
+			// The 'pagevalues' action is also a Cargo special page.
+			$wgRequest->getVal( 'action' ) == 'pagevalues' ) {
+			$parserOutput = $parser->parse( $value, $wgTitle, new ParserOptions(), false );
+			$value = $parserOutput->getText();
+		} else {
+			$value = $parser->internalParse( $value );
+		}
+		return $value;
 	}
 
 }

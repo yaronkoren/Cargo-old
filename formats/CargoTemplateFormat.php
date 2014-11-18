@@ -35,7 +35,7 @@ class CargoTemplateFormat extends CargoDisplayFormat {
 		foreach ( $valuesTable as $row ) {
 			$text .= $this->displayRow( $templateName, $row, $fieldDescriptions );
 		}
-		return CargoQuery::smartParse( $text, $this->mParser );
+		return CargoUtils::smartParse( $text, $this->mParser );
 	}
 
 }

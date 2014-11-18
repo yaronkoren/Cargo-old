@@ -28,7 +28,7 @@ END;
 		foreach ( $valuesTable as $row ) {
 			$text .= $this->displayRow( $row );
 		}
-		return CargoQuery::smartParse( $text, $this->mParser );
+		return CargoUtils::smartParse( $text, $this->mParser );
 	}
 
 }
