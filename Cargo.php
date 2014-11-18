@@ -29,7 +29,7 @@ $wgJobClasses['cargoRecreateTables'] = 'CargoRecreateTablesJob';
 
 $wgHooks['ParserFirstCallInit'][] = 'cargoRegisterParserFunctions';
 $wgHooks['MakeGlobalVariablesScript'][] = 'CargoHooks::setGlobalJSVariables';
-$wgHooks['PageContentSave'][] = 'CargoHooks::onPageContentSave';
+$wgHooks['PageContentSaveComplete'][] = 'CargoHooks::onPageContentSaveComplete';
 $wgHooks['ApprovedRevsRevisionApproved'][] = 'CargoHooks::onARRevisionApproved';
 $wgHooks['ApprovedRevsRevisionUnapproved'][] = 'CargoHooks::onARRevisionUnapproved';
 $wgHooks['TitleMoveComplete'][] = 'CargoHooks::onTitleMoveComplete';

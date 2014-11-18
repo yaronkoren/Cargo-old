@@ -53,11 +53,14 @@ class CargoHooks {
 	}
 
 	/**
-	 * Called by the MediaWiki 'PageContentSave' hook.
+	 * Called by the MediaWiki 'PageContentSaveComplete' hook.
+	 *
+	 * We use that hook, instead of 'PageContentSave', because we need
+	 * the page ID to have been set already for newly-created pages.
 	 */
-	public static function onPageContentSave( $wikiPage, $user, $content, $summary, $isMinor, $isWatch, $section, $flags, $status ) {
+	public static function onPageContentSaveComplete( $article, $user, $content, $summary, $isMinor, $isWatch, $section, $flags, $status ) {
 		// First, delete the existing data.
-		$pageID = $wikiPage->getID();
+		$pageID = $article->getID();
 		self::deletePageFromSystem( $pageID );
 
 		// Now parse the page again, so that #cargo_store will be
@@ -67,7 +70,7 @@ class CargoHooks {
 		// added to remain set.
 		CargoStore::$settings['origin'] = 'page save';
 		global $wgParser;
-		$title = $wikiPage->getTitle();
+		$title = $article->getTitle();
 
 		// Special handling for the Approved Revs extension.
 		$pageText = null;
