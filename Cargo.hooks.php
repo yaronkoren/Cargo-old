@@ -98,7 +98,7 @@ class CargoHooks {
 		// this setting will be enough to get the correct revision of
 		// this page to be saved by Cargo, since the page will be
 		// parsed right after this.
-		CargoStore::$settings['origin'] = 'page save';
+		CargoStore::$settings['origin'] = 'Approved Revs revision approved';
 		return true;
 	}
 
@@ -109,7 +109,7 @@ class CargoHooks {
 		$pageID = $title->getArticleID();
 		self::deletePageFromSystem( $pageID );
 		// This is all we need - see onARRevisionApproved(), above.
-		CargoStore::$settings['origin'] = 'page save';
+		CargoStore::$settings['origin'] = 'Approved Revs revision unapproved';
 		return true;
 	}
 
