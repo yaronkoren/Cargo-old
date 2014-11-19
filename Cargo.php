@@ -92,6 +92,7 @@ $wgAutoloadClasses['CargoGoogleMapsFormat'] = $dir . '/formats/CargoGoogleMapsFo
 $wgAutoloadClasses['CargoOpenLayersFormat'] = $dir . '/formats/CargoOpenLayersFormat.php';
 $wgAutoloadClasses['CargoCalendarFormat'] = $dir . '/formats/CargoCalendarFormat.php';
 $wgAutoloadClasses['CargoCategoryFormat'] = $dir . '/formats/CargoCategoryFormat.php';
+$wgAutoloadClasses['CargoBarChartFormat'] = $dir . '/formats/CargoBarChartFormat.php';
 
 // Drilldown
 $wgAutoloadClasses['CargoAppliedFilter'] = $dir . '/drilldown/CargoAppliedFilter.php';
@@ -164,6 +165,15 @@ $wgResourceModules += array(
 			'libs/ext.cargo.datatables.js',
 		),
 		'position' => 'top',
+		'localBasePath' => __DIR__,
+		'remoteExtPath' => 'Cargo'
+	),
+	'ext.cargo.nvd3' => array(
+		'scripts' => array(
+			'libs/d3.js',
+			'libs/nv.d3.js',
+			'libs/ext.cargo.nvd3.js',
+		),
 		'localBasePath' => __DIR__,
 		'remoteExtPath' => 'Cargo'
 	),

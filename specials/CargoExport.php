@@ -1,7 +1,8 @@
 <?php
 /**
- * Gets the results of a Cargo query for one date range, specifically for use
- * by the FullCalendar JS library, for the 'calendar' format.
+ * Displays the results of a Cargo query in one of several possible
+ * structured data formats - in some cases for use by an Ajax-based
+ * display format.
  *
  * @author Yaron Koren
  * @ingroup Cargo
@@ -37,6 +38,8 @@ class CargoExport extends SpecialPage {
 
 		if ( $format == 'fullcalendar' ) {
 			$this->displayCalendarData( $sqlQueries );
+		} elseif ( $format == 'nvd3chart' ) {
+			$this->displayNVD3ChartData( $sqlQueries );
 		}
 	}
 
@@ -87,6 +90,53 @@ class CargoExport extends SpecialPage {
 		}
 
 		print json_encode( $displayedArray );
+	}
+
+	function displayNVD3ChartData( $sqlQueries ) {
+		$req = $this->getRequest();
+
+		// We'll only use the first query, if there's more than one.
+		$sqlQuery = $sqlQueries[0];
+		$queryResults = $sqlQuery->run();
+
+		// @TODO - this array needs to be longer.
+		$colorsArray = array( '#60BD68', '#FAA43A', '#5DA6DA', '#CC333F' );
+
+		// Initialize everything, using the field names.
+		$firstRow = reset( $queryResults );
+		$displayedArray = array();
+		$labelNames = array();
+		$fieldNum = 0;
+		foreach( $firstRow as $fieldName => $value ) {
+			if ( $fieldNum == 0 ) {
+				$labelNames[] = $value;
+			} else {
+				$curSeries = array(
+					'key' => $fieldName,
+					'color' => $colorsArray[$fieldNum - 1],
+					'values' => array()
+				);
+				$displayedArray[] = $curSeries;
+			}
+			$fieldNum++;
+		}
+
+		foreach ( $queryResults as $i => $queryResult ) {
+			$fieldNum = 0;
+			foreach ( $queryResult as $fieldName => $value ) {
+				if ( $fieldNum == 0 ) {
+					$labelName = $value;
+				} else {
+					$displayedArray[$fieldNum - 1]['values'][] = array(
+						'label' => $labelName,
+						'value' => $value
+					);
+				}
+				$fieldNum++;
+			}
+		}
+
+		print json_encode( $displayedArray, JSON_NUMERIC_CHECK | JSON_HEX_TAG );
 	}
 
 }

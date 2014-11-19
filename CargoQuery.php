@@ -83,6 +83,7 @@ class CargoQuery {
 			'googlemaps' => 'CargoGoogleMapsFormat',
 			'openlayers' => 'CargoOpenLayersFormat',
 			'calendar' => 'CargoCalendarFormat',
+			'bar chart' => 'CargoBarChartFormat',
 			'category' => 'CargoCategoryFormat',
 		);
 
