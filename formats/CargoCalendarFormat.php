@@ -11,7 +11,7 @@ class CargoCalendarFormat extends CargoDeferredFormat {
 
 	function queryAndDisplay( $sqlQueries, $displayParams, $querySpecificParams = null ) {
 		$this->mOutput->addModules( 'ext.cargo.calendar' );
-		$cd = SpecialPage::getTitleFor( 'CalendarData' );
+		$ce = SpecialPage::getTitleFor( 'CargoExport' );
 		$queryParams = $this->sqlQueriesToQueryParams( $sqlQueries );
 		$queryParams['format'] = 'fullcalendar';
 		$queryParams['color'] = array();
@@ -36,7 +36,7 @@ class CargoCalendarFormat extends CargoDeferredFormat {
 
 		$attrs = array(
 			'class' => 'cargoCalendar',
-			'dataurl' => $cd->getFullURL( $queryParams ),
+			'dataurl' => $ce->getFullURL( $queryParams ),
 			'style' => "width: $width"
 		);
 		if ( array_key_exists( 'start date', $displayParams ) ) {

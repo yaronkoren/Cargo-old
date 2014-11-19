@@ -7,37 +7,49 @@
  * @ingroup Cargo
  */
 
-class CargoCalendarData extends SpecialPage {
+class CargoExport extends SpecialPage {
 
 	/**
 	 * Constructor
 	 */
 	function __construct() {
-		parent::__construct( 'CalendarData' );
+		parent::__construct( 'CargoExport' );
 	}
 
 	function execute( $query ) {
 		$this->getOutput()->setArticleBodyOnly( true );
-		//list( $limit, $offset ) = wfCheckLimits();
 
 		$req = $this->getRequest();
 		$tableArray = $req->getArray( 'tables' );
+		$fieldsArray = $req->getArray( 'fields' );
 		$whereArray = $req->getArray( 'where' );
 		$joinOnArray = $req->getArray( 'join_on' );
 		$groupByArray = $req->getArray( 'group_by' );
 		$orderByArray = $req->getArray( 'order_by' );
-		$colorArray = $req->getArray( 'color' );
-		$fieldsArray = $req->getArray( 'fields' );
+		$limitArray = $req->getArray( 'limit' );
 
-		$limitStr = null;
+		$sqlQueries = array();
+		foreach ( $tableArray as $i => $table ) {
+			$sqlQueries[] = CargoSQLQuery::newFromValues( $table, $fieldsArray[$i], $whereArray[$i], $joinOnArray[$i], $groupByArray[$i], $orderByArray[$i], $limitArray[$i] );
+		}
+
+		$format = $req->getVal( 'format' );
+
+		if ( $format == 'fullcalendar' ) {
+			$this->displayCalendarData( $sqlQueries );
+		}
+	}
+
+	function displayCalendarData( $sqlQueries ) {
+		$req = $this->getRequest();
+
+		$colorArray = $req->getArray( 'color' );
 
 		$startDate = $req->getVal( 'start' );
 		$endDate = $req->getVal( 'end' );
 
 		$displayedArray = array();
-		foreach ( $tableArray as $i => $table ) {
-			$sqlQuery = CargoSQLQuery::newFromValues( $table, $fieldsArray[$i], $whereArray[$i], $joinOnArray[$i], $groupByArray[$i], $orderByArray[$i], $limitStr );
-
+		foreach ( $sqlQueries as $i => $sqlQuery ) {
 			$dateFields = array();
 			foreach( $sqlQuery->mFieldDescriptions as $field => $description ) {
 				if ( $description['type'] == 'Date' || $description['type'] == 'Datetime' ) {
