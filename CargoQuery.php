@@ -85,6 +85,8 @@ class CargoQuery {
 			'calendar' => 'CargoCalendarFormat',
 			'bar chart' => 'CargoBarChartFormat',
 			'category' => 'CargoCategoryFormat',
+			'csv' => 'CargoCSVFormat',
+			'json' => 'CargoJSONFormat',
 		);
 
 		if ( array_key_exists( $format, $formatClasses ) ) {

@@ -40,6 +40,10 @@ class CargoExport extends SpecialPage {
 			$this->displayCalendarData( $sqlQueries );
 		} elseif ( $format == 'nvd3chart' ) {
 			$this->displayNVD3ChartData( $sqlQueries );
+		} elseif ( $format == 'csv' ) {
+			$this->displayCSVData( $sqlQueries );
+		} elseif ( $format == 'json' ) {
+			$this->displayJSONData( $sqlQueries );
 		}
 	}
 
@@ -137,6 +141,28 @@ class CargoExport extends SpecialPage {
 		}
 
 		print json_encode( $displayedArray, JSON_NUMERIC_CHECK | JSON_HEX_TAG );
+	}
+
+	function displayCSVData( $sqlQueries ) {
+		// We'll only use the first query, if there's more than one.
+		$sqlQuery = $sqlQueries[0];
+		$queryResults = $sqlQuery->run();
+		$out = fopen('php://output', 'w');
+		// Display header row.
+		fputcsv( $out, array_keys( reset( $queryResults ) ) );
+		foreach( $queryResults as $queryResult ) {
+			fputcsv( $out, $queryResult );
+		}
+		fclose( $out );
+	}
+
+	function displayJSONData( $sqlQueries ) {
+		$allQueryResults = array();
+		foreach ( $sqlQueries as $sqlQuery ) {
+			$queryResults = $sqlQuery->run();
+			$allQueryResults = array_merge( $allQueryResults, $queryResults );
+		}
+		print json_encode( $allQueryResults, JSON_NUMERIC_CHECK | JSON_HEX_TAG | JSON_PRETTY_PRINT );
 	}
 
 }
