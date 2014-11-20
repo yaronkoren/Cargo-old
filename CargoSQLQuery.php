@@ -34,7 +34,7 @@ class CargoSQLQuery {
 		$sqlQuery->mWhere = $whereStr;
 		$sqlQuery->setCargoJoinConds( $joinOnStr );
 		$sqlQuery->setAliasedFieldNames();
-		$sqlQuery->mTableSchemas = CargoQuery::getTableSchemas( $sqlQuery->mTableNames );
+		$sqlQuery->mTableSchemas = CargoUtils::getTableSchemas( $sqlQuery->mTableNames );
 		$sqlQuery->setOrderBy( $orderByStr );
 		$sqlQuery->setDescriptionsForFields();
 		$sqlQuery->handleVirtualFields();
