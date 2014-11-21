@@ -8,17 +8,18 @@
 
 class CargoSQLQuery {
 
+	var $mTablesStr;
 	var $mTableNames;
 	var $mFieldsStr;
-	var $mWhere;
+	var $mWhereStr;
 	var $mJoinOnStr;
 	var $mCargoJoinConds;
 	var $mJoinConds;
 	var $mAliasedFieldNames;
 	var $mTableSchemas;
 	var $mFieldDescriptions;
-	var $mGroupBy;
-	var $mOrderBy;
+	var $mGroupByStr;
+	var $mOrderByStr;
 	var $mQueryLimit;
 
 	/**
@@ -29,9 +30,13 @@ class CargoSQLQuery {
 		global $wgCargoDefaultQueryLimit, $wgCargoMaxQueryLimit;
 
 		$sqlQuery = new CargoSQLQuery();
+		$sqlQuery->mTablesStr = $tablesStr;
 		$sqlQuery->mTableNames = explode( ',', $tablesStr );
 		$sqlQuery->mFieldsStr = $fieldsStr;
-		$sqlQuery->mWhere = $whereStr;
+		// This _decode() call is necessary because the "where="
+		// clause can (and often does) include a call to {{PAGENAME}},
+		// which HTML-encodes certain characters, notably single quotes.
+		$sqlQuery->mWhereStr = htmlspecialchars_decode( $whereStr, ENT_QUOTES );
 		$sqlQuery->setCargoJoinConds( $joinOnStr );
 		$sqlQuery->setAliasedFieldNames();
 		$sqlQuery->mTableSchemas = CargoUtils::getTableSchemas( $sqlQuery->mTableNames );
@@ -40,7 +45,7 @@ class CargoSQLQuery {
 		$sqlQuery->handleVirtualFields();
 		$sqlQuery->handleVirtualCoordinateFields();
 		$sqlQuery->setMWJoinConds();
-		$sqlQuery->mGroupBy = $groupByStr;
+		$sqlQuery->mGroupByStr = $groupByStr;
 		$sqlQuery->mQueryLimit = $wgCargoDefaultQueryLimit;
 		if ( $limitStr != '' ) {
 			$sqlQuery->mQueryLimit = min( $limitStr, $wgCargoMaxQueryLimit );
@@ -397,10 +402,10 @@ class CargoSQLQuery {
 			$fieldName = $virtualField['fieldName'];
 			$tableName = $virtualField['tableName'];
 			$pattern1 = "/\b$tableName\.$fieldName(\s*HOLDS\s*)?/";
-			$foundMatch = preg_match( $pattern1, $this->mWhere, $matches);
+			$foundMatch = preg_match( $pattern1, $this->mWhereStr, $matches);
 			if ( !$foundMatch ) {
 				$pattern2 = "/\b$fieldName(\s*HOLDS\s*)?/";
-				$foundMatch2 = preg_match( $pattern2, $this->mWhere, $matches);
+				$foundMatch2 = preg_match( $pattern2, $this->mWhereStr, $matches);
 			}
 			if ( $foundMatch || $foundMatch2 ) {
 				// If no "HOLDS", throw an error.
@@ -417,9 +422,9 @@ class CargoSQLQuery {
 					'field2' => '_rowID'
 				);
 				if ( $foundMatch ) {
-					$this->mWhere = preg_replace( $pattern1, "$fieldTableName._value=", $this->mWhere );
+					$this->mWhereStr = preg_replace( $pattern1, "$fieldTableName._value=", $this->mWhereStr );
 				} elseif ( $foundMatch2 ) {
-					$this->mWhere = preg_replace( $pattern2, "$fieldTableName._value=", $this->mWhere );
+					$this->mWhereStr = preg_replace( $pattern2, "$fieldTableName._value=", $this->mWhereStr );
 				}
 			}
 		}
@@ -600,10 +605,10 @@ class CargoSQLQuery {
 			$fieldName = $coordinateField['fieldName'];
 			$tableName = $coordinateField['tableName'];
 			$pattern1 = "/\b$tableName\.$fieldName(\s*NEAR\s*)\(([^)]*)\)/";
-			$foundMatch = preg_match( $pattern1, $this->mWhere, $matches);
+			$foundMatch = preg_match( $pattern1, $this->mWhereStr, $matches);
 			if ( !$foundMatch ) {
 				$pattern2 = "/\b$fieldName(\s*NEAR\s*)\(([^)]*)\)/";
-				$foundMatch2 = preg_match( $pattern2, $this->mWhere, $matches);
+				$foundMatch2 = preg_match( $pattern2, $this->mWhereStr, $matches);
 			}
 			if ( $foundMatch || $foundMatch2 ) {
 				// If no "NEAR", throw an error.
@@ -632,9 +637,9 @@ class CargoSQLQuery {
 					" AND $tableName.{$fieldName}__lon <= " . min( $longitude + $longDistance, 180 );
 
 				if ( $foundMatch ) {
-					$this->mWhere = preg_replace( $pattern1, $newWhere, $this->mWhere );
+					$this->mWhereStr = preg_replace( $pattern1, $newWhere, $this->mWhereStr );
 				} elseif ( $foundMatch2 ) {
-					$this->mWhere = preg_replace( $pattern2, $newWhere, $this->mWhere );
+					$this->mWhereStr = preg_replace( $pattern2, $newWhere, $this->mWhereStr );
 				}
 			}
 		}
@@ -689,11 +694,11 @@ class CargoSQLQuery {
 		foreach ( $this->mAliasedFieldNames as $alias => $fieldName ) {
 			$this->mAliasedFieldNames[$alias] = self::addTablePrefixes( $fieldName );
 		}
-		if ( !is_null( $this->mWhere ) ) {
-			$this->mWhere = self::addTablePrefixes( $this->mWhere );
+		if ( !is_null( $this->mWhereStr ) ) {
+			$this->mWhereStr = self::addTablePrefixes( $this->mWhereStr );
 		}
-		$this->mGroupBy = self::addTablePrefixes( $this->mGroupBy );
-		$this->mOrderBy = self::addTablePrefixes( $this->mOrderBy );
+		$this->mGroupByStr = self::addTablePrefixes( $this->mGroupByStr );
+		$this->mOrderByStr = self::addTablePrefixes( $this->mOrderByStr );
 	}
 
 	/**
@@ -711,8 +716,8 @@ class CargoSQLQuery {
 
 		$selectOptions = array();
 
-		if ( $this->mGroupBy != '' ) {
-			$selectOptions['GROUP BY'] = $this->mGroupBy;
+		if ( $this->mGroupByStr != '' ) {
+			$selectOptions['GROUP BY'] = $this->mGroupByStr;
 		}
 		$selectOptions['ORDER BY'] = $this->mOrderBy;
 		$selectOptions['LIMIT'] = $this->mQueryLimit;
@@ -724,7 +729,7 @@ class CargoSQLQuery {
 			$realAliasedFieldNames['"' . $alias . '"'] = $fieldName;
 		}
 
-		$res = $cdb->select( $this->mTableNames, $realAliasedFieldNames, $this->mWhere, __METHOD__, $selectOptions, $this->mJoinConds );
+		$res = $cdb->select( $this->mTableNames, $realAliasedFieldNames, $this->mWhereStr, __METHOD__, $selectOptions, $this->mJoinConds );
 
 		// Is there a more straightforward way of turning query
 		// results into an array?

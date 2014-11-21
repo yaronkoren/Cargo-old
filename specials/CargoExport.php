@@ -64,7 +64,7 @@ class CargoExport extends SpecialPage {
 				}
 			}
 
-			$where = $sqlQuery->mWhere;
+			$where = $sqlQuery->mWhereStr;
 			if ( $where != '' ) {
 				$where .= " AND ";
 			}
@@ -76,7 +76,7 @@ class CargoExport extends SpecialPage {
 				$where .= "($dateField >= '$startDate' AND $dateField <= '$endDate')";
 			}
 			$where .= ")";
-			$sqlQuery->mWhere = $where;
+			$sqlQuery->mWhereStr = $where;
 
 			$queryResults = $sqlQuery->run();
 

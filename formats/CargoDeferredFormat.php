@@ -34,14 +34,14 @@ abstract class CargoDeferredFormat extends CargoDisplayFormat {
 			if ( $sqlQuery->mFieldsStr != '' ) {
 				$queryParams['fields'] = $sqlQuery->mFieldsStr;
 			}
-			if ( $sqlQuery->mWhere != '' ) {
-				$queryParams['where'] = $sqlQuery->mWhere;
+			if ( $sqlQuery->mWhereStr != '' ) {
+				$queryParams['where'] = $sqlQuery->mWhereStr;
 			}
-			if ( $sqlQuery->mGroupBy != '' ) {
-				$queryParams['group by'] = $sqlQuery->mGroupBy;
+			if ( $sqlQuery->mGroupByStr != '' ) {
+				$queryParams['group by'] = $sqlQuery->mGroupByStr;
 			}
-			if ( $sqlQuery->mOrderBy != '' ) {
-				$queryParams['order by'] = $sqlQuery->mOrderBy;
+			if ( $sqlQuery->mOrderByStr != '' ) {
+				$queryParams['order by'] = $sqlQuery->mOrderByStr;
 			}
 			if ( $sqlQuery->mQueryLimit != '' ) {
 				$queryParams['limit'] = $sqlQuery->mQueryLimit;

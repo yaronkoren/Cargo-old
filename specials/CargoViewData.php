@@ -77,8 +77,8 @@ class ViewDataPage extends QueryPage {
 
 	function getQueryInfo() {
 		$selectOptions = array();
-		if ( $this->sqlQuery->mGroupBy != '' ) {
-			$selectOptions['GROUP BY'] = $this->sqlQuery->mGroupBy;
+		if ( $this->sqlQuery->mGroupByStr != '' ) {
+			$selectOptions['GROUP BY'] = $this->sqlQuery->mGroupByStr;
 		}
 		// "order by" is handled elsewhere, in getOrderFields().
 
@@ -94,8 +94,8 @@ class ViewDataPage extends QueryPage {
 			'fields' => $realAliasedFieldNames,
 			'options' => $selectOptions
 		);
-		if ( $this->sqlQuery->mWhere != '' ) {
-			$queryInfo['conds'] = $this->sqlQuery->mWhere;
+		if ( $this->sqlQuery->mWhereStr != '' ) {
+			$queryInfo['conds'] = $this->sqlQuery->mWhereStr;
 		}
 		if ( !empty( $this->sqlQuery->mJoinConds ) ) {
 			$queryInfo['join_conds'] = $this->sqlQuery->mJoinConds;
@@ -121,8 +121,8 @@ class ViewDataPage extends QueryPage {
 	}
 
 	function getOrderFields() {
-		if ( $this->sqlQuery->mOrderBy != '' ) {
-			return array( $this->sqlQuery->mOrderBy );
+		if ( $this->sqlQuery->mOrderByStr != '' ) {
+			return array( $this->sqlQuery->mOrderByStr );
 		}
 	}
 
