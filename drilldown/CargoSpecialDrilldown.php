@@ -952,16 +952,16 @@ END;
 	 * @param int $offset Paging offset
 	 */
 	protected function outputResults( $out, $skin, $dbr, $res, $num, $offset ) {
-		global $wgParser;
-
 		$valuesTable = array();
 		while ( $row = $dbr->fetchRow( $res ) ) {
 			$valuesTable[] = array( 'title' => $row['title'] );
 		}
-		$fieldDescriptions = array( 'title' => array( 'type' => 'Page' ) );
-		$formattedValuesTable = CargoQuery::getFormattedQueryResults( $valuesTable, $fieldDescriptions, $wgParser );
-		$formatObject = new CargoCategoryFormat( $out );
-		$html = $formatObject->display( $valuesTable, $formattedValuesTable, $fieldDescriptions, $displayParams = array() );
+		$queryDisplayer = new CargoQueryDisplayer();
+		$queryDisplayer->mFieldDescriptions = array( 'title' => array( 'type' => 'Page' ) );
+		$queryDisplayer->mFormat = 'category';
+		$formattedValuesTable = $queryDisplayer->getFormattedQueryResults( $valuesTable );
+		$formatter = $queryDisplayer->getFormatter( $out );
+		$html = $formatter->display( $valuesTable, $formattedValuesTable, $queryDisplayer->mFieldDescriptions, $displayParams = array() );
 		$out->addHTML( $html );
 	}
 
