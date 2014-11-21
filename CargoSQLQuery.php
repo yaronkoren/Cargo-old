@@ -225,11 +225,11 @@ class CargoSQLQuery {
 
 	function setOrderBy( $orderByStr = null ) {
 		if ( $orderByStr != '' ) {
-			$this->mOrderBy = $orderByStr;
+			$this->mOrderByStr = $orderByStr;
 		} else {
 			// By default, sort on the first field.
 			reset( $this->mAliasedFieldNames );
-			$this->mOrderBy = current( $this->mAliasedFieldNames );
+			$this->mOrderByStr = current( $this->mAliasedFieldNames );
 		}
 	}
 
@@ -510,12 +510,12 @@ class CargoSQLQuery {
 			$fieldName = $virtualField['fieldName'];
 			$tableName = $virtualField['tableName'];
 			$pattern1 = "/\b$tableName\.$fieldName\b/";
-			$foundMatch = preg_match( $pattern1, $this->mOrderBy, $matches);
+			$foundMatch = preg_match( $pattern1, $this->mOrderByStr, $matches);
 			$pattern2 = "/\b$fieldName\b/";
 			$foundMatch2 = false;
 
 			if ( !$foundMatch ) {
-				$foundMatch2 = preg_match( $pattern2, $this->mOrderBy, $matches);
+				$foundMatch2 = preg_match( $pattern2, $this->mOrderByStr, $matches);
 			}
 			if ( $foundMatch || $foundMatch2 ) {
 				$fieldTableName = $tableName . '__' . $fieldName;
@@ -525,9 +525,9 @@ class CargoSQLQuery {
 					$replacement = $tableName . '.' . $fieldName . '__full';
 				}
 				if ( $foundMatch ) {
-					$this->mOrderBy = preg_replace( $pattern1, $replacement, $this->mOrderBy );
+					$this->mOrderByStr = preg_replace( $pattern1, $replacement, $this->mOrderByStr );
 				} elseif ( $foundMatch2 ) {
-					$this->mOrderBy = preg_replace( $pattern2, $replacement, $this->mOrderBy );
+					$this->mOrderByStr = preg_replace( $pattern2, $replacement, $this->mOrderByStr );
 				}
 			}
 		}
@@ -719,7 +719,7 @@ class CargoSQLQuery {
 		if ( $this->mGroupByStr != '' ) {
 			$selectOptions['GROUP BY'] = $this->mGroupByStr;
 		}
-		$selectOptions['ORDER BY'] = $this->mOrderBy;
+		$selectOptions['ORDER BY'] = $this->mOrderByStr;
 		$selectOptions['LIMIT'] = $this->mQueryLimit;
 
 		// Aliases need to be surrounded by quotes when we actually
