@@ -141,11 +141,13 @@ class ViewDataPage extends QueryPage {
 		for ( $i = 0; $i < $num && $row = $res->fetchObject(); $i++ ) {
 			$valuesTable[] = get_object_vars( $row );
 		}
-		$formattedValuesTable = CargoQuery::getFormattedQueryResults( $valuesTable, $this->sqlQuery->mFieldDescriptions, null );
-		$formatClass = CargoQuery::getFormatClass( $this->format, $this->sqlQuery->mFieldDescriptions );
-		$formatObject = new $formatClass( $out );
+		$queryDisplayer = new CargoQueryDisplayer();
+		$queryDisplayer->mFieldDescriptions = $this->sqlQuery->mFieldDescriptions;
+		$queryDisplayer->mFormat = $this->format;
+		$formattedValuesTable = $queryDisplayer->getFormattedQueryResults( $valuesTable );
+		$formatter = $queryDisplayer->getFormatter( $out );
 		$this->displayParams['offset'] = $offset;
-		$html = $formatObject->display( $valuesTable, $formattedValuesTable, $this->sqlQuery->mFieldDescriptions, $this->displayParams );
+		$html = $formatter->display( $valuesTable, $formattedValuesTable, $this->sqlQuery->mFieldDescriptions, $this->displayParams );
 		$out->addHTML( $html );
 		return;
 	}

@@ -79,7 +79,8 @@ class CargoViewTable extends IncludableSpecialPage {
 
 		$queryResults = $sqlQuery->run();
 
-		$formattedQueryResults = CargoQuery::getFormattedQueryResults( $queryResults, $sqlQuery->mFieldDescriptions, null );
+		$queryDisplayer = CargoQueryDisplayer::newFromSQLQuery( $sqlQuery );
+		$formattedQueryResults = $queryDisplayer->getFormattedQueryResults( $queryResults );
 
 		$displayParams = array();
 
@@ -95,7 +96,7 @@ class CargoViewTable extends IncludableSpecialPage {
 			}
 			// Remove the comma at the end.
 			$fieldsStr = trim( $fieldsStr, ',' );
-			$text .= CargoQuery::viewMoreResultsLink( $tableName, $fieldsStr, null, null, null, $sqlQuery->mOrderBy, $sqlQuery->mQueryLimit, 'table', $displayParams );
+			$text .= $queryDisplayer->viewMoreResultsLink();
 		}
 
 		$out->addHTML( $text );

@@ -106,11 +106,16 @@ class CargoCompoundQuery {
 		return $queryResults;
 	}
 
+	/**
+	 * @TODO - this should probably be streamlined and renamed.
+	 */
 	public static function getOrDisplayQueryResultsFromStrings( $sqlQueries, $querySpecificParams, $format = null, $displayParams = null, $parser = null ) {
-		$formatClass = CargoQuery::getFormatClass( $format, array() );
-		$formatObject = new $formatClass( $parser->getOutput() );
-		if ( $formatObject->isDeferred() ) {
-			$text = $formatObject->queryAndDisplay( $sqlQueries, $displayParams, $querySpecificParams );
+		$queryDisplayer = new CargoQueryDisplayer();
+		$queryDisplayer->mParser = $parser;
+		$queryDisplayer->mFormat = $format;
+		$formatter = $queryDisplayer->getFormatter( $parser->getOutput() );
+		if ( $formatter->isDeferred() ) {
+			$text = $formatter->queryAndDisplay( $sqlQueries, $displayParams, $querySpecificParams );
 			$text = $parser->insertStripItem( $text, $parser->mStripState );
 			return $text;
 		}
@@ -123,7 +128,8 @@ class CargoCompoundQuery {
 		foreach ( $sqlQueries as $i => $sqlQuery ) {
 			$queryResults = $sqlQuery->run();
 			$allQueryResults = array_merge( $allQueryResults, $queryResults );
-			$formattedQueryResults = array_merge( $formattedQueryResults, CargoQuery::getFormattedQueryResults( $queryResults, $sqlQuery->mFieldDescriptions, $parser ) );
+			$queryDisplayer->mFieldDescriptions = $sqlQuery->mFieldDescriptions;
+			$formattedQueryResults = array_merge( $formattedQueryResults, $queryDisplayer->getFormattedQueryResults( $queryResults ) );
 			//$formattedQueryResultsArray[] = $formattedQueryResults;
 			foreach ( $sqlQuery->mFieldDescriptions as $alias => $description ) {
 				$allFieldDescriptions[$alias] = $description;
@@ -157,7 +163,7 @@ class CargoCompoundQuery {
 		}
 
 		// Finally, do the display, based on the format.
-		$text = $formatObject->display( $allQueryResults, $formattedQueryResults, $allFieldDescriptions, $displayParams );
+		$text = $formatter->display( $allQueryResults, $formattedQueryResults, $allFieldDescriptions, $displayParams );
 
 		// Don't show a "view more" link.
 		// @TODO - is such a thing possible for a compound query,

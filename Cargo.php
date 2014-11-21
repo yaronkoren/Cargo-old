@@ -58,6 +58,7 @@ $wgAutoloadClasses['CargoStore'] = $dir . '/CargoStore.php';
 $wgAutoloadClasses['CargoQuery'] = $dir . '/CargoQuery.php';
 $wgAutoloadClasses['CargoCompoundQuery'] = $dir . '/CargoCompoundQuery.php';
 $wgAutoloadClasses['CargoSQLQuery'] = $dir . '/CargoSQLQuery.php';
+$wgAutoloadClasses['CargoQueryDisplayer'] = $dir . '/CargoQueryDisplayer.php';
 $wgAutoloadClasses['CargoRecurringEvent'] = $dir . '/CargoRecurringEvent.php';
 $wgAutoloadClasses['CargoDisplayMap'] = $dir . '/CargoDisplayMap.php';
 $wgAutoloadClasses['CargoPopulateTableJob'] = $dir . '/CargoPopulateTableJob.php';

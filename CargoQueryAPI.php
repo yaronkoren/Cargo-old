@@ -26,8 +26,9 @@ class CargoQueryAPI extends ApiBase {
 			$this->dieUsage( 'The tables must be specified', 'param_substr' );
 		}
 
+		$sqlQuery = CargoSQLQuery::newFromValues( $tablesStr, $fieldsStr, $whereStr, $joinOnStr, $groupByStr, $orderByStr, $limitStr );
 		try {
-			$queryResults = CargoQuery::getOrDisplayQueryResultsFromStrings( $tablesStr, $fieldsStr, $whereStr, $joinOnStr, $groupByStr, $orderByStr, $limitStr );
+			$queryResults = $sqlQuery->run();
 		} catch ( Exception $e ) {
 			$this->dieUsage( $e );
 		}
