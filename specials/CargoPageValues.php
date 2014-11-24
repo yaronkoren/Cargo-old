@@ -35,6 +35,11 @@ class CargoPageValues extends IncludableSpecialPage {
 			foreach ( $queryResults as $rowValues ) {
 				$tableContents = '';
 				foreach ( $rowValues as $field => $value ) {
+					// @HACK - this check should ideally
+					// be done earlier.
+					if ( strpos( $field, '__precision' ) !== false ) {
+						continue;
+					}
 					$tableContents .= $this->printRow( $field, $value );
 				}
 				$text .= $this->printTable( $tableContents );

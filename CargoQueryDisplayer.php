@@ -101,6 +101,10 @@ class CargoQueryDisplayer {
 						if ( $i > 0 ) $text .= "$delimiter ";
 						$text .= self::formatFieldValue( $fieldValue, $type, $fieldDescription, $this->mParser );
 					}
+				} elseif ( $type == 'Date' || $type == 'Datetime' ) {
+					$datePrecisionField = str_replace( ' ', '_', $fieldName ) . '__precision';
+					$datePrecision = $row[$datePrecisionField];
+					$text = self::formatDateFieldValue( $value, $datePrecision, $fieldDescription['type'] );
 				} else {
 					$text = self::formatFieldValue( $value, $type, $fieldDescription, $this->mParser );
 				}
@@ -138,16 +142,33 @@ class CargoQueryDisplayer {
 				return null;
 			}
 		} elseif ( $type == 'Date' || $type == 'Datetime' ) {
+			// This should not get called - date fields
+			// have a separate formatting function.
+			return null;
+		} elseif ( $type == 'Wikitext' || $type == '' ) {
+			return CargoUtils::smartParse( $value, $parser );
+		}
+		// If it's not any of these specially-handled types, just
+		// return null.
+	}
+
+	static function formatDateFieldValue( $dateValue, $datePrecision, $type ) {
+		if ( $datePrecision == CargoStore::YEAR_ONLY ) {
+			$seconds = strtotime( $dateValue );
+			// 'o' is better than 'Y' because it does not add
+			// leading zeroes to years with less than four digits.
+			return date( 'o', $seconds );
+		} else { // CargoStore::FULL_PRECISION
 			global $wgAmericanDates;
-			$seconds = strtotime( $value );
+			$seconds = strtotime( $dateValue );
 			if ( $wgAmericanDates ) {
 				// We use MediaWiki's representation of month
 				// names, instead of PHP's, because its i18n
 				// support is of course far superior.
 				$dateText = CargoDrilldownUtils::monthToString( date( 'm', $seconds ) );
-				$dateText .= ' ' . date( 'j, Y', $seconds );
+				$dateText .= ' ' . date( 'j, o', $seconds );
 			} else {
-				$dateText = date( 'Y-m-d', $seconds );
+				$dateText = date( 'o-m-d', $seconds );
 			}
 			if ( $type == 'Date' ) {
 				return $dateText;
@@ -157,11 +178,7 @@ class CargoQueryDisplayer {
 			// @TODO - have some variable for 24-hour time display?
 			$timeText = date( 'g:i:s A', $seconds );
 			return "$dateText $timeText";
-		} elseif ( $type == 'Wikitext' || $type == '' ) {
-			return CargoUtils::smartParse( $value, $parser );
 		}
-		// If it's not any of these specially-handled types, just
-		// return null.
 	}
 
 	/**

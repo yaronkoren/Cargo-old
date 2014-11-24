@@ -74,6 +74,7 @@ class CargoViewTable extends IncludableSpecialPage {
 
 		$sqlQuery->mAliasedFieldNames = $aliasedFieldNames;
 		$sqlQuery->setDescriptionsForFields();
+		$sqlQuery->handleDateFields();
 		$sqlQuery->setOrderBy();
 		$sqlQuery->mQueryLimit = 100;
 

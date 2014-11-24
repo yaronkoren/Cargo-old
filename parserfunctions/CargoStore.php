@@ -10,6 +10,11 @@ class CargoStore {
 
 	public static $settings = array();
 
+	const FULL_PRECISION = 0;
+	const TIME_MISSING = 1;
+	const MONTH_ONLY = 2;
+	const YEAR_ONLY = 3;
+
 	/**
 	 * Gets the template page where this table is defined -
 	 * hopefully there's exactly one of them.
@@ -244,17 +249,44 @@ class CargoStore {
 					$tableFieldValues[$fieldName] = null;
 				}
 			}
-			if ( $fieldDescription['type'] == 'Date' ) {
-				// Put into YYYY-MM-DD format.
+			if ( $fieldDescription['type'] == 'Date' || $fieldDescription['type'] == 'Datetime' ) {
 				if ( $curValue != '' ) {
+					// Special handling if it's just a year.
+					if ( ctype_digit( $curValue ) ) {
+						// Add a fake date - it will
+						// get ignored later.
+						$curValue = "$curValue-01-01";
+						$precision = self::YEAR_ONLY;
+					} else {
+						// Determine if there's a month
+						// but no day. There's no ideal
+						// way to do this, so: we'll
+						// just look for the total
+						// number of spaces, slashes
+						// and dashes, and if there's
+						// exactly one altogether, we'll
+						// guess that it's a month only.
+						$numSpecialChars = substr_count( $curValue, ' ' ) + substr_count( $curValue, '/' ) + substr_count( $curValue, '-' );
+						if ( $numSpecialChars == 1 ) {
+							// No need to add
+							// anything - PHP will
+							// set it to the 1st
+							// of the month.
+							$precision = self::MONTH_ONLY;
+						} else {
+							$precision = self::FULL_PRECISION;
+						}
+					}
 					$seconds = strtotime( $curValue );
-					$tableFieldValues[$fieldName] = date('Y-m-d', $seconds );
-				}
-			} elseif ( $fieldDescription['type'] == 'Datetime' ) {
-				// Put into YYYY-MM-DD hh::mi:ss AM format.
-				if ( $curValue != '' ) {
-					$seconds = strtotime( $curValue );
-					$tableFieldValues[$fieldName] = date('Y-m-d G:i:s', $seconds );
+					if ( $fieldDescription['type'] == 'Date' ) {
+						// Put into YYYY-MM-DD format.
+						$tableFieldValues[$fieldName] = date('Y-m-d', $seconds );
+					} else { // ( $fieldDescription['type'] == 'Datetime' )
+						// @TODO - check for
+						// "time missing" precision.
+						$tableFieldValues[$fieldName] = date('Y-m-d G:i:s', $seconds );
+					}
+					$tableFieldValues[$fieldName . '__precision'] = $precision;
 				}
 			} elseif ( $fieldDescription['type'] == 'Integer' ) {
 				// Remove digit-grouping character.

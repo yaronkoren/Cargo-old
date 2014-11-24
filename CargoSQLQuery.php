@@ -44,6 +44,7 @@ class CargoSQLQuery {
 		$sqlQuery->setDescriptionsForFields();
 		$sqlQuery->handleVirtualFields();
 		$sqlQuery->handleVirtualCoordinateFields();
+		$sqlQuery->handleDateFields();
 		$sqlQuery->setMWJoinConds();
 		$sqlQuery->mGroupByStr = $groupByStr;
 		$sqlQuery->mQueryLimit = $wgCargoDefaultQueryLimit;
@@ -682,6 +683,26 @@ class CargoSQLQuery {
 		$longDistance = $distanceInKM / $lengthOfOneDegreeLongitude;
 
 		return array( $latDistance, $longDistance );
+	}
+
+	/**
+	 * For each date field, also add its corresponding "precisicon"
+	 * field (which indicates whether the date is year-only, etc.) to
+	 * the query.
+	 */
+	function handleDateFields() {
+		$dateFields = array();
+		foreach ( $this->mAliasedFieldNames as $alias => $fieldName ) {
+			$fieldDescription = $this->mFieldDescriptions[$alias];
+			$type = $fieldDescription['type'];
+			if ( $type == 'Date' || $type == 'Datetime' ) {
+				$dateFields[] = $fieldName;
+			}
+		}
+		foreach ( $dateFields as $dateField ) {
+			$precisionFieldName = $dateField . '__precision';
+			$this->mAliasedFieldNames[$precisionFieldName] = $precisionFieldName;
+		}
 	}
 
 	/**

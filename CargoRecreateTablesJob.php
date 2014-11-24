@@ -112,6 +112,10 @@ class CargoRecreateTablesJob extends Job {
 				$createSQL .= $floatTypeString;
 				$createSQL .= ', ' . $fieldName . '__lon ';
 				$createSQL .= $floatTypeString;
+			} elseif ( $fieldType == 'Date' || $fieldType == 'Datetime' ) {
+				$integerTypeString = self::fieldTypeToSQLType( 'Integer', $wgDBtype );
+				$createSQL .= ', ' . $fieldName . '__precision ';
+				$createSQL .= $integerTypeString;
 			}
 		}
 		$createSQL .= ' )';
