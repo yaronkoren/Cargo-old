@@ -113,7 +113,15 @@ class CargoQueryDisplayer {
 	}
 
 	public static function formatFieldValue( $value, $type, $fieldDescription, $parser ) {
-		if ( $type == 'Page' ) {
+		if ( $type == 'Integer' ) {
+			global $wgCargoDecimalMark, $wgCargoDigitGroupingCharacter;
+			return number_format( $value, 0, $wgCargoDecimalMark, $wgCargoDigitGroupingCharacter );
+		} elseif ( $type == 'Float' ) {
+			global $wgCargoDecimalMark, $wgCargoDigitGroupingCharacter;
+			// Can we assume that the decimal mark will be a '.' in the database?
+			$numDecimalPlaces = strlen( $value ) - strrpos( $value, '.' ) - 1;
+			return number_format( $value, $numDecimalPlaces, $wgCargoDecimalMark, $wgCargoDigitGroupingCharacter );
+		} elseif ( $type == 'Page' ) {
 			$title = Title::newFromText( $value );
 			return Linker::link( $title );
 		} elseif ( $type == 'File' ) {
