@@ -64,6 +64,11 @@ class CargoDrilldown extends IncludableSpecialPage {
 				continue;
 			}
 
+			// Skip coordinate fields.
+			if ( array_key_exists( 'type', $fieldDescription ) && $fieldDescription['type'] == 'Coordinates' ) {
+				continue;
+			}
+
 			$curFilter = new CargoFilter();
 			$curFilter->setName( $fieldName );
 			$curFilter->setTableName( $tableName );
