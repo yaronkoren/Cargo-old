@@ -181,6 +181,27 @@ class CargoQueryDisplayer {
 		}
 	}
 
+	public function displayQueryResults( $formatter, $queryResults ) {
+		if ( count( $queryResults ) == 0 ) {
+			if ( array_key_exists( 'default', $this->mDisplayParams ) ) {
+				return $this->mDisplayParams['default'];
+			} else {
+				return '<em>' . wfMessage( 'table_pager_empty' )->text() . '</em>'; //default
+			}
+		}
+
+		$formattedQueryResults = $this->getFormattedQueryResults( $queryResults );
+		$text = '';
+		if ( array_key_exists( 'intro', $this->mDisplayParams ) ) {
+			$text .= $this->mDisplayParams['intro'];
+		}
+		$text .= $formatter->display( $queryResults, $formattedQueryResults, $this->mFieldDescriptions, $this->mDisplayParams );
+		if ( array_key_exists( 'outro', $this->mDisplayParams ) ) {
+			$text .= $this->mDisplayParams['outro'];
+		}
+		return $text;
+	}
+
 	/**
 	 * Display the link to view more results, pointing to Special:ViewData.
 	 */

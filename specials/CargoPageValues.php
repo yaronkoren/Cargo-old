@@ -51,8 +51,6 @@ class CargoPageValues extends IncludableSpecialPage {
 	}
 
 	function getRowsForPageInTable( $tableName ) {
-		global $wgParser;
-
 		$sqlQuery = new CargoSQLQuery();
 		$sqlQuery->mTableNames = array( $tableName );
 
@@ -82,7 +80,8 @@ class CargoPageValues extends IncludableSpecialPage {
 		$sqlQuery->mWhereStr = "_pageID = " . $this->mTitle->getArticleID();
 
 		$queryResults = $sqlQuery->run();
-		$formattedQueryResults = CargoQuery::getFormattedQueryResults( $queryResults, $sqlQuery->mFieldDescriptions, $wgParser );
+		$queryDisplayer = CargoQueryDisplayer::newFromSQLQuery( $sqlQuery );
+		$formattedQueryResults = $queryDisplayer->getFormattedQueryResults( $queryResults );
 		return $formattedQueryResults;
 	}
 

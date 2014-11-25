@@ -964,9 +964,8 @@ END;
 		$queryDisplayer = new CargoQueryDisplayer();
 		$queryDisplayer->mFieldDescriptions = array( 'title' => array( 'type' => 'Page' ) );
 		$queryDisplayer->mFormat = 'category';
-		$formattedValuesTable = $queryDisplayer->getFormattedQueryResults( $valuesTable );
 		$formatter = $queryDisplayer->getFormatter( $out );
-		$html = $formatter->display( $valuesTable, $formattedValuesTable, $queryDisplayer->mFieldDescriptions, $displayParams = array() );
+		$html = $queryDisplayer->displayQueryResults( $formatter, $valuesTable );
 		$out->addHTML( $html );
 	}
 

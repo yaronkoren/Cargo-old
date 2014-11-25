@@ -76,10 +76,9 @@ class CargoQuery {
 			return CargoUtils::formatError( $e->getMessage() );
 		}
 
-		$formattedQueryResults = $queryDisplayer->getFormattedQueryResults( $queryResults );
 
-		// Finally, do the display, based on the format.
-		$text = $formatter->display( $queryResults, $formattedQueryResults, $sqlQuery->mFieldDescriptions, $displayParams );
+		// Finally, do the display.
+		$text = $queryDisplayer->displayQueryResults( $formatter, $queryResults );
 
 		// If there are (seemingly) more results than what we showed,
 		// show a "View more" link that links to Special:ViewData.

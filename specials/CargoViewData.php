@@ -144,10 +144,10 @@ class ViewDataPage extends QueryPage {
 		$queryDisplayer = new CargoQueryDisplayer();
 		$queryDisplayer->mFieldDescriptions = $this->sqlQuery->mFieldDescriptions;
 		$queryDisplayer->mFormat = $this->format;
-		$formattedValuesTable = $queryDisplayer->getFormattedQueryResults( $valuesTable );
 		$formatter = $queryDisplayer->getFormatter( $out );
 		$this->displayParams['offset'] = $offset;
-		$html = $formatter->display( $valuesTable, $formattedValuesTable, $this->sqlQuery->mFieldDescriptions, $this->displayParams );
+		$queryDisplayer->mDisplayParams = $this->displayParams;
+		$html = $queryDisplayer->displayQueryResults( $formatter, $valuesTable );
 		$out->addHTML( $html );
 		return;
 	}
