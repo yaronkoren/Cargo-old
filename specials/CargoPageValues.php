@@ -78,6 +78,7 @@ class CargoPageValues extends IncludableSpecialPage {
 
 		$sqlQuery->mAliasedFieldNames = $aliasedFieldNames;
 		$sqlQuery->setDescriptionsForFields();
+		$sqlQuery->handleDateFields();
 		$sqlQuery->mWhereStr = "_pageID = " . $this->mTitle->getArticleID();
 
 		$queryResults = $sqlQuery->run();
