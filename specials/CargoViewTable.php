@@ -109,16 +109,58 @@ class CargoViewTable extends IncludableSpecialPage {
 	 */
 	function displayListOfTables() {
 		$tableNames = CargoUtils::getTables();
+		$templatesThatDeclareTables = self::getAllPageProps( 'CargoTableName' );
+
 		$viewTablePage = Title::makeTitleSafe( NS_SPECIAL, 'ViewTable' );
 		$viewTableText = $viewTablePage->getFullURL();
 		$text = Html::element( 'p', null, wfMessage( 'cargo-viewtable-tablelist' )->parse() ) . "\n";
 		$text .= "<ul>\n";
 		foreach ( $tableNames as $tableName ) {
-			$tableLink = Html::element( 'a', array( 'href' => "$viewTableText/$tableName" ), $tableName );
+			$tableLink = Html::element( 'a', array( 'href' => "$viewTableText/$tableName", 'style' => 'font-weight: bold;' ), $tableName );
+			$templatesForThisTable = $templatesThatDeclareTables[$tableName];
+			if ( count( $templatesForThisTable ) == 0 ) {
+				$tableLink .= ' (' . wfMessage( 'cargo-viewtable-notdeclared' )->text() . ')';
+			} else {
+				$templateLinks = array();
+				foreach( $templatesForThisTable as $templateID ) {
+					$templateTitle = Title::newFromID( $templateID );
+					$templateLinks[] = Linker::link( $templateTitle );
+				}
+				$tableLink .= ' (' . implode( $templateLinks ) . ')';
+			}
 			$text .= Html::rawElement( 'li', null, $tableLink );
 		}
 		$text .= "</ul>\n";
 		return $text;
+	}
+
+	/**
+	 * Similar to CargoUtils::getPageProp().
+	 */
+	 public static function getAllPageProps( $pageProp ) {
+		$dbr = wfGetDB( DB_SLAVE );
+		$res = $dbr->select( 'page_props',
+			array(
+				'pp_page',
+				'pp_value'
+			),
+			array(
+				'pp_propname' => $pageProp
+			)
+		);
+
+		$pagesPerValue = array();
+		while ( $row = $dbr->fetchRow( $res ) ) {
+			$pageID = $row['pp_page'];
+			$pageValue = $row['pp_value'];
+			if ( array_key_exists( $pageValue, $pagesPerValue ) ) {
+				$pagesPerValue[$pageValue][] = $pageID;
+			} else {
+				$pagesPerValue[$pageValue] = array( $pageID );
+			}
+		}
+
+		return $pagesPerValue;
 	}
 
 }

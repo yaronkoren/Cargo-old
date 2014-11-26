@@ -13,6 +13,7 @@
     "viewdata": "View data",
     "viewtable": "View table",
     "cargo-viewtable-tablelist": "The following tables are defined:",
+    "cargo-viewtable-notdeclared": "not defined by any template",
     "cargo-viewtable-tablenotfound": "Table \"$1\" not found in Cargo database.",
     "cargo-viewtable-totalrows": "This table has $1 rows altogether.",
     "pagevalues": "Page values",
