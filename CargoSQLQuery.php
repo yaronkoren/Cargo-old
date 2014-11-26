@@ -694,6 +694,9 @@ class CargoSQLQuery {
 		$dateFields = array();
 		foreach ( $this->mAliasedFieldNames as $alias => $fieldName ) {
 			$fieldDescription = $this->mFieldDescriptions[$alias];
+			if ( !array_key_exists( 'type', $fieldDescription ) ) {
+				continue;
+			}
 			$type = $fieldDescription['type'];
 			if ( $type == 'Date' || $type == 'Datetime' ) {
 				$dateFields[] = $fieldName;
