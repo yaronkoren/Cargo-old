@@ -153,17 +153,18 @@ class CargoQueryDisplayer {
 				return Html::element( 'a', array( 'href' => $value ), $fieldDescription['link text'] );
 			} else {
 				// Otherwise, do nothing.
-				return null;
+				return $value;
 			}
 		} elseif ( $type == 'Date' || $type == 'Datetime' ) {
 			// This should not get called - date fields
 			// have a separate formatting function.
-			return null;
+			return $value;
 		} elseif ( $type == 'Wikitext' || $type == '' ) {
 			return CargoUtils::smartParse( $value, $parser );
 		}
 		// If it's not any of these specially-handled types, just
-		// return null.
+		// return the value.
+		return $value;
 	}
 
 	static function formatDateFieldValue( $dateValue, $datePrecision, $type ) {

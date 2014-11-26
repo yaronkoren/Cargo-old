@@ -245,8 +245,21 @@ class CargoStore {
 
 			if ( array_key_exists( 'allowedValues', $fieldDescription ) ) {
 				$allowedValues = $fieldDescription['allowedValues'];
-				if ( !in_array( $tableFieldValues[$fieldName], $allowedValues ) ) {
-					$tableFieldValues[$fieldName] = null;
+				if ( array_key_exists( 'isList', $fieldDescription ) ) {
+					$delimiter = $fieldDescription['delimiter'];
+					$individualValues = explode( $delimiter, $curValue );
+					$valuesToBeKept = array();
+					foreach( $individualValues as $individualValue ) {
+						$realIndividualVal = trim( $individualValue );
+						if ( in_array( $realIndividualVal, $allowedValues ) ) {
+							$valuesToBeKept[] = $realIndividualVal;
+						}
+					}
+					$tableFieldValues[$fieldName] = implode( $delimiter, $valuesToBeKept );
+				} else {
+					if ( !in_array( $curValue, $allowedValues ) ) {
+						$tableFieldValues[$fieldName] = null;
+					}
 				}
 			}
 			if ( $fieldDescription['type'] == 'Date' || $fieldDescription['type'] == 'Datetime' ) {
