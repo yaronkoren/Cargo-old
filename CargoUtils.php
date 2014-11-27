@@ -169,7 +169,7 @@ class CargoUtils {
 			global $wgParser;
 			$parser = $wgParser;
 		}
-		if ( $wgTitle->isSpecialPage() ||
+		if ( ( $wgTitle != null && $wgTitle->isSpecialPage() ) ||
 			// The 'pagevalues' action is also a Cargo special page.
 			$wgRequest->getVal( 'action' ) == 'pagevalues' ) {
 			$parserOutput = $parser->parse( $value, $wgTitle, new ParserOptions(), false );
