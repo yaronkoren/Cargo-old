@@ -15,6 +15,24 @@ class CargoHooks {
 		return true;
 	}
 
+        public static function addPurgeCacheTab( SkinTemplate &$skinTemplate, array &$links ) {
+		// Only add this tab if Semantic MediaWiki (which has its
+		// identical "refresh" tab) is not installed.
+		if ( defined( 'SMW_VERSION' ) ) {
+			return true;
+		}
+
+                if ( $skinTemplate->getUser()->isAllowed( 'purge' ) ) {
+                        $links['actions']['cargo-purge'] = array(
+                                'class' => false,
+                                'text' => $skinTemplate->msg( 'cargo-purgecache' )->text(),
+                                'href' => $skinTemplate->getTitle()->getLocalUrl( array( 'action' => 'purge' ) )
+                        );
+                }
+
+                return true;
+        }
+
 	/**
 	 * @TODO - move this to a different class, like CargoUtils?
 	 */

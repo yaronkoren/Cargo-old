@@ -30,5 +30,6 @@
     "cargo-drilldown-novalues": "There are no values for this filter",
     "cargo-drilldown-toomanyvalues": "Too many values; not displaying.",
     "cargo-viewcsv": "View CSV",
-    "cargo-viewjson": "View JSON"
+    "cargo-viewjson": "View JSON",
+    "cargo-purgecache": "Purge cache"
 }
