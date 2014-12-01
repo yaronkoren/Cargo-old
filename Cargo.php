@@ -68,6 +68,8 @@ $wgAutoloadClasses['CargoRecreateDataAction'] = $dir . '/CargoRecreateDataAction
 $wgAutoloadClasses['CargoRecreateData'] = $dir . '/specials/CargoRecreateData.php';
 $wgSpecialPages['ViewTable'] = 'CargoViewTable';
 $wgAutoloadClasses['CargoViewTable'] = $dir . '/specials/CargoViewTable.php';
+$wgSpecialPages['DeleteCargoTable'] = 'CargoDeleteCargoTable';
+$wgAutoloadClasses['CargoDeleteCargoTable'] = $dir . '/specials/CargoDeleteTable.php';
 $wgSpecialPages['ViewData'] = 'CargoViewData';
 $wgAutoloadClasses['CargoViewData'] = $dir . '/specials/CargoViewData.php';
 $wgSpecialPages['CargoExport'] = 'CargoExport';
@@ -106,9 +108,11 @@ $wgAutoloadClasses['CargoDrilldownUtils'] = $dir . '/drilldown/CargoDrilldownUti
 $wgAutoloadClasses['CargoDrilldown'] = $dir . '/drilldown/CargoSpecialDrilldown.php';
 $wgSpecialPages['Drilldown'] = 'CargoDrilldown';
 
-// User right for recreating data.
+// User rights
 $wgAvailableRights[] = 'recreatedata';
 $wgGroupPermissions['sysop']['recreatedata'] = true;
+$wgAvailableRights[] = 'deletecargodata';
+$wgGroupPermissions['sysop']['deletecargodata'] = true;
 
 // Page properties
 $wgPageProps['CargoTableName'] = "The name of the database table that holds this template's data";
