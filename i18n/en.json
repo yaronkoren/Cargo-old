@@ -7,6 +7,7 @@
     "cargo-tablenotcreated": "This table has not been created yet.",
     "cargo-addsrows": "This template adds rows to the table \"$1\".",
     "recreatedata": "Recreate data",
+    "action-recreatecargodata": "recreate Cargo data",
     "action-deletecargodata": "delete Cargo data",
     "cargo-createdatatable": "Create data table",
     "cargo-recreatedata-desc": "Recreate Cargo data for this template?",

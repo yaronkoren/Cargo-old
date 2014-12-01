@@ -13,7 +13,7 @@ class CargoRecreateData extends IncludableSpecialPage {
 	var $mIsDeclared;
 
 	function __construct( $templateTitle, $tableName, $isDeclared ) {
-		parent::__construct( 'RecreateData', 'recreatedata' );
+		parent::__construct( 'RecreateData', 'recreatecargodata' );
 		$this->mTemplateTitle = $templateTitle;
 		$this->mTableName = $tableName;
 		$this->mIsDeclared = $isDeclared;
@@ -22,8 +22,8 @@ class CargoRecreateData extends IncludableSpecialPage {
 	function execute( $query = null ) {
 		$out = $this->getOutput();
 
-		if ( ! $this->getUser()->isAllowed( 'recreatedata' ) ) {
-			$out->permissionRequired( 'recreatedata' );
+		if ( ! $this->getUser()->isAllowed( 'recreatcargodata' ) ) {
+			$out->permissionRequired( 'recreatecargodata' );
 			return;
 		}
 

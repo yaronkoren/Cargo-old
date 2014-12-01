@@ -109,8 +109,8 @@ $wgAutoloadClasses['CargoDrilldown'] = $dir . '/drilldown/CargoSpecialDrilldown.
 $wgSpecialPages['Drilldown'] = 'CargoDrilldown';
 
 // User rights
-$wgAvailableRights[] = 'recreatedata';
-$wgGroupPermissions['sysop']['recreatedata'] = true;
+$wgAvailableRights[] = 'recreatecargodata';
+$wgGroupPermissions['sysop']['recreatecargodata'] = true;
 $wgAvailableRights[] = 'deletecargodata';
 $wgGroupPermissions['sysop']['deletecargodata'] = true;
 
