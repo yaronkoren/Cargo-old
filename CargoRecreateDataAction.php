@@ -61,7 +61,7 @@ class CargoRecreateDataAction {
 			return true;
 		}
 
-		if ( !$title->userCan( 'recreatedata' ) ) {
+		if ( !$title->userCan( 'recreatecargodata' ) ) {
 			return true;
 		}
 
