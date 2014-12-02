@@ -22,11 +22,13 @@ class CargoViewTable extends IncludableSpecialPage {
 
 		$tableName = $query;
 		if ( $tableName == '' ) {
+			$pageTitle = wfMessage( 'viewtable' )->parse();
+			$out->setPageTitle( $pageTitle );
 			$out->addHTML( $this->displayListOfTables() );
 			return;
 		}
 
-		$pageTitle = wfMessage( 'viewtable' )->parse() . ': ' . $tableName;
+		$pageTitle = wfMessage( 'cargo-viewtable-viewtable', $tableName )->parse();
 		$out->setPageTitle( $pageTitle );
 
 		$cdb = CargoUtils::getDB();
