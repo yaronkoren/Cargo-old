@@ -50,9 +50,9 @@ class CargoAttach {
 
 		// Link to the Special:ViewTable page for this table.
 		$text = wfMessage( 'cargo-addsrows', $tableName )->text();
-		$vt = SpecialPage::getTitleFor( 'ViewTable' );
-		$pageName = $vt->getPrefixedText() . "/$tableName";
-		$viewTableMsg = wfMessage( 'ViewTable' )->parse();
+		$ct = SpecialPage::getTitleFor( 'CargoTables' );
+		$pageName = $ct->getPrefixedText() . "/$tableName";
+		$viewTableMsg = wfMessage( 'cargo-cargotables-viewtablelink' )->parse();
 		$text .= " [[$pageName|$viewTableMsg]].";
 
 		return $text;

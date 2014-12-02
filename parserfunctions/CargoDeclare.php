@@ -107,15 +107,15 @@ class CargoDeclare {
 		$parserOutput->setProperty( 'CargoTableName', $tableName );
 		$parserOutput->setProperty( 'CargoFields', serialize( $cargoFields ) );
 
-		// Link to the Special:ViewTable page for this table, if it
+		// Link to the Special:CargoTables page for this table, if it
 		// exists already - otherwise, explain that it needs to be
 		// created.
 		$text = wfMessage( 'cargo-definestable', $tableName )->text();
 		$cdb = CargoUtils::getDB();
 		if ( $cdb->tableExists( $tableName ) ) {
-			$vt = SpecialPage::getTitleFor( 'ViewTable' );
-			$pageName = $vt->getPrefixedText() . "/$tableName";
-			$viewTableMsg = wfMessage( 'ViewTable' )->parse();
+			$ct = SpecialPage::getTitleFor( 'CargoTables' );
+			$pageName = $ct->getPrefixedText() . "/$tableName";
+			$viewTableMsg = wfMessage( 'cargo-cargotables-viewtablelink' )->parse();
 			$text .= " [[$pageName|$viewTableMsg]].";
 		} else {
 			$text .= ' ' . wfMessage( 'cargo-tablenotcreated' )->text();

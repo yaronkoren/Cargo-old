@@ -7,13 +7,13 @@
  * @ingroup Cargo
  */
 
-class CargoViewTable extends IncludableSpecialPage {
+class CargoTables extends IncludableSpecialPage {
 
 	/**
 	 * Constructor
 	 */
 	public function __construct() {
-		parent::__construct( 'ViewTable' );
+		parent::__construct( 'CargoTables' );
 	}
 
 	function execute( $query ) {
@@ -22,13 +22,11 @@ class CargoViewTable extends IncludableSpecialPage {
 
 		$tableName = $query;
 		if ( $tableName == '' ) {
-			$pageTitle = wfMessage( 'viewtable' )->parse();
-			$out->setPageTitle( $pageTitle );
 			$out->addHTML( $this->displayListOfTables() );
 			return;
 		}
 
-		$pageTitle = wfMessage( 'cargo-viewtable-viewtable', $tableName )->parse();
+		$pageTitle = wfMessage( 'cargo-cargotables-viewtable', $tableName )->parse();
 		$out->setPageTitle( $pageTitle );
 
 		$cdb = CargoUtils::getDB();
@@ -37,11 +35,11 @@ class CargoViewTable extends IncludableSpecialPage {
 		try {
 			$res = $cdb->select( $tableName, 'COUNT(*)' );
 		} catch ( Exception $e ) {
-			$out->addHTML( Html::element( 'div', array( 'class' => 'error' ), wfMessage( 'cargo-viewtable-tablenotfound', $tableName )->parse() ) . "\n" );
+			$out->addHTML( Html::element( 'div', array( 'class' => 'error' ), wfMessage( 'cargo-cargotables-tablenotfound', $tableName )->parse() ) . "\n" );
 			return;
 		}
 		$row = $cdb->fetchRow( $res );
-		$out->addWikiText( wfMessage( 'cargo-viewtable-totalrows', "'''" . $row[0] . "'''" ) . "\n" );
+		$out->addWikiText( wfMessage( 'cargo-cargotables-totalrows', "'''" . $row[0] . "'''" ) . "\n" );
 
 		$sqlQuery = new CargoSQLQuery();
 		$sqlQuery->mTableNames = array( $tableName );
@@ -106,31 +104,75 @@ class CargoViewTable extends IncludableSpecialPage {
 	}
 
 	/**
-	 * Returns HTML for a bulleted list of Cargo tables, with a link to
-	 * the Special:ViewTable page for each one.
+	 * Returns HTML for a bulleted list of Cargo tables, with various
+	 * links and information for each one.
 	 */
 	function displayListOfTables() {
+		global $wgUser;
+
 		$tableNames = CargoUtils::getTables();
 		$templatesThatDeclareTables = self::getAllPageProps( 'CargoTableName' );
+		$templatesThatAttachToTables = self::getAllPageProps( 'CargoAttachedTable' );
 
-		$viewTablePage = Title::makeTitleSafe( NS_SPECIAL, 'ViewTable' );
-		$viewTableText = $viewTablePage->getFullURL();
-		$text = Html::element( 'p', null, wfMessage( 'cargo-viewtable-tablelist' )->parse() ) . "\n";
+		$ctPage = SpecialPageFactory::getPage( 'CargoTables' );
+		$ctURL = $ctPage->getTitle()->getFullURL();
+		$text = Html::element( 'p', null, wfMessage( 'cargo-cargotables-tablelist' )->parse() ) . "\n";
 		$text .= "<ul>\n";
 		foreach ( $tableNames as $tableName ) {
-			$tableLink = Html::element( 'a', array( 'href' => "$viewTableText/$tableName", 'style' => 'font-weight: bold;' ), $tableName );
-			$templatesForThisTable = $templatesThatDeclareTables[$tableName];
-			if ( count( $templatesForThisTable ) == 0 ) {
-				$tableLink .= ' (' . wfMessage( 'cargo-viewtable-notdeclared' )->text() . ')';
+			$tableLink = Html::element( 'a', array( 'href' => "$ctURL/$tableName", ), $tableName );
+
+			// Actions for this table - this display is modeled on
+			// Special:ListUsers.
+			$drilldownPage = SpecialPageFactory::getPage( 'Drilldown' );
+			$drilldownURL = $drilldownPage->getTitle()->getLocalURL() . '/' . $tableName;
+			$drilldownURL .= ( strpos( $drilldownURL, '?' ) ) ? '&' : '?';
+			$drilldownURL .= "_single";
+			$actionLinks = Html::element( 'a', array( 'href' => $drilldownURL ), $drilldownPage->getDescription() );
+
+			if ( $wgUser->isAllowed( 'deletecargodata' ) ) {
+				$deleteTablePage = SpecialPageFactory::getPage( 'DeleteCargoTable' );
+				$deleteTableURL = $deleteTablePage->getTitle()->getLocalURL() . '/' . $tableName;
+				$actionLinks .= ' | ' . Html::element( 'a', array( 'href' => $deleteTableURL ), wfMessage( 'delete' )->text() );
+			}
+
+			// "Declared by" text
+			$templatesThatDeclareThisTable = $templatesThatDeclareTables[$tableName];
+			if ( count( $templatesThatDeclareThisTable ) == 0 ) {
+				$declaringTemplatesText = wfMessage( 'cargo-cargotables-notdeclared' )->text();
 			} else {
 				$templateLinks = array();
-				foreach( $templatesForThisTable as $templateID ) {
+				foreach( $templatesThatDeclareThisTable as $templateID ) {
 					$templateTitle = Title::newFromID( $templateID );
 					$templateLinks[] = Linker::link( $templateTitle );
 				}
-				$tableLink .= ' (' . implode( $templateLinks ) . ')';
+				$declaringTemplatesText = wfMessage( 'cargo-cargotables-declaredby', implode( $templateLinks ) )->text();
 			}
-			$text .= Html::rawElement( 'li', null, $tableLink );
+
+			// "Attached by" text
+			if ( array_key_exists( $tableName, $templatesThatAttachToTables ) ) {
+				$templatesThatAttachToThisTable = $templatesThatAttachToTables[$tableName];
+			} else {
+				$templatesThatAttachToThisTable = array();
+			}
+
+			if ( count( $templatesThatAttachToThisTable ) == 0 ) {
+				$attachingTemplatesText = '';
+			} else {
+				$templateLinks = array();
+				foreach( $templatesThatAttachToThisTable as $templateID ) {
+					$templateTitle = Title::newFromID( $templateID );
+					$templateLinks[] = Linker::link( $templateTitle );
+				}
+				$attachingTemplatesText = wfMessage( 'cargo-cargotables-attachedby', implode( $templateLinks ) )->text();
+			}
+
+			$tableText = "$tableLink ($actionLinks) ($declaringTemplatesText";
+			if ( $attachingTemplatesText != '' ) {
+				$tableText .= ", $attachingTemplatesText";
+			}
+			$tableText .= ')';
+
+			$text .= Html::rawElement( 'li', null, $tableText );
 		}
 		$text .= "</ul>\n";
 		return $text;
