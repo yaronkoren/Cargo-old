@@ -177,4 +177,14 @@ class CargoHooks {
 		return true;
 	}
 
+	public static function addToAdminLinks( &$adminLinksTree ) {
+		$browseSearchSection = $adminLinksTree->getSection( wfMessage( 'adminlinks_browsesearch' )->text() );
+		$cargoRow = new ALRow( 'cargo' );
+		$cargoRow->addItem( ALItem::newFromSpecialPage( 'CargoTables' ) );
+		$cargoRow->addItem( ALItem::newFromSpecialPage( 'Drilldown' ) );
+		$browseSearchSection->addRow( $cargoRow );
+
+		return true;
+	}
+
 }

@@ -42,6 +42,7 @@ $wgHooks['UnknownAction'][] = 'CargoRecreateDataAction::show';
 $wgHooks['BaseTemplateToolbox'][] = 'CargoPageValuesAction::addLink';
 $wgHooks['UnknownAction'][] = 'CargoPageValuesAction::show';
 $wgHooks['SkinTemplateNavigation'][] = 'CargoHooks::addPurgeCacheTab';
+$wgHooks['AdminLinks'][] = 'CargoHooks::addToAdminLinks';
 
 $wgMessagesDirs['Cargo'] = $dir . '/i18n';
 $wgExtensionMessagesFiles['Cargo'] = $dir . '/Cargo.i18n.php';
