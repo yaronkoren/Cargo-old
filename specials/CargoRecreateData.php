@@ -29,7 +29,8 @@ class CargoRecreateData extends IncludableSpecialPage {
 
 		$this->setHeaders();
 
-		if ( !CargoUtils::tableExists( $this->mTableName ) ) {
+		$tableExists = CargoUtils::tableExists( $this->mTableName );
+		if ( !$tableExists ) {
 			$out->setPageTitle( wfMessage( 'cargo-createdatatable' )->parse() );
 		}
 
@@ -51,7 +52,8 @@ class CargoRecreateData extends IncludableSpecialPage {
 		// Add in a little bit of JS to make sure that the button
 		// isn't accidentally pressed twice.
 		$text = '<form method="post" onSubmit="submitButton.disabled = true; return true;">';
-		$text .= Html::element( 'p', null, wfMessage( 'cargo-recreatedata-desc' )->parse() );
+		$msg = $tableExists ? 'cargo-recreatedata-desc' : 'cargo-recreatedata-createdata';
+		$text .= Html::element( 'p', null, wfMessage( $msg )->parse() );
 		$text .= Html::hidden( 'action', 'recreatedata' ) . "\n";
 		$text .= Html::hidden( 'submitted', 'yes' ) . "\n";
 

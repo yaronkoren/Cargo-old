@@ -11,6 +11,7 @@
     "action-deletecargodata": "delete Cargo data",
     "cargo-createdatatable": "Create data table",
     "cargo-recreatedata-desc": "Recreate Cargo data for this template?",
+    "cargo-recreatedata-createdata": "Create Cargo data for this template?",
     "cargo-recreatedata-success": "The data will be recreated.",
     "viewdata": "View data",
     "cargotables": "Cargo tables",
