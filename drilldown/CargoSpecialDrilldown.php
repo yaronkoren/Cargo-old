@@ -156,8 +156,8 @@ class CargoDrilldownPage extends QueryPage {
 	}
 
 	function makeBrowseURL( $tableName, $applied_filters = array(), $filter_to_remove = null ) {
-		$bd = SpecialPage::getTitleFor( 'Drilldown' );
-		$url = $bd->getLocalURL() . '/' . $tableName;
+		$dd = SpecialPage::getTitleFor( 'Drilldown' );
+		$url = $dd->getLocalURL() . '/' . $tableName;
 		if ( $this->showSingleTable ) {
 			$url .= ( strpos( $url, '?' ) ) ? '&' : '?';
 			$url .= "_single";
@@ -230,8 +230,9 @@ END;
 			$res = $cdb->select( $table, 'COUNT(*)' );
 			$row = $cdb->fetchRow( $res );
 			$tableRows = $row[0];
-			$tableStr = $table . " ($tableRows)";
-			if ( str_replace( '_', ' ', $this->tableName ) == $table ) {
+			$realTableName = str_replace( '_', ' ', $table );
+			$tableStr = "$realTableName ($tableRows)";
+			if ( $this->tableName == $table ) {
 				$text .= '						<li class="tableName selected">';
 				$text .= $tableStr;
 			} else {
