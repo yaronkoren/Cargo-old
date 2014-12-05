@@ -48,7 +48,7 @@ class CargoListFormat extends CargoDisplayFormat {
 
 	function display( $valuesTable, $formattedValuesTable, $fieldDescriptions, $displayParams ) {
 		$text = '';
-		$delimiter = ( array_key_exists( 'delimiter', $displayParams ) ) ? $displayParams['delimiter'] : ',';
+		$delimiter = ( array_key_exists( 'delimiter', $displayParams ) ) ? $displayParams['delimiter'] : wfMessage( 'comma-separator' )->text();
 		foreach ( $formattedValuesTable as $i => $row ) {
 			if ( $i > 0 ) {
 				$text .= $delimiter . ' ';
