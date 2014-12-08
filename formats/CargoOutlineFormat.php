@@ -25,7 +25,7 @@ class CargoOutlineRow {
 	function addOutlineFieldValues( $fieldName, $values, $formattedValues ) {
 		$this->mOutlineFields[$fieldName] = array(
 			'unformatted' => $values,
-			'formatted' => $displayValues
+			'formatted' => $formattedValues
 		);
 	}
 
@@ -75,7 +75,7 @@ class CargoOutlineTree {
 			if ( array_key_exists( $val, $this->mTree ) ) {
 				$this->mTree[$val]->mUnsortedRows[] = $row;
 			} else {
-				$formattedVal = $formattedVals[$i];
+				$formattedVal = reset( $formattedVals );
 				$this->mTree[$val] = new CargoOutlineTree( array( $row ), $formattedVal );
 			}
 		}
@@ -106,7 +106,7 @@ class CargoOutlineFormat extends CargoListFormat {
 		if ( ! is_null( $outlineTree->mUnsortedRows ) ) {
 			$text .= "<ul>\n";
 			foreach ( $outlineTree->mUnsortedRows as $row ) {
-				$text .= "<li>{$this->displayRow( $row->mDisplayFields, $this->mFieldDescriptions )}</li>\n";
+				$text .= Html::rawElement( 'li', null, $this->displayRow( $row->mDisplayFields, $this->mFieldDescriptions ) ) . "\n";
 			}
 			$text .= "</ul>\n";
 		}
@@ -132,8 +132,7 @@ class CargoOutlineFormat extends CargoListFormat {
 			$fontWeight = 'regular';
 		}
 		foreach ( $outlineTree->mTree as $key => $node ) {
-			$formattedValue = $node->mFormattedValue;
-			$text .= "<p style=\"font-size: $fontSize; font-weight: $fontWeight;\">$formattedValue</p>\n";
+			$text .= Html::rawElement( 'p', array( 'style' => "font-size: $fontSize; font-weight: $fontWeight;" ), $node->mFormattedValue ) . "\n";
 			$text .= $this->printTree( $node, $level + 1 );
 		}
 		if ( $level > 0 ) $text .= "</ul>\n";
