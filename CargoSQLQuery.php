@@ -18,6 +18,7 @@ class CargoSQLQuery {
 	var $mAliasedFieldNames;
 	var $mTableSchemas;
 	var $mFieldDescriptions;
+	var $mFieldTables;
 	var $mGroupByStr;
 	var $mOrderByStr;
 	var $mQueryLimit;
@@ -241,6 +242,7 @@ class CargoSQLQuery {
 	 */
 	function setDescriptionsForFields() {
 		$this->mFieldDescriptions = array();
+		$this->mFieldTables = array();
 		foreach ( $this->mAliasedFieldNames as $alias => $fieldName ) {
 			$tableName = null;
 			if ( strpos( $fieldName, '.' ) !== false ) {
@@ -248,13 +250,13 @@ class CargoSQLQuery {
 				// regexps.
 				list( $tableName, $fieldName ) = explode( '.', $fieldName, 2 );
 			}
-			$description = array();
+			$description = new CargoFieldDescription();
 			// If it's a pre-defined field, we probably know the
 			// type.
 			if ( $fieldName == '_ID' || $fieldName == '_rowID' || $fieldName == '_pageID' ) {
-				$description = array( 'type' => 'Integer' );
+				$description->mType = 'Integer';
 			} elseif ( $fieldName == '_pageName' ) {
-				$description = array( 'type' => 'Page' );
+				$description->mType = 'Page';
 			} elseif ( strpos( $tableName, '(' ) !== false || strpos( $fieldName, '(' ) !== false ) {
 				$fieldNameParts = explode( '(', $fieldName );
 				if ( count( $fieldNameParts ) > 1 ) {
@@ -265,11 +267,11 @@ class CargoSQLQuery {
 					$probableFunction = strtolower( trim( $tableNameParts[0] ) );
 				}
 				if ( in_array( $probableFunction, array( 'count', 'max', 'min', 'avg', 'sum', 'sqrt' ) ) ) {
-					$description = array( 'type' => 'Integer' );
+					$description->mType = 'Integer';
 				} elseif ( in_array( $probableFunction, array( 'concat', 'lower', 'lcase', 'upper', 'ucase' ) ) ) {
-					$description = array();
+					// Do nothing.
 				} elseif ( in_array( $probableFunction, array( 'date', 'date_format', 'date_add', 'date_sub', 'date_diff' ) ) ) {
-					$description = array( 'type' => 'Date' );
+					$description->mType = 'Date';
 				}
 			} else {
 				// It's a standard field - though if it's
@@ -300,7 +302,8 @@ class CargoSQLQuery {
 				} elseif ( substr( $fieldName, -5 ) == '__lat' || substr( $fieldName, -5 ) == '__lon' ) {
 					// Special handling for lat/lon
 					// helper fields.
-					$description = array( 'type' => 'Coordinates part', 'tableName' => '' );
+					$description->mType = 'Coordinates part';
+					$tableName = '';
 				} else {
 					// Go through all the fields, until we
 					// find the one matching this one.
@@ -316,7 +319,7 @@ class CargoSQLQuery {
 			// Fix alias.
 			$alias = trim( $alias );
 			$this->mFieldDescriptions[$alias] = $description;
-			$this->mFieldDescriptions[$alias]['tableName'] = $tableName;
+			$this->mFieldTables[$alias] = $tableName;
 		}
 	}
 
@@ -388,7 +391,7 @@ class CargoSQLQuery {
 		$virtualFields = array();
 		foreach ( $this->mTableSchemas as $tableName => $tableSchema ) {
 			foreach ( $tableSchema as $fieldName => $fieldDescription ) {
-				if ( array_key_exists( 'isList', $fieldDescription ) ) {
+				if ( $fieldDescription->mIsList ) {
 					$virtualFields[] = array(
 						'fieldName' => $fieldName,
 						'tableName' => $tableName
@@ -477,7 +480,7 @@ class CargoSQLQuery {
 				// regexps.
 				list( $tableName, $fieldName ) = explode( '.', $fieldName, 2 );
 			} else {
-				$tableName = $fieldDescription['tableName'];
+				$tableName = $this->mFieldTables[$alias];
 			}
 
 			// We're only interested in virtual list fields.
@@ -552,7 +555,7 @@ class CargoSQLQuery {
 		$coordinateFields = array();
 		foreach ( $this->mTableSchemas as $tableName => $tableSchema ) {
 			foreach ( $tableSchema as $fieldName => $fieldDescription ) {
-				if ( $fieldDescription['type'] == 'Coordinates' ) {
+				if ( $fieldDescription->mType == 'Coordinates' ) {
 					$coordinateFields[] = array(
 						'fieldName' => $fieldName,
 						'tableName' => $tableName
@@ -570,7 +573,7 @@ class CargoSQLQuery {
 				// regexps.
 				list( $tableName, $fieldName ) = explode( '.', $fieldName, 2 );
 			} else {
-				$tableName = $fieldDescription['tableName'];
+				$tableName = $this->mFieldTables[$alias];
 			}
 
 			// We have to do this roundabout checking, instead

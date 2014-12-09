@@ -65,7 +65,7 @@ class CargoDrilldown extends IncludableSpecialPage {
 			}
 
 			// Skip coordinate fields.
-			if ( array_key_exists( 'type', $fieldDescription ) && $fieldDescription['type'] == 'Coordinates' ) {
+			if ( $fieldDescription->mType == 'Coordinates' ) {
 				continue;
 			}
 
@@ -305,7 +305,7 @@ END;
 			return wfMessage( 'htmlform-selectorother-other' )->text();
 		} elseif ( $value === ' none' ) {
 			return Html::element( 'span', array( 'style' => 'font-style: italic;' ), wfMessage( 'powersearch-togglenone' )->text() );
-		} elseif ( $filter->fieldDescription['type'] === 'Boolean' ) {
+		} elseif ( $filter->fieldDescription->mType === 'Boolean' ) {
 			// Use existing MW messages for "Yes" and "No".
 			if ( $value == true ) {
 				return wfMessage( 'htmlform-yes' )->text();
@@ -346,7 +346,7 @@ END;
 		}
 		// add 'Other' and 'None', regardless of whether either has
 		// any results - add 'Other' only if it's not a date field
-		if ( $af->filter->fieldDescription['type'] != 'Date' ) {
+		if ( $af->filter->fieldDescription->mType != 'Date' ) {
 			$or_values[] = '_other';
 		}
 		$or_values[] = '_none';
@@ -725,7 +725,8 @@ END;
 	function printUnappliedFilterLine( $f, $cur_url = null ) {
 		global $wgCargoDrilldownMinValuesForComboBox;
 
-		if ( $f->fieldDescription['type'] == 'Date' ) {
+		$fieldType = $f->fieldDescription->mType;
+		if ( $fieldType == 'Date' ) {
 			$filter_values = $f->getTimePeriodValues( $this->applied_filters );
 		} else {
 			$filter_values = $f->getAllValues( $this->applied_filters );
@@ -738,7 +739,7 @@ END;
 		$normal_filter = true;
 		if ( count( $filter_values ) == 0 ) {
 			$results_line = '(' . wfMessage( 'cargo-drilldown-novalues' )->text() . ')';
-		} elseif ( $f->fieldDescription['type'] == 'Integer' || $f->fieldDescription['type'] == 'Float' ) {
+		} elseif ( $fieldType == 'Integer' || $fieldType == 'Float' ) {
 			$results_line = $this->printNumberRanges( $filter_name, $filter_values );
 		} elseif ( count( $filter_values ) >= 300 ) {
 			// If it's really big, don't show anything.
@@ -836,10 +837,11 @@ END;
 		$tableSchemas = CargoUtils::getTableSchemas( array( $this->tableName ) );
 		$tableSchema = $tableSchemas[$this->tableName];
 		foreach ( $tableSchema as $fieldName => $fieldDescription ) {
+			$fieldType = $fieldDescription->mType;
 			// Some field types shouldn't get a filter at all.
-			if ( in_array( $fieldDescription['type'], array( 'URL', 'Wikitext' ) ) ) {
+			if ( in_array( $fieldType, array( 'URL', 'Wikitext' ) ) ) {
 				continue;
-			} elseif ( $fieldDescription['type'] == 'Text' && array_key_exists( 'size', $fieldDescription ) && $fieldDescription['size'] > 100 ) {
+			} elseif ( $fieldType == 'Text' && $fieldDescription->mSize != null && $fieldDescription->mSize > 100 ) {
 				continue;
 			}
 			$f = new CargoFilter();
@@ -848,7 +850,7 @@ END;
 			$f->setFieldDescription( $fieldDescription );
 			foreach ( $this->applied_filters as $af ) {
 				if ( $af->filter->name == $f->name ) {
-					if ( $f->fieldDescription['type'] == 'Date' || $f->fieldDescription['type'] == 'Integer' || $f->fieldDescription['type'] == 'Float' ) {
+					if ( $fieldType == 'Date' || $fieldType == 'Integer' || $fieldType == 'Float' ) {
 						$header .= $this->printUnappliedFilterLine( $f );
 					} else {
 						$header .= $this->printAppliedFilterLine( $af );
@@ -905,7 +907,7 @@ END;
 		$joinConds = array();
 		foreach ( $this->applied_filters as $i => $af ) {
 			$conds[] = $af->checkSQL();
-			if ( array_key_exists( 'isList', $af->filter->fieldDescription ) ) {
+			if ( $af->filter->fieldDescription->mIsList ) {
 				$fieldTableName = $this->tableName . '__' . $af->filter->name;
 				$tableNames[] = $fieldTableName;
 				$joinConds[$fieldTableName] = array(
@@ -963,7 +965,9 @@ END;
 			$valuesTable[] = array( 'title' => $row['title'] );
 		}
 		$queryDisplayer = new CargoQueryDisplayer();
-		$queryDisplayer->mFieldDescriptions = array( 'title' => array( 'type' => 'Page' ) );
+		$fieldDescription = new CargoFieldDescription();
+		$fieldDescription->mType = 'Page';
+		$queryDisplayer->mFieldDescriptions = array( 'title' => $fieldDescription );
 		$queryDisplayer->mFormat = 'category';
 		$formatter = $queryDisplayer->getFormatter( $out );
 		$html = $queryDisplayer->displayQueryResults( $formatter, $valuesTable );

@@ -87,7 +87,12 @@ class CargoUtils {
 		while ( $row = $dbr->fetchRow( $res ) ) {
 			$tableName = $row['main_table'];
 			$tableFieldsString = $row['table_schema'];
-			$tableSchemas[$tableName] = unserialize( $tableFieldsString );
+			$tableSchema = array();
+			$tableSchemaFromDB = unserialize( $tableFieldsString );
+			foreach ( $tableSchemaFromDB as $fieldName => $fieldDesc ) {
+				$tableSchema[$fieldName] = CargoFieldDescription::newFromDBArray( $fieldDesc );
+			}
+			$tableSchemas[$tableName] = $tableSchema;
 		}
 		return $tableSchemas;
 	}

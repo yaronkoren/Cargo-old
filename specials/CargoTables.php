@@ -55,17 +55,18 @@ class CargoTables extends IncludableSpecialPage {
 			}
 
 			$fieldAlias = str_replace( '_', ' ', $fieldName );
+			$fieldType = $fieldDescription->mType;
 			// Special handling for URLs, to avoid them
 			// overwhelming the page.
-			if ( $fieldDescription['type'] == 'URL' ) {
+			if ( $fieldType == 'URL' ) {
 				// Thankfully, there's a message in core
 				// MediaWiki that seems to just be "URL".
 				$fieldName = "CONCAT('[', $fieldName, ' " . wfMessage( 'version-entrypoints-header-url' )->parse() . "]')";
 			}
 
-			if ( array_key_exists( 'isList', $fieldDescription ) ) {
+			if ( $fieldDescription->mIsList ) {
 				$aliasedFieldNames[$fieldAlias] = $fieldName . '__full';
-			} elseif ( $fieldDescription['type'] == 'Coordinates' ) {
+			} elseif ( $fieldType == 'Coordinates' ) {
 				$aliasedFieldNames[$fieldAlias] = $fieldName . '__full';
 			} else {
 				$aliasedFieldNames[$fieldAlias] = $fieldName;

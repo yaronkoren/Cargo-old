@@ -82,15 +82,11 @@ class CargoRecreateTablesJob extends Job {
 			"_pageNamespace $intTypeString NOT NULL, " .
 			"_pageID $intTypeString NOT NULL";
 
-		foreach ( $tableFields as $fieldName => $fieldDescription ) {
-			if ( array_key_exists( 'size', $fieldDescription ) ) {
-				$size = $fieldDescription['size'];
-			} else {
-				$size = null;
-			}
-
-			$isList = array_key_exists( 'isList', $fieldDescription );
-			$fieldType = $fieldDescription['type'];
+		foreach ( $tableFields as $fieldName => $fieldDescFromDB ) {
+			$fieldDescription = CargoFieldDescription::newFromDBArray( $fieldDescFromDB );
+			$size = $fieldDescription->mSize;
+			$isList = $fieldDescription->mIsList;
+			$fieldType = $fieldDescription->mType;
 
 			if ( $isList || $fieldType == 'Coordinates' ) {
 				// No field will be created with this name -
@@ -139,7 +135,7 @@ class CargoRecreateTablesJob extends Job {
 		// if there are any.
 		$fieldTableNames = array();
 		foreach ( $tableFields as $fieldName => $fieldDescription ) {
-			if ( !array_key_exists( 'isList', $fieldDescription ) ) {
+			if ( !$fieldDescription->mIsList ) {
 				continue;
 			}
 			// The double underscore in this table name should
@@ -147,7 +143,7 @@ class CargoRecreateTablesJob extends Job {
 			// table.
 			$fieldTableName = $tableName . '__' . $fieldName;
 			$cdb->dropTable( $fieldTableName );
-			$fieldType = $fieldDescription['type'];
+			$fieldType = $fieldDescription->mType;
 			$createSQL = "CREATE TABLE " .
 				$cdb->tableName( $fieldTableName ) . ' ( ' .
 				"_rowID $intTypeString, ";

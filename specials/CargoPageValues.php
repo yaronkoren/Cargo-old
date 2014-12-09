@@ -59,15 +59,15 @@ class CargoPageValues extends IncludableSpecialPage {
 
 		$aliasedFieldNames = array();
 		foreach( $tableSchemas[$tableName] as $fieldName => $fieldDescription ) {
-			if ( array_key_exists( 'hidden', $fieldDescription ) ) {
-				// do some custom formatting
+			if ( $fieldDescription->mIsHidden ) {
+				// @TODO - do some custom formatting
 			}
 
 			$fieldAlias = str_replace( '_', ' ', $fieldName );
 
-			if ( array_key_exists( 'isList', $fieldDescription ) ) {
+			if ( $fieldDescription->mIsList ) {
 				$aliasedFieldNames[$fieldAlias] = $fieldName . '__full';
-			} elseif ( $fieldDescription['type'] == 'Coordinates' ) {
+			} elseif ( $fieldDescription->mType == 'Coordinates' ) {
 				$aliasedFieldNames[$fieldAlias] = $fieldName . '__full';
 			} else {
 				$aliasedFieldNames[$fieldAlias] = $fieldName;

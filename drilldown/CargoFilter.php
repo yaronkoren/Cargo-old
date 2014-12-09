@@ -40,7 +40,7 @@ class CargoFilter {
 
 	function getTimePeriod( $appliedFilters ) {
 		// If it's not a date field, return null.
-		if ( $this->fieldDescription['type'] != 'Date' ) {
+		if ( $this->fieldDescription->mType != 'Date' ) {
 			return null;
 		}
 
@@ -93,7 +93,7 @@ class CargoFilter {
 		$joinConds = array();
 		foreach( $appliedFilters as $af ) {
 			$conds[] = $af->checkSQL();
-			if ( array_key_exists( 'isList', $af->filter->fieldDescription ) ) {
+			if ( $af->filter->fieldDescription->mIsList ) {
 				$fieldTableName = $this->tableName . '__' . $af->filter->name;
 				$tableNames[] = $fieldTableName;
 				$joinConds[$fieldTableName] = array(
@@ -164,7 +164,7 @@ class CargoFilter {
 	 */
 	function getAllValues( $appliedFilters ) {
 		list( $tableNames, $conds, $joinConds ) = $this->getQueryParts( $appliedFilters );
-		if ( array_key_exists( 'isList', $this->fieldDescription ) ) {
+		if ( $this->fieldDescription->mIsList ) {
 			$fieldTableName = $this->tableName . '__' . $this->name;
 			$tableNames[] = $fieldTableName;
 			$fieldName = '_value';

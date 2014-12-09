@@ -233,7 +233,7 @@ class CargoStore {
 		// First, though, let's do some processing:
 		// - remove invalid values, if any
 		// - put dates and numbers into correct format
-		foreach ( $tableFields as $fieldName => $fieldDescription ) {
+		foreach ( $tableFields as $fieldName => $fieldDescFromDB ) {
 			// If it's null or not set, skip this value.
 			if ( !array_key_exists( $fieldName, $tableFieldValues ) ) {
 				continue;
@@ -243,10 +243,16 @@ class CargoStore {
 				continue;
 			}
 
-			if ( array_key_exists( 'allowedValues', $fieldDescription ) ) {
-				$allowedValues = $fieldDescription['allowedValues'];
-				if ( array_key_exists( 'isList', $fieldDescription ) ) {
-					$delimiter = $fieldDescription['delimiter'];
+			// Change from the format stored in the DB to the
+			// "real" one.
+			$fieldDescription = CargoFieldDescription::newFromDBArray( $fieldDescFromDB );
+
+			$fieldType = $fieldDescription->mType;
+
+			if ( $fieldDescription->mAllowedValues != null ) {
+				$allowedValues = $fieldDescription->mAllowedValues;
+				if ( $fieldDescription->mIsList ) {
+					$delimiter = $fieldDescription->mDelimiter;
 					$individualValues = explode( $delimiter, $curValue );
 					$valuesToBeKept = array();
 					foreach( $individualValues as $individualValue ) {
@@ -262,7 +268,7 @@ class CargoStore {
 					}
 				}
 			}
-			if ( $fieldDescription['type'] == 'Date' || $fieldDescription['type'] == 'Datetime' ) {
+			if ( $fieldType == 'Date' || $fieldType == 'Datetime' ) {
 				if ( $curValue != '' ) {
 					// Special handling if it's just a year.
 					if ( ctype_digit( $curValue ) ) {
@@ -291,21 +297,21 @@ class CargoStore {
 						}
 					}
 					$seconds = strtotime( $curValue );
-					if ( $fieldDescription['type'] == 'Date' ) {
+					if ( $fieldType == 'Date' ) {
 						// Put into YYYY-MM-DD format.
 						$tableFieldValues[$fieldName] = date('Y-m-d', $seconds );
-					} else { // ( $fieldDescription['type'] == 'Datetime' )
+					} else { // ( $fieldType == 'Datetime' )
 						// @TODO - check for
 						// "time missing" precision.
 						$tableFieldValues[$fieldName] = date('Y-m-d G:i:s', $seconds );
 					}
 					$tableFieldValues[$fieldName . '__precision'] = $precision;
 				}
-			} elseif ( $fieldDescription['type'] == 'Integer' ) {
+			} elseif ( $fieldType == 'Integer' ) {
 				// Remove digit-grouping character.
 				global $wgCargoDigitGroupingCharacter;
 				$tableFieldValues[$fieldName] = str_replace( $wgCargoDigitGroupingCharacter, '', $curValue );
-			} elseif ( $fieldDescription['type'] == 'Float' ) {
+			} elseif ( $fieldType == 'Float' ) {
 				// Remove digit-grouping character, and
 				// change decimal mark to '.' if it's
 				// anything else.
@@ -314,7 +320,7 @@ class CargoStore {
 				$curValue = str_replace( $wgCargoDigitGroupingCharacter, '', $curValue );
 				$curValue = str_replace( $wgCargoDecimalMark, '.', $curValue );
 				$tableFieldValues[$fieldName] = $curValue;
-			} elseif ( $fieldDescription['type'] == 'Boolean' ) {
+			} elseif ( $fieldType == 'Boolean' ) {
 				// True = 1, "yes"
 				// False = 0, "no"
 				$msgForNo = wfMessage( 'htmlform-no' )->text();
@@ -347,11 +353,12 @@ class CargoStore {
 
 		// For each field that holds a list of values, also add its
 		// values to its own table; and rename the actual field.
-		foreach ( $tableFields as $fieldName => $fieldDescription ) {
-			if ( array_key_exists( 'isList', $fieldDescription ) ) {
+		foreach ( $tableFields as $fieldName => $fieldDescFromDB ) {
+			$fieldDescription = CargoFieldDescription::newFromDBArray( $fieldDescFromDB );
+			$fieldType = $fieldDescription->mType;
+			if ( $fieldDescription->mIsList ) {
 				$fieldTableName = $tableName . '__' . $fieldName;
-				$delimiter = $fieldDescription['delimiter'];
-				$individualValues = explode( $delimiter, $tableFieldValues[$fieldName] );
+				$individualValues = explode( $fieldDescription->mDelimiter, $tableFieldValues[$fieldName] );
 				foreach ( $individualValues as $individualValue ) {
 					$individualValue = trim( $individualValue );
 					// Ignore blank values.
@@ -364,7 +371,7 @@ class CargoStore {
 					);
 					// For coordinates, there are two more
 					// fields, for latitude and longitude.
-					if ( $fieldDescription['type'] == 'Coordinates' ) {
+					if ( $fieldType == 'Coordinates' ) {
 						list( $latitude, $longitude) = self::parseCoordinatesString( $individualValue );
 						$fieldValues['_lat'] = $latitude;
 						$fieldValues['_lon'] = $longitude;
@@ -376,7 +383,7 @@ class CargoStore {
 				$tableFieldValues[$fieldName . '__full'] = $tableFieldValues[$fieldName];
 				unset( $tableFieldValues[$fieldName] );
 
-			} elseif ( $fieldDescription['type'] == 'Coordinates' ) {
+			} elseif ( $fieldType == 'Coordinates' ) {
 				list( $latitude, $longitude) = self::parseCoordinatesString( $tableFieldValues[$fieldName] );
 				// Rename the field.
 				$tableFieldValues[$fieldName . '__full'] = $tableFieldValues[$fieldName];

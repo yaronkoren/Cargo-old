@@ -13,11 +13,13 @@ class CargoQueryDisplayer {
 	var $mDisplayParams = array();
 	var $mParser = null;
 	var $mFieldDescriptions;
+	var $mFieldTables;
 
 	public static function newFromSQLQuery( $sqlQuery ) {
 		$cqd = new CargoQueryDisplayer();
 		$cqd->mSQLQuery = $sqlQuery;
 		$cqd->mFieldDescriptions = $sqlQuery->mFieldDescriptions;
+		$cqd->mFieldTables = $sqlQuery->mFieldTables;
 
 		return $cqd;
 	}
@@ -84,29 +86,25 @@ class CargoQueryDisplayer {
 				}
 
 				$fieldDescription = $this->mFieldDescriptions[$fieldName];
-				if ( array_key_exists( 'type', $fieldDescription ) ) {
-					$type = trim( $fieldDescription['type'] );
-				} else {
-					$type = null;
-				}
+				$tableName = $this->mFieldTables[$fieldName];
+				$fieldType = $fieldDescription->mType;
 
 				$text = '';
-				if ( array_key_exists( 'isList', $fieldDescription ) ) {
+				if ( $fieldDescription->mIsList ) {
 					// There's probably an easier way to do
 					// this, using array_map().
-					$delimiter = $fieldDescription['delimiter'];
+					$delimiter = $fieldDescription->mDelimiter;
 					$fieldValues = explode( $delimiter, $value );
 					foreach( $fieldValues as $i => $fieldValue ) {
 						if ( trim( $fieldValue ) == '' ) continue;
 						if ( $i > 0 ) $text .= "$delimiter ";
-						$text .= self::formatFieldValue( $fieldValue, $type, $fieldDescription, $this->mParser );
+						$text .= self::formatFieldValue( $fieldValue, $fieldType, $fieldDescription, $this->mParser );
 					}
-				} elseif ( $type == 'Date' || $type == 'Datetime' ) {
+				} elseif ( $fieldType == 'Date' || $fieldType == 'Datetime' ) {
 					$datePrecisionField = str_replace( ' ', '_', $fieldName ) . '__precision';
 					if ( array_key_exists( $datePrecisionField, $row ) ) {
 						$datePrecision = $row[$datePrecisionField];
 					} else {
-						$tableName = $fieldDescription['tableName'];
 						$fullDatePrecisionField = $tableName . '.' . $datePrecisionField;
 						if ( array_key_exists( $fullDatePrecisionField, $row ) ) {
 							$datePrecision = $row[$fullDatePrecisionField];
@@ -118,9 +116,9 @@ class CargoQueryDisplayer {
 							$datePrecision = CargoStore::FULL_PRECISION;
 						}
 					}
-					$text = self::formatDateFieldValue( $value, $datePrecision, $fieldDescription['type'] );
+					$text = self::formatDateFieldValue( $value, $datePrecision, $fieldType );
 				} else {
-					$text = self::formatFieldValue( $value, $type, $fieldDescription, $this->mParser );
+					$text = self::formatFieldValue( $value, $fieldType, $fieldDescription, $this->mParser );
 				}
 				if ( $text != '' ) {
 					$formattedQueryResults[$rowNum][$fieldName] = $text;
@@ -149,8 +147,8 @@ class CargoQueryDisplayer {
 			$title = Title::newFromText( $value, NS_FILE );
 			return Linker::makeThumbLinkObj( $title, wfLocalFile( $title ), $value, '' );
 		} elseif ( $type == 'URL' ) {
-			if ( array_key_exists( 'link text', $fieldDescription ) ) {
-				return Html::element( 'a', array( 'href' => $value ), $fieldDescription['link text'] );
+			if ( array_key_exists( 'link text', $fieldDescription->mOtherParams ) ) {
+				return Html::element( 'a', array( 'href' => $value ), $fieldDescription->mOtherParams['link text'] );
 			} else {
 				// Otherwise, do nothing.
 				return $value;

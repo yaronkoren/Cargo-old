@@ -51,7 +51,7 @@ class CargoAppliedFilter {
 	 */
 	function checkSQL() {
 		global $wgDBtype;
-		if ( array_key_exists( 'isList', $this->filter->fieldDescription) ) {
+		if ( $this->filter->fieldDescription->mIsList ) {
 			$fieldTableName = $this->filter->tableName . '__' . $this->filter->name;
 			$value_field = "cargo__$fieldTableName._value";
 		} else {
@@ -111,7 +111,7 @@ class CargoAppliedFilter {
 				} elseif ( $fv->upper_limit ) {
 					$sql .= "$value_field < {$fv->upper_limit} ";
 				}
-			} elseif ( $this->filter->fieldDescription['type'] == 'Date' ) {
+			} elseif ( $this->filter->fieldDescription->mType == 'Date' ) {
 				$date_field = $this->filter->name;
 				if ( $fv->time_period == 'day' ) {
 					$sql .= "YEAR($date_field) = {$fv->year} AND MONTH($date_field) = {$fv->month} AND DAYOFMONTH($date_field) = {$fv->day} ";
@@ -138,7 +138,7 @@ class CargoAppliedFilter {
 	 */
 	function getAllOrValues() {
 		$possible_values = array();
-		if ( array_key_exists( 'isList', $this->filter->fieldDescription ) ) {
+		if ( $this->filter->fieldDescription->mIsList ) {
 			$tableName = $this->filter->tableName . '__' . $this->filter->name;
 			$value_field = '_value';
 		} else {
@@ -146,7 +146,7 @@ class CargoAppliedFilter {
 			$value_field = $this->filter->name;
 		}
 
-		if ( $this->filter->fieldDescription['type'] == 'Date' ) {
+		if ( $this->filter->fieldDescription->mType == 'Date' ) {
 			// Is this necessary?
 			$date_field = $value_field;
 			if ( $this->filter->getTimePeriod() == 'month' ) {
@@ -163,7 +163,7 @@ class CargoAppliedFilter {
 		$cdb = CargoUtils::getDB();
 		$res = $cdb->select( $tableName, "DISTINCT " . $value_field );
 		while ( $row = $cdb->fetchRow( $res ) ) {
-			if ( $this->filter->fieldDescription['type'] == 'Date' && $this->filter->getTimePeriod() == 'month' ) {
+			if ( $this->filter->fieldDescription->mType == 'Date' && $this->filter->getTimePeriod() == 'month' ) {
 				$value_string = CargoDrilldownUtils::monthToString( $row[1] ) . " " . $row[0];
 			} else {
 				$value_string = $row[0];

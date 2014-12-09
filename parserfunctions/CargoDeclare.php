@@ -34,7 +34,7 @@ class CargoDeclare {
 				$tableName = $value;
 			} else {
 				$fieldName = $key;
-				$typeDescription = $value;
+				$fieldDescriptionStr = $value;
 				// Validate field name.
 				if ( strpos( $fieldName, ' ' ) !== false ) {
 					return CargoUtils::formatError( "Error: Field name \"$fieldName\" contains spaces. Spaces are not allowed; consider using underscores(\"_\") instead." );
@@ -46,46 +46,11 @@ class CargoDeclare {
 					return CargoUtils::formatError( "Error: Field name \"$fieldName\" contains a comma; this is not allowed." );
 				}
 
-				$fieldData = array();
-
-				if ( strpos( $typeDescription, 'List') === 0 ) {
-					$matches = array();
-					$foundMatch = preg_match( '/List \((.*)\) of (.*)/', $typeDescription, $matches);
-					if (! $foundMatch) {
-						return CargoUtils::formatError( "Error: could not parse type for field \"$fieldName\"." );
-					}
-					$fieldData['isList'] = true;
-					$fieldData['delimiter'] = $matches[1];
-					$typeDescription = $matches[2];
+				$fieldDescription = CargoFieldDescription::newFromString( $fieldDescriptionStr );
+				if ( $fieldDescription == null ) {
+					return CargoUtils::formatError( "Error: could not parse type for field \"$fieldName\"." );
 				}
-
-				// There may be additional parameters, in
-				// parentheses.
-				$matches = array();
-				$foundMatch2 = preg_match( '/(.*)\s*\((.*)\)/', $typeDescription, $matches);
-				if ( $foundMatch2 ) {
-					$typeDescription = trim( $matches[1] );
-					$extraParamsString = $matches[2];
-					$extraParams = explode( ';', $extraParamsString );
-					foreach ( $extraParams as $extraParam ) {
-						$extraParamParts = explode( '=', $extraParam, 2 );
-						if ( count( $extraParamParts ) == 1 ) {
-							$paramKey = trim( $extraParamParts[0] );
-							$fieldData[$paramKey] = true;
-						} else {
-							$paramKey = trim( $extraParamParts[0] );
-							$paramValue = trim( $extraParamParts[1] );
-							if ( $paramKey == 'allowed values' ) {
-								$fieldData['allowedValues'] = array_map( 'trim', explode( ',', $paramValue ) );
-							} else {
-								$fieldData[$paramKey] = $paramValue;
-							}
-						}
-					}
-				}
-
-				$fieldData['type'] = $typeDescription;
-				$cargoFields[$fieldName] = $fieldData;
+				$cargoFields[$fieldName] = $fieldDescription;
 			}
 		}
 
