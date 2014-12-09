@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * @author Yaron Koren
+ * @ingroup Cargo
  */
 class CargoOpenLayersFormat extends CargoMapsFormat {
 

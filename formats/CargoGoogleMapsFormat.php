@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * @author Yaron Koren
+ * @ingroup Cargo
+ */
 class CargoGoogleMapsFormat extends CargoMapsFormat {
 
 	function __construct( $output ) {
