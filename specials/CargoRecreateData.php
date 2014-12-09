@@ -22,7 +22,7 @@ class CargoRecreateData extends IncludableSpecialPage {
 	function execute( $query = null ) {
 		$out = $this->getOutput();
 
-		if ( ! $this->getUser()->isAllowed( 'recreatcargodata' ) ) {
+		if ( ! $this->getUser()->isAllowed( 'recreatecargodata' ) ) {
 			$out->permissionRequired( 'recreatecargodata' );
 			return;
 		}
