@@ -50,7 +50,7 @@ class CargoDeclare {
 				if ( $fieldDescription == null ) {
 					return CargoUtils::formatError( "Error: could not parse type for field \"$fieldName\"." );
 				}
-				$cargoFields[$fieldName] = $fieldDescription;
+				$cargoFields[$fieldName] = $fieldDescription->toDBArray();
 			}
 		}
 
