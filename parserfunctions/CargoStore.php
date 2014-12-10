@@ -219,11 +219,10 @@ class CargoStore {
 			wfDebugLog('cargo', "CargoStore::run() - skipping 4.\n");
 			return;
 		}
-		$tableFieldsString = $row['table_schema'];
-		$tableFields = unserialize( $tableFieldsString );
+		$tableSchema = CargoTableSchema::newFromDBString( $row['table_schema'] );
 
 		foreach ( $tableFieldValues as $fieldName => $fieldValue ) {
-			if ( !array_key_exists( $fieldName, $tableFields ) ) {
+			if ( !array_key_exists( $fieldName, $tableSchema->mFieldDescriptions ) ) {
 				throw new MWException( "Error: Unknown field, \"$fieldName\"." );
 			}
 		}
@@ -233,7 +232,7 @@ class CargoStore {
 		// First, though, let's do some processing:
 		// - remove invalid values, if any
 		// - put dates and numbers into correct format
-		foreach ( $tableFields as $fieldName => $fieldDescFromDB ) {
+		foreach ( $tableSchema->mFieldDescriptions as $fieldName => $fieldDescription ) {
 			// If it's null or not set, skip this value.
 			if ( !array_key_exists( $fieldName, $tableFieldValues ) ) {
 				continue;
@@ -245,10 +244,7 @@ class CargoStore {
 
 			// Change from the format stored in the DB to the
 			// "real" one.
-			$fieldDescription = CargoFieldDescription::newFromDBArray( $fieldDescFromDB );
-
 			$fieldType = $fieldDescription->mType;
-
 			if ( $fieldDescription->mAllowedValues != null ) {
 				$allowedValues = $fieldDescription->mAllowedValues;
 				if ( $fieldDescription->mIsList ) {
@@ -312,9 +308,8 @@ class CargoStore {
 				global $wgCargoDigitGroupingCharacter;
 				$tableFieldValues[$fieldName] = str_replace( $wgCargoDigitGroupingCharacter, '', $curValue );
 			} elseif ( $fieldType == 'Float' ) {
-				// Remove digit-grouping character, and
-				// change decimal mark to '.' if it's
-				// anything else.
+				// Remove digit-grouping character, and change
+				// decimal mark to '.' if it's anything else.
 				global $wgCargoDigitGroupingCharacter;
 				global $wgCargoDecimalMark;
 				$curValue = str_replace( $wgCargoDigitGroupingCharacter, '', $curValue );
@@ -353,8 +348,7 @@ class CargoStore {
 
 		// For each field that holds a list of values, also add its
 		// values to its own table; and rename the actual field.
-		foreach ( $tableFields as $fieldName => $fieldDescFromDB ) {
-			$fieldDescription = CargoFieldDescription::newFromDBArray( $fieldDescFromDB );
+		foreach ( $tableSchema->mFieldDescriptions as $fieldName => $fieldDescription ) {
 			$fieldType = $fieldDescription->mType;
 			if ( $fieldDescription->mIsList ) {
 				$fieldTableName = $tableName . '__' . $fieldName;

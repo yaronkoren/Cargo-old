@@ -21,7 +21,7 @@ class CargoDeclare {
 		array_shift( $params ); // we already know the $parser...
 
 		$tableName = null;
-		$cargoFields = array();
+		$tableSchema = new CargoTableSchema();
 		foreach ( $params as $param ) {
 			$parts = explode( '=', $param, 2 );
 			
@@ -50,7 +50,7 @@ class CargoDeclare {
 				if ( $fieldDescription == null ) {
 					return CargoUtils::formatError( "Error: could not parse type for field \"$fieldName\"." );
 				}
-				$cargoFields[$fieldName] = $fieldDescription->toDBArray();
+				$tableSchema->mFieldDescriptions[$fieldName] = $fieldDescription;
 			}
 		}
 
@@ -70,7 +70,7 @@ class CargoDeclare {
 		$parserOutput = $parser->getOutput();
 
 		$parserOutput->setProperty( 'CargoTableName', $tableName );
-		$parserOutput->setProperty( 'CargoFields', serialize( $cargoFields ) );
+		$parserOutput->setProperty( 'CargoFields', $tableSchema->toDBString() );
 
 		// Link to the Special:CargoTables page for this table, if it
 		// exists already - otherwise, explain that it needs to be

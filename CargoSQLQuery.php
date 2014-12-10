@@ -298,7 +298,7 @@ class CargoSQLQuery {
 					$fieldName = substr( $fieldName, 0, strlen( $fieldName ) - 6 );
 				}
 				if ( $tableName != null ) {
-					$description = $this->mTableSchemas[$tableName][$fieldName];
+					$description = $this->mTableSchemas[$tableName]->mFieldDescriptions[$fieldName];
 				} elseif ( substr( $fieldName, -5 ) == '__lat' || substr( $fieldName, -5 ) == '__lon' ) {
 					// Special handling for lat/lon
 					// helper fields.
@@ -308,8 +308,8 @@ class CargoSQLQuery {
 					// Go through all the fields, until we
 					// find the one matching this one.
 					foreach ( $this->mTableSchemas as $curTableName => $tableSchema ) {
-						if ( array_key_exists( $fieldName, $tableSchema ) ) {
-							$description = $tableSchema[$fieldName];
+						if ( array_key_exists( $fieldName, $tableSchema->mFieldDescriptions ) ) {
+							$description = $tableSchema->mFieldDescriptions[$fieldName];
 							$tableName = $curTableName;
 							break;
 						}
@@ -390,7 +390,7 @@ class CargoSQLQuery {
 		// set of tables.
 		$virtualFields = array();
 		foreach ( $this->mTableSchemas as $tableName => $tableSchema ) {
-			foreach ( $tableSchema as $fieldName => $fieldDescription ) {
+			foreach ( $tableSchema->mFieldDescriptions as $fieldName => $fieldDescription ) {
 				if ( $fieldDescription->mIsList ) {
 					$virtualFields[] = array(
 						'fieldName' => $fieldName,
@@ -554,7 +554,7 @@ class CargoSQLQuery {
 		// current set of tables.
 		$coordinateFields = array();
 		foreach ( $this->mTableSchemas as $tableName => $tableSchema ) {
-			foreach ( $tableSchema as $fieldName => $fieldDescription ) {
+			foreach ( $tableSchema->mFieldDescriptions as $fieldName => $fieldDescription ) {
 				if ( $fieldDescription->mType == 'Coordinates' ) {
 					$coordinateFields[] = array(
 						'fieldName' => $fieldName,
@@ -697,11 +697,7 @@ class CargoSQLQuery {
 		$dateFields = array();
 		foreach ( $this->mAliasedFieldNames as $alias => $fieldName ) {
 			$fieldDescription = $this->mFieldDescriptions[$alias];
-			if ( !array_key_exists( 'type', $fieldDescription ) ) {
-				continue;
-			}
-			$type = $fieldDescription['type'];
-			if ( $type == 'Date' || $type == 'Datetime' ) {
+			if ( $fieldDescription->mType == 'Date' || $fieldDescription->mType == 'Datetime' ) {
 				$dateFields[] = $fieldName;
 			}
 		}

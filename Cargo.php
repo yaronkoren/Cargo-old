@@ -55,6 +55,7 @@ $wgAPIModules['cargoquery'] = 'CargoQueryAPI';
 $wgAutoloadClasses['CargoHooks'] = $dir . '/Cargo.hooks.php';
 $wgAutoloadClasses['CargoUtils'] = $dir . '/CargoUtils.php';
 $wgAutoloadClasses['CargoFieldDescription'] = $dir . '/CargoFieldDescription.php';
+$wgAutoloadClasses['CargoTableSchema'] = $dir . '/CargoTableSchema.php';
 $wgAutoloadClasses['CargoDeclare'] = $dir . '/parserfunctions/CargoDeclare.php';
 $wgAutoloadClasses['CargoAttach'] = $dir . '/parserfunctions/CargoAttach.php';
 $wgAutoloadClasses['CargoStore'] = $dir . '/parserfunctions/CargoStore.php';

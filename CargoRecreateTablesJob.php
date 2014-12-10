@@ -40,17 +40,13 @@ class CargoRecreateTablesJob extends Job {
 	public static function recreateDBTablesForTemplate( $templatePageID ) {
 		global $wgDBtype;
 
-		$tableFieldsString = CargoUtils::getPageProp( $templatePageID, 'CargoFields' );
+		$tableSchemaString = CargoUtils::getPageProp( $templatePageID, 'CargoFields' );
 		// First, see if there even is DB storage for this template -
 		// if not, exit.
-		if ( is_null( $tableFieldsString ) ) {
+		if ( is_null( $tableSchemaString ) ) {
 			return false;
 		}
-
-		$tableFields = unserialize( $tableFieldsString );
-		if ( !is_array( $tableFields ) ) {
-			throw new MWException( "Invalid field information found for template." );
-		}
+		$tableSchema = CargoTableSchema::newFromDBString( $tableSchemaString );
 
 		$dbr = wfGetDB( DB_MASTER );
 		$cdb = CargoUtils::getDB();
@@ -82,8 +78,7 @@ class CargoRecreateTablesJob extends Job {
 			"_pageNamespace $intTypeString NOT NULL, " .
 			"_pageID $intTypeString NOT NULL";
 
-		foreach ( $tableFields as $fieldName => $fieldDescFromDB ) {
-			$fieldDescription = CargoFieldDescription::newFromDBArray( $fieldDescFromDB );
+		foreach ( $tableSchema->mFieldDescriptions as $fieldName => $fieldDescription ) {
 			$size = $fieldDescription->mSize;
 			$isList = $fieldDescription->mIsList;
 			$fieldType = $fieldDescription->mType;
@@ -134,7 +129,7 @@ class CargoRecreateTablesJob extends Job {
 		// Now also create tables for each of the 'list' fields,
 		// if there are any.
 		$fieldTableNames = array();
-		foreach ( $tableFields as $fieldName => $fieldDescription ) {
+		foreach ( $tableSchema->mFieldDescriptions as $fieldName => $fieldDescription ) {
 			if ( !$fieldDescription->mIsList ) {
 				continue;
 			}
@@ -163,7 +158,7 @@ class CargoRecreateTablesJob extends Job {
 		}
 
 		// Finally, store all the info in the cargo_tables table.
-		$dbr->insert( 'cargo_tables', array( 'template_id' => $templatePageID, 'main_table' => $tableName, 'field_tables' => serialize( $fieldTableNames ), 'table_schema' => $tableFieldsString ) );
+		$dbr->insert( 'cargo_tables', array( 'template_id' => $templatePageID, 'main_table' => $tableName, 'field_tables' => serialize( $fieldTableNames ), 'table_schema' => $tableSchemaString ) );
 		return true;
 	}
 
