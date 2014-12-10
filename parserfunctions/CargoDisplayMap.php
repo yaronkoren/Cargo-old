@@ -45,6 +45,10 @@ class CargoDisplayMap {
 			}
 		}
 
+		if ( $pointStr == null ) {
+			return CargoUtils::formatError( "Error: 'point' parameter must be set." );
+		}
+
 		// Simulate a query with the appropriate mapping format.
 		// Ideally, both this code and the #cargo_query code would
 		// call some separate mapping code, but that's not the case
