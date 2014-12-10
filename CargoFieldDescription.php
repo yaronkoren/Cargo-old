@@ -107,5 +107,7 @@ class CargoFieldDescription {
 		foreach ( $this->mOtherParams as $otherParam => $value ) {
 			$descriptionData[$otherParam] = $value;
 		}
+
+		return $descriptionData;
 	}
 }
