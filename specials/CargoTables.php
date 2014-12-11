@@ -48,7 +48,7 @@ class CargoTables extends IncludableSpecialPage {
 		$sqlQuery->mTableSchemas = $tableSchemas;
 
 		$aliasedFieldNames = array( wfMessage( 'nstab-main' )->parse() => '_pageName' );
-		foreach( $tableSchemas[$tableName] as $fieldName => $fieldDescription ) {
+		foreach( $tableSchemas[$tableName]->mFieldDescriptions as $fieldName => $fieldDescription ) {
 			// Skip "hidden" fields.
 			if ( array_key_exists( 'hidden', $fieldDescription ) ) {
 				continue;

@@ -59,7 +59,7 @@ class CargoExport extends SpecialPage {
 		foreach ( $sqlQueries as $i => $sqlQuery ) {
 			$dateFields = array();
 			foreach( $sqlQuery->mFieldDescriptions as $field => $description ) {
-				if ( $description['type'] == 'Date' || $description['type'] == 'Datetime' ) {
+				if ( $description->mType == 'Date' || $description->mType == 'Datetime' ) {
 					$dateFields[] = $field;
 				}
 			}
