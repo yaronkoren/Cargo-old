@@ -63,12 +63,28 @@ class CargoQuery {
 		$queryDisplayer->mParser = $parser;
 		$formatter = $queryDisplayer->getFormatter( $parser->getOutput() );
 
-                // Let the format run the query itself, if it wants to.
-                if ( $formatter->isDeferred() ) {
-                        $text = $formatter->queryAndDisplay( array( $sqlQuery ), $displayParams );
-                        $text = $parser->insertStripItem( $text, $parser->mStripState );
-                        return $text;
-                }
+		// Let the format run the query itself, if it wants to.
+		if ( $formatter->isDeferred() ) {
+			// @TODO - fix this inefficiency. Right now a
+			// CargoSQLQuery object is constructed three times for
+			// deferred formats: the first two times here and the
+			// 3rd by Special:CargoExport. It's the first
+			// construction that involves a bunch of text
+			// processing, and is unneeded.
+			// However, this first CargoSQLQuery is passed to
+			// the CargoQueryDisplayer, which in turn uses it
+			// to figure out the formatting class, so that we
+			// know whether it is a deferred class or not. The
+			// class is based in part on the set of fields in the
+			// query, so in theory (though not in practice),
+			// whether or not it's deferred could depend on the
+			// fields in the query, making the first 'Query
+			// necessary. There has to be some better way, though.
+			$sqlQuery = CargoSQLQuery::newFromValues2( $tablesStr, $fieldsStr, $whereStr, $joinOnStr, $groupByStr, $orderByStr, $limitStr );
+			$text = $formatter->queryAndDisplay( array( $sqlQuery ), $displayParams );
+			$text = $parser->insertStripItem( $text, $parser->mStripState );
+			return $text;
+		}
 
 		try {
 			$queryResults = $sqlQuery->run();
