@@ -302,7 +302,7 @@ END;
 		$value = str_replace( '_', ' ', $value );
 		// if it's boolean, display something nicer than "0" or "1"
 		if ( $value === ' other' ) {
-			return wfMessage( 'htmlform-selectorother-other' )->text();
+			return Html::element( 'span', array( 'style' => 'font-style: italic;' ), wfMessage( 'htmlform-selectorother-other' )->text() );
 		} elseif ( $value === ' none' ) {
 			return Html::element( 'span', array( 'style' => 'font-style: italic;' ), wfMessage( 'powersearch-togglenone' )->text() );
 		} elseif ( $filter->fieldDescription->mType === 'Boolean' ) {
@@ -373,7 +373,7 @@ END;
 				$results_line .= "\n\t\t\t\t$filter_text";
 			} else {
 				$filter_url = $this->makeBrowseURL( $this->tableName, $applied_filters );
-				$results_line .= "\n\t\t\t\t\t\t" . Html::element( 'a', array( 'href' => $filter_url, 'title' => wfMessage( 'cargo-drilldown-filterbyvalue' )->text() ), $filter_text );
+				$results_line .= "\n\t\t\t\t\t\t" . Html::rawElement( 'a', array( 'href' => $filter_url, 'title' => wfMessage( 'cargo-drilldown-filterbyvalue' )->text() ), $filter_text );
 			}
 			foreach ( $applied_filters as $af2 ) {
 				if ( $af->filter->name == $af2->filter->name ) {
