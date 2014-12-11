@@ -51,9 +51,9 @@ abstract class CargoDeferredFormat extends CargoDisplayFormat {
 				$queryParams['tables'][] = implode( ',', $sqlQuery->mTableNames );
 				$queryParams['join on'][] = $sqlQuery->mJoinOnStr;
 				$queryParams['fields'][] = $sqlQuery->mFieldsStr;
-				$queryParams['where'][] = $sqlQuery->mWhere;
-				$queryParams['group by'][] = $sqlQuery->mGroupBy;
-				$queryParams['order by'][] = $sqlQuery->mOrderBy;
+				$queryParams['where'][] = $sqlQuery->mWhereStr;
+				$queryParams['group by'][] = $sqlQuery->mGroupByStr;
+				$queryParams['order by'][] = $sqlQuery->mOrderByStr;
 				$queryParams['limit'][] = $sqlQuery->mQueryLimit;
 			}
 		}
