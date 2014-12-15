@@ -162,7 +162,7 @@ class CargoUtils {
 		// Of course, Text and Page fields could be set using
 		// {{PAGENAME}} as well, but those seem less likely.
 		$value = htmlspecialchars_decode( $value );
-		// Parse it as if it's wikitext./ The exact call
+		// Parse it as if it's wikitext. The exact call
 		// depends on whether we're in a special page or not.
 		global $wgTitle, $wgRequest;
 		if ( is_null( $parser ) ) {
