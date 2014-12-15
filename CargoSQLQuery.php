@@ -1,6 +1,7 @@
 <?php
 /**
- * CargoSQLQuery
+ * CargoSQLQuery - a wrapper class around SQL queries, that also handles
+ * the special Cargo keywords like "HOLDS" and "NEAR".
  *
  * @author Yaron Koren
  * @ingroup Cargo
@@ -42,18 +43,35 @@ class CargoSQLQuery {
 		$sqlQuery->setAliasedFieldNames();
 		$sqlQuery->mTableSchemas = CargoUtils::getTableSchemas( $sqlQuery->mTableNames );
 		$sqlQuery->setOrderBy( $orderByStr );
+		$sqlQuery->mGroupByStr = $groupByStr;
 		$sqlQuery->setDescriptionsForFields();
 		$sqlQuery->handleVirtualFields();
 		$sqlQuery->handleVirtualCoordinateFields();
 		$sqlQuery->handleDateFields();
 		$sqlQuery->setMWJoinConds();
-		$sqlQuery->mGroupByStr = $groupByStr;
 		$sqlQuery->mQueryLimit = $wgCargoDefaultQueryLimit;
 		if ( $limitStr != '' ) {
 			$sqlQuery->mQueryLimit = min( $limitStr, $wgCargoMaxQueryLimit );
 		}
 		$sqlQuery->addTablePrefixesToAll();
 
+		return $sqlQuery;
+	}
+
+	/**
+	 * Lightweight constructor that just sets the fields, with (essentially)
+	 * no processing.
+	 */
+	public static function newFromValues2( $tablesStr, $fieldsStr, $whereStr, $joinOnStr, $groupByStr, $orderByStr, $limitStr ) {
+		$sqlQuery = new CargoSQLQuery();
+		$sqlQuery->mTablesStr = $tablesStr;
+		$sqlQuery->mTableNames = explode( ',', $tablesStr );
+		$sqlQuery->mFieldsStr = $fieldsStr;
+		$sqlQuery->mWhereStr = $whereStr;
+		$sqlQuery->mJoinOnStr = $joinOnStr;
+		$sqlQuery->mGroupByStr = $groupByStr;
+		$sqlQuery->mOrderByStr = $orderByStr;
+		$sqlQuery->mQueryLimit = $limitStr;
 		return $sqlQuery;
 	}
 
@@ -381,6 +399,7 @@ class CargoSQLQuery {
 		//     "join on".
 		// "join on" - make sure that "HOLDS" is specified, If it is,
 		//     "translate" it, and add the values table to "tables".
+		// "group by" - always "translate" it into the single value.
 		// "fields" - "translate" it, where the translation (i.e.
 		//     the true field) depends on whether or not the values
 		//     table is included.
@@ -470,6 +489,45 @@ class CargoSQLQuery {
 			}
 		}
 		$this->addToCargoJoinConds( $newCargoJoinConds );
+
+		// "group by"
+		// We handle this before "fields" and "order by" because,
+		// unlike those two, a virtual field here can affect the
+		// set of tables and fields being included - which will
+		// affect the other two.
+		$matches = array();
+		foreach ( $virtualFields as $virtualField ) {
+			$fieldName = $virtualField['fieldName'];
+			$tableName = $virtualField['tableName'];
+			$pattern1 = "/\b$tableName\.$fieldName\b/";
+			$foundMatch = preg_match( $pattern1, $this->mGroupByStr, $matches);
+			$pattern2 = "/\b$fieldName\b/";
+			$foundMatch2 = false;
+
+			if ( !$foundMatch ) {
+				$foundMatch2 = preg_match( $pattern2, $this->mGroupByStr, $matches);
+			}
+			if ( $foundMatch || $foundMatch2 ) {
+				$fieldTableName = $tableName . '__' . $fieldName;
+				if ( !$this->fieldTableIsIncluded( $fieldTableName ) ) {
+					$this->addFieldTableToTableNames( $fieldTableName, $tableName );
+					$this->mCargoJoinConds[] = array(
+						'joinType' => 'LEFT OUTER JOIN',
+						'table1' => $tableName,
+						'field1' => '_ID',
+						'table2' => $fieldTableName,
+						'field2' => '_rowID'
+					);
+				}
+				$replacement = "$fieldTableName._value";
+
+				if ( $foundMatch ) {
+					$this->mGroupByStr = preg_replace( $pattern1, $replacement, $this->mGroupByStr );
+				} elseif ( $foundMatch2 ) {
+					$this->mGroupByStr = preg_replace( $pattern2, $replacement, $this->mGroupByStr );
+				}
+			}
+		}
 
 		// "fields"
 		foreach ( $this->mAliasedFieldNames as $alias => $fieldName ) {
