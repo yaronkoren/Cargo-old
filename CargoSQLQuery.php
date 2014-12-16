@@ -148,8 +148,11 @@ class CargoSQLQuery {
 			$containsEquals = strpos( $joinString, '=' );
 			// Must be all-caps for now.
 			$containsHolds = strpos( $joinString, ' HOLDS ' );
+			$containsHoldsLike = strpos( $joinString, ' HOLDS LIKE ' );
 			if ( $containsEquals ) {
 				$joinParts = explode( '=', $joinString );
+			} elseif ( $containsHoldsLike ) {
+				$joinParts = explode( ' HOLDS LIKE ', $joinString );
 			} elseif ( $containsHolds ) {
 				$joinParts = explode( ' HOLDS ', $joinString );
 			} else {
@@ -174,7 +177,9 @@ class CargoSQLQuery {
 				'table2' => $table2,
 				'field2' => $field2
 			);
-			if ( $containsHolds ) {
+			if ( $containsHoldsLike ) {
+				$joinCond['holds like'] = true;
+			} elseif ( $containsHolds ) {
 				$joinCond['holds'] = true;
 			}
 			$this->mCargoJoinConds[] = $joinCond;
@@ -389,14 +394,13 @@ class CargoSQLQuery {
 		return false;
 	}
 
-
 	function handleVirtualFields() {
 		// The array-field alias can be found in the "where", "join on",
 		// "fields" or "order by" clauses. Handling depends on which
 		// clause it is:
-		// "where" - make sure that "HOLDS" is specified. If it is,
-		//     "translate" it, and add the values table to "tables" and
-		//     "join on".
+		// "where" - make sure that "HOLDS" or "HOlDS LIKE" is
+		//     specified. If it is, "translate" it, and add the values
+		//     table to "tables" and "join on".
 		// "join on" - make sure that "HOLDS" is specified, If it is,
 		//     "translate" it, and add the values table to "tables".
 		// "group by" - always "translate" it into the single value.
@@ -424,16 +428,28 @@ class CargoSQLQuery {
 		foreach ( $virtualFields as $virtualField ) {
 			$fieldName = $virtualField['fieldName'];
 			$tableName = $virtualField['tableName'];
-			$pattern1 = "/\b$tableName\.$fieldName(\s*HOLDS\s*)?/";
-			$foundMatch = preg_match( $pattern1, $this->mWhereStr, $matches);
-			if ( !$foundMatch ) {
-				$pattern2 = "/\b$fieldName(\s*HOLDS\s*)?/";
-				$foundMatch2 = preg_match( $pattern2, $this->mWhereStr, $matches);
+
+			$likePattern1 = "/\b$tableName\.$fieldName(\s*HOLDS LIKE\s*)/";
+			$foundLikeMatch1 = preg_match( $likePattern1, $this->mWhereStr, $matches);
+			$foundLikeMatch2 = $foundMatch1 = $foundMatch2 = false;
+			if ( !$foundLikeMatch1 ) {
+				$likePattern2 = "/\b$fieldName(\s*HOLDS LIKE\s*)/";
+				$foundLikeMatch2 = preg_match( $likePattern2, $this->mWhereStr, $matches);
 			}
-			if ( $foundMatch || $foundMatch2 ) {
+
+			if ( !$foundLikeMatch1 && !$foundLikeMatch2 ) {
+				$pattern1 = "/\b$tableName\.$fieldName(\s*HOLDS\s*)?/";
+				$foundMatch1 = preg_match( $pattern1, $this->mWhereStr, $matches);
+				if ( !$foundMatch1 ) {
+					$pattern2 = "/\b$fieldName(\s*HOLDS\s*)?/";
+					$foundMatch2 = preg_match( $pattern2, $this->mWhereStr, $matches);
+				}
+			}
+
+			if ( $foundLikeMatch1 || $foundLikeMatch2 || $foundMatch1 || $foundMatch2 ) {
 				// If no "HOLDS", throw an error.
 				if ( count( $matches ) == 1 ) {
-					throw new MWException( "Error: operator for the virtual field '$tableName.$fieldName' must be 'HOLDS'." );
+					throw new MWException( "Error: operator for the virtual field '$tableName.$fieldName' must be 'HOLDS' or 'HOLDS LIKE'." );
 				}
 				$fieldTableName = $tableName . '__' . $fieldName;
 				$this->addFieldTableToTableNames( $fieldTableName, $tableName );
@@ -444,7 +460,11 @@ class CargoSQLQuery {
 					'table2' => $fieldTableName,
 					'field2' => '_rowID'
 				);
-				if ( $foundMatch ) {
+				if ( $foundLikeMatch1 ) {
+					$this->mWhereStr = preg_replace( $likePattern1, "$fieldTableName._value LIKE ", $this->mWhereStr );
+				} elseif ( $foundLikeMatch2 ) {
+					$this->mWhereStr = preg_replace( $likePattern2, "$fieldTableName._value LIKE ", $this->mWhereStr );
+				} elseif ( $foundMatch1 ) {
 					$this->mWhereStr = preg_replace( $pattern1, "$fieldTableName._value=", $this->mWhereStr );
 				} elseif ( $foundMatch2 ) {
 					$this->mWhereStr = preg_replace( $pattern2, "$fieldTableName._value=", $this->mWhereStr );
@@ -455,6 +475,8 @@ class CargoSQLQuery {
 		// "join on"
 		$newCargoJoinConds = array();
 		foreach ( $this->mCargoJoinConds as $i => $joinCond ) {
+			// We only handle 'HOLDS' here - no joining on
+			// 'HOLDS LIKE'.
 			if ( ! array_key_exists( 'holds', $joinCond ) ) {
 				continue;
 			}
@@ -500,14 +522,14 @@ class CargoSQLQuery {
 			$fieldName = $virtualField['fieldName'];
 			$tableName = $virtualField['tableName'];
 			$pattern1 = "/\b$tableName\.$fieldName\b/";
-			$foundMatch = preg_match( $pattern1, $this->mGroupByStr, $matches);
+			$foundMatch1 = preg_match( $pattern1, $this->mGroupByStr, $matches);
 			$pattern2 = "/\b$fieldName\b/";
 			$foundMatch2 = false;
 
-			if ( !$foundMatch ) {
+			if ( !$foundMatch1 ) {
 				$foundMatch2 = preg_match( $pattern2, $this->mGroupByStr, $matches);
 			}
-			if ( $foundMatch || $foundMatch2 ) {
+			if ( $foundMatch1 || $foundMatch2 ) {
 				$fieldTableName = $tableName . '__' . $fieldName;
 				if ( !$this->fieldTableIsIncluded( $fieldTableName ) ) {
 					$this->addFieldTableToTableNames( $fieldTableName, $tableName );
@@ -521,7 +543,7 @@ class CargoSQLQuery {
 				}
 				$replacement = "$fieldTableName._value";
 
-				if ( $foundMatch ) {
+				if ( $foundMatch1 ) {
 					$this->mGroupByStr = preg_replace( $pattern1, $replacement, $this->mGroupByStr );
 				} elseif ( $foundMatch2 ) {
 					$this->mGroupByStr = preg_replace( $pattern2, $replacement, $this->mGroupByStr );
@@ -572,21 +594,21 @@ class CargoSQLQuery {
 			$fieldName = $virtualField['fieldName'];
 			$tableName = $virtualField['tableName'];
 			$pattern1 = "/\b$tableName\.$fieldName\b/";
-			$foundMatch = preg_match( $pattern1, $this->mOrderByStr, $matches);
+			$foundMatch1 = preg_match( $pattern1, $this->mOrderByStr, $matches);
 			$pattern2 = "/\b$fieldName\b/";
 			$foundMatch2 = false;
 
-			if ( !$foundMatch ) {
+			if ( !$foundMatch1 ) {
 				$foundMatch2 = preg_match( $pattern2, $this->mOrderByStr, $matches);
 			}
-			if ( $foundMatch || $foundMatch2 ) {
+			if ( $foundMatch1 || $foundMatch2 ) {
 				$fieldTableName = $tableName . '__' . $fieldName;
 				if ( $this->fieldTableIsIncluded( $fieldTableName ) ) {
 					$replacement = "$fieldTableName._value";
 				} else {
 					$replacement = $tableName . '.' . $fieldName . '__full';
 				}
-				if ( $foundMatch ) {
+				if ( $foundMatch1 ) {
 					$this->mOrderByStr = preg_replace( $pattern1, $replacement, $this->mOrderByStr );
 				} elseif ( $foundMatch2 ) {
 					$this->mOrderByStr = preg_replace( $pattern2, $replacement, $this->mOrderByStr );
@@ -667,12 +689,12 @@ class CargoSQLQuery {
 			$fieldName = $coordinateField['fieldName'];
 			$tableName = $coordinateField['tableName'];
 			$pattern1 = "/\b$tableName\.$fieldName(\s*NEAR\s*)\(([^)]*)\)/";
-			$foundMatch = preg_match( $pattern1, $this->mWhereStr, $matches);
-			if ( !$foundMatch ) {
+			$foundMatch1 = preg_match( $pattern1, $this->mWhereStr, $matches);
+			if ( !$foundMatch1 ) {
 				$pattern2 = "/\b$fieldName(\s*NEAR\s*)\(([^)]*)\)/";
 				$foundMatch2 = preg_match( $pattern2, $this->mWhereStr, $matches);
 			}
-			if ( $foundMatch || $foundMatch2 ) {
+			if ( $foundMatch1 || $foundMatch2 ) {
 				// If no "NEAR", throw an error.
 				if ( count( $matches ) != 3 ) {
 					throw new MWException( "Error: operator for the virtual coordinates field '$tableName.$fieldName' must be 'NEAR'." );
@@ -698,7 +720,7 @@ class CargoSQLQuery {
 					" AND $tableName.{$fieldName}__lon >= " . max( $longitude - $longDistance, -180 ) .
 					" AND $tableName.{$fieldName}__lon <= " . min( $longitude + $longDistance, 180 );
 
-				if ( $foundMatch ) {
+				if ( $foundMatch1 ) {
 					$this->mWhereStr = preg_replace( $pattern1, $newWhere, $this->mWhereStr );
 				} elseif ( $foundMatch2 ) {
 					$this->mWhereStr = preg_replace( $pattern2, $newWhere, $this->mWhereStr );
