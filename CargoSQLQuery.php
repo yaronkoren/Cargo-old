@@ -777,7 +777,12 @@ class CargoSQLQuery {
 		$dateFields = array();
 		foreach ( $this->mAliasedFieldNames as $alias => $fieldName ) {
 			$fieldDescription = $this->mFieldDescriptions[$alias];
-			if ( $fieldDescription->mType == 'Date' || $fieldDescription->mType == 'Datetime' ) {
+			if ( ( $fieldDescription->mType == 'Date' || $fieldDescription->mType == 'Datetime' ) &&
+			// Make sure this is an actual field and not a call
+			// to a function, like DATE_FORMAT(), by checking for
+			// the presence of '(' and ')' - there's probably a
+			// more elegant way to do this.
+			( strpos( $fieldName, '(' ) == false ) && ( strpos( $fieldName, ')' ) == false ) ) {
 				$dateFields[] = $fieldName;
 			}
 		}
