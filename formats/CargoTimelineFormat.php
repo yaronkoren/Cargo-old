@@ -6,7 +6,7 @@
 
 class CargoTimelineFormat extends CargoDeferredFormat {
 	function allowedParameters() {
-		return array();
+		return array( 'width', 'height', );
 	}
 
 	function queryAndDisplay( $sqlQueries, $displayParams, $querySpecificParams = null ) {
@@ -21,6 +21,11 @@ class CargoTimelineFormat extends CargoDeferredFormat {
 			}
 		}
 
+		if ( array_key_exists( 'height', $displayParams ) ) {
+			$height = $displayParams['height'];
+		} else {
+			$height = "350px";
+		}
 		if ( array_key_exists( 'width', $displayParams ) ) {
 			$width = $displayParams['width'];
 		} else {
@@ -30,7 +35,7 @@ class CargoTimelineFormat extends CargoDeferredFormat {
 		$attrs = array(
 			'class' => 'cargoTimeline',
 			'dataurl' => $ce->getFullURL( $queryParams ),
-			'style' => "width: $width; height: 350px; border: 1px solid #aaa;"
+			'style' => "height: $height; width: $width; border: 1px solid #aaa;"
 		);
 		$text = Html::rawElement( 'div', $attrs, '' );
 
