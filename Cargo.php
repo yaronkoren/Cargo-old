@@ -100,6 +100,7 @@ $wgAutoloadClasses['CargoMapsFormat'] = $dir . '/formats/CargoMapsFormat.php';
 $wgAutoloadClasses['CargoGoogleMapsFormat'] = $dir . '/formats/CargoGoogleMapsFormat.php';
 $wgAutoloadClasses['CargoOpenLayersFormat'] = $dir . '/formats/CargoOpenLayersFormat.php';
 $wgAutoloadClasses['CargoCalendarFormat'] = $dir . '/formats/CargoCalendarFormat.php';
+$wgAutoloadClasses['CargoTimelineFormat'] = $dir . '/formats/CargoTimelineFormat.php';
 $wgAutoloadClasses['CargoCategoryFormat'] = $dir . '/formats/CargoCategoryFormat.php';
 $wgAutoloadClasses['CargoBarChartFormat'] = $dir . '/formats/CargoBarChartFormat.php';
 
@@ -162,6 +163,36 @@ $wgResourceModules += array(
 			'libs/moment.js',
 			'libs/fullcalendar.js',
 			'libs/ext.cargo.calendar.js',
+		),
+		'position' => 'top',
+		'localBasePath' => __DIR__,
+		'remoteExtPath' => 'Cargo'
+	),
+	'ext.cargo.timeline' => array(
+		'styles' => array(
+			'libs/SimileTimeline/styles/timeline.css',
+			'libs/SimileTimeline/styles/ethers.css',
+			'libs/SimileTimeline/styles/events.css',
+		),
+		'scripts' => array(
+			'libs/ext.cargo.timeline.js',
+			'libs/SimileTimeline/scripts/timeline.js',
+			'libs/SimileTimeline/scripts/util/platform.js',
+			'libs/SimileTimeline/scripts/util/debug.js',
+			'libs/SimileTimeline/scripts/util/xmlhttp.js',
+			'libs/SimileTimeline/scripts/util/dom.js',
+			'libs/SimileTimeline/scripts/util/graphics.js',
+			'libs/SimileTimeline/scripts/util/date-time.js',
+			'libs/SimileTimeline/scripts/util/data-structure.js',
+			'libs/SimileTimeline/scripts/units.js',
+			'libs/SimileTimeline/scripts/themes.js',
+			'libs/SimileTimeline/scripts/ethers.js',
+			'libs/SimileTimeline/scripts/ether-painters.js',
+			'libs/SimileTimeline/scripts/labellers.js',
+			'libs/SimileTimeline/scripts/sources.js',
+			'libs/SimileTimeline/scripts/layouts.js',
+			'libs/SimileTimeline/scripts/painters.js',
+			'libs/SimileTimeline/scripts/decorators.js',
 		),
 		'position' => 'top',
 		'localBasePath' => __DIR__,

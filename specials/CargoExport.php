@@ -38,6 +38,8 @@ class CargoExport extends SpecialPage {
 
 		if ( $format == 'fullcalendar' ) {
 			$this->displayCalendarData( $sqlQueries );
+		} elseif ( $format == 'timeline' ) {
+			$this->displayTimelineData( $sqlQueries );
 		} elseif ( $format == 'nvd3chart' ) {
 			$this->displayNVD3ChartData( $sqlQueries );
 		} elseif ( $format == 'csv' ) {
@@ -94,6 +96,71 @@ class CargoExport extends SpecialPage {
 		}
 
 		print json_encode( $displayedArray );
+	}
+
+	/**
+	 * Used by displayTimelineData().
+	 */
+	function timelineDatesCmp( $a, $b ) {
+		if ( $a['start'] == $b['start'] ) {
+			return 0;
+		}
+		return ( $a['start'] < $b['start'] ) ? -1 : 1;
+	}
+
+	function displayTimelineData( $sqlQueries ) {
+		$req = $this->getRequest();
+
+		$displayedArray = array();
+		foreach ( $sqlQueries as $i => $sqlQuery ) {
+			$dateFields = array();
+			foreach( $sqlQuery->mFieldDescriptions as $field => $description ) {
+				if ( $description->mType == 'Date' || $description->mType == 'Datetime' ) {
+					$dateFields[] = $field;
+				}
+			}
+
+			$queryResults = $sqlQuery->run();
+
+			foreach ( $queryResults as $queryResult ) {
+				$title = Title::newFromText( $queryResult['_pageName'] );
+				$eventDescription = '';
+				$firstField = true;
+				foreach ( $sqlQuery->mFieldDescriptions as $fieldName => $fieldDescription ) {
+					// Don't display the first field (it'll
+					// be the title), or date fields.
+					if ( $firstField ) {
+						$firstField = false;
+						continue;
+					}
+					if ( in_array( $fieldName, $dateFields ) ) {
+						continue;
+					}
+					if ( !array_key_exists( $fieldName, $queryResult ) ) {
+						continue;
+					}
+					$fieldValue = $queryResult[$fieldName];
+					if ( trim( $fieldValue ) == '' ) {
+						continue;
+					}
+					$eventDescription .= "<strong>$fieldName:</strong> $fieldValue<br />\n";
+				}
+
+				$displayedArray[] = array(
+					// Get first field for the 'title' - not
+					// necessarily the page name.
+					'title' => reset( $queryResult ),
+					'start' => $queryResult[$dateFields[0]],
+					'description' => $eventDescription,
+					'link' => $title->getFullURL(),
+				);
+			}
+		}
+		// Sort by date, ascending.
+		usort( $displayedArray, 'self::timelineDatesCmp' );
+
+		$displayedArray = array( 'events' => $displayedArray );
+		print json_encode( $displayedArray, JSON_HEX_TAG | JSON_HEX_QUOT );
 	}
 
 	function displayNVD3ChartData( $sqlQueries ) {
