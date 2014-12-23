@@ -61,11 +61,11 @@ $(document).ready(function() {
 			var bandType2 = Timeline.DateTime.DAY;
 			if ( daysDifference <= 14 ) {
 				// Keep the default.
-			} else if ( daysDifference <= 100 ) {
+			} else if ( daysDifference <= 50 ) {
 				bandType2 = Timeline.DateTime.WEEK;
-			} else if ( daysDifference <= 400 ) {
+			} else if ( daysDifference <= 200 ) {
 				bandType2 = Timeline.DateTime.MONTH;
-			} else if ( daysDifference <= 5000 ) {
+			} else if ( daysDifference <= 2400 ) {
 				bandType2 = Timeline.DateTime.YEAR;
 			} else {
 				bandType2 = Timeline.DateTime.DECADE;
