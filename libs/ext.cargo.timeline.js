@@ -18,6 +18,10 @@ $(document).ready(function() {
 			// the timeline.
 			var events = json['events'];
 			var numEvents = events.length;
+			if ( numEvents == 0 ) {
+				return;
+			}
+
 			if ( numEvents % 2 == 1 ) {
 				medianEventIndex = ( numEvents - 1 ) / 2;
 			} else {
