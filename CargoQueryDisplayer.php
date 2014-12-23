@@ -44,6 +44,7 @@ class CargoQueryDisplayer {
 			'googlemaps' => 'CargoGoogleMapsFormat',
 			'openlayers' => 'CargoOpenLayersFormat',
 			'calendar' => 'CargoCalendarFormat',
+			'timeline' => 'CargoTimelineFormat',
 			'category' => 'CargoCategoryFormat',
 			'bar chart' => 'CargoBarChartFormat',
 		);
