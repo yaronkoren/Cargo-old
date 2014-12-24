@@ -6,7 +6,7 @@
 
 class CargoCalendarFormat extends CargoDeferredFormat {
 	function allowedParameters() {
-		return array( 'width', 'start date' );
+		return array( 'width', 'start date', 'color' );
 	}
 
 	function queryAndDisplay( $sqlQueries, $displayParams, $querySpecificParams = null ) {
