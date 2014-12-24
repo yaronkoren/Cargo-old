@@ -52,7 +52,7 @@ class CargoFieldDescription {
 					if ( $paramKey == 'allowed values' ) {
 						$fieldDescription->mAllowedValues = array_map( 'trim', explode( ',', $paramValue ) );
 					} elseif ( $paramKey == 'size' ) {
-						$fieldDescrption->mSize = $paramVAlue;
+						$fieldDescription->mSize = $paramValue;
 					} else {
 						$fieldDescription->mOtherParams[$paramKey] = $paramValue;
 					}
