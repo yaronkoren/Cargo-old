@@ -45,8 +45,16 @@ class CargoDisplayMap {
 			}
 		}
 
-		if ( $pointStr == null ) {
+		// If $pointStr is null, it means that the 'point' parameter
+		// was not set for #cargo_display_map - display an error
+		// message. If, however, it is blank, it means that it was set,
+		// but to a blank value, most likely via a template call. In
+		// that case, just don't display anything.
+		if ( $pointStr === null ) {
 			return CargoUtils::formatError( "Error: 'point' parameter must be set." );
+		}
+		if ( $pointStr === '' ) {
+			return;
 		}
 
 		// Simulate a query with the appropriate mapping format.
