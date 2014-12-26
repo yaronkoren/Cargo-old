@@ -169,7 +169,13 @@ class CargoUtils {
 			global $wgParser;
 			$parser = $wgParser;
 		}
-		if ( ( $wgTitle != null && $wgTitle->isSpecialPage() ) ||
+		if ( $wgTitle != null && $wgTitle->isSpecialPage() && $wgTitle->getText() == 'RunJobs' ) {
+			// Conveniently, if this is called from within a job
+			// being run, the name of the page will be
+			// Special:RunJobs.
+			// If that's the case, do nothing - we don't need to
+			// parse the value.
+		} elseif ( ( $wgTitle != null && $wgTitle->isSpecialPage() ) ||
 			// The 'pagevalues' action is also a Cargo special page.
 			$wgRequest->getVal( 'action' ) == 'pagevalues' ) {
 			$parserOutput = $parser->parse( $value, $wgTitle, new ParserOptions(), false );
