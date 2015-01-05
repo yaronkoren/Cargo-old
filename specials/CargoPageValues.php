@@ -24,6 +24,12 @@ class CargoPageValues extends IncludableSpecialPage {
 		$pageName = $this->mTitle->getPrefixedText();
 		$out->setPageTitle( wfMessage( 'cargo-pagevaluesfor', $pageName )->text() );
 
+		// Exit if this page does not exist.
+		// @TODO - display some message?
+		if ( !$this->mTitle->exists() ) {
+			return;
+		}
+
 		$text = '';
 
 		$dbr = wfGetDB( DB_MASTER );
