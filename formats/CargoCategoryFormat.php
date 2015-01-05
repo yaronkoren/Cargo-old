@@ -7,14 +7,19 @@
 class CargoCategoryFormat extends CargoListFormat {
 
 	function allowedParameters() {
-		return array();
+		return array( 'columns' );
 	}
 
 	function display( $valuesTable, $formattedValuesTable, $fieldDescriptions, $displayParams ) {
 		global $wgContLang;
 
+		if ( array_key_exists( 'columns', $displayParams ) ) {
+			$numColumns = max( $displayParams['columns'], 1 );
+		} else {
+			$numColumns = 3;
+		}
+
 		$result = '';
-		$numColumns = 3;
 		$showHeaders = true;
 		$num = count( $valuesTable );
 
