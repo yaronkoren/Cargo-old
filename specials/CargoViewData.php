@@ -63,10 +63,8 @@ class ViewDataPage extends QueryPage {
 
 	function isSyndicated() { return false; }
 
-	function getPageHeader() {
-		$header = '<p>' . 'Results:' . "</p><br />\n";
-		return $header;
-	}
+	// @TODO - declare a getPageHeader() function, to show some
+	// information about the query?
 
 	function getPageFooter() {
 	}
