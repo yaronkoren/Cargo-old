@@ -44,7 +44,10 @@ class CargoRecreateData extends IncludableSpecialPage {
 		if ( $formSubmitted ) {
 			// Recreate the data!
 			$this->recreateData();
-			$out->redirect( $this->mTemplateTitle->getFullURL() );
+			// Redirect to the main template page - we need to
+			// add "action=purge" to the URL so that the new
+			// "View table" link will show up on the page.
+			$out->redirect( $this->mTemplateTitle->getFullURL( array( 'action' => 'purge' ) ) );
 			return true;
 		}
 
