@@ -35,6 +35,7 @@ class CargoDeleteCargoTable extends SpecialPage {
 		} catch ( Exception $e ) {
 			throw new MWException( "Caught exception ($e) while trying to drop Cargo table. Please make sure that your database user account has the DROP permission." );
 		}
+		$cdb->close();
 
 		$dbr = wfGetDB( DB_MASTER );
 		$dbr->delete( 'cargo_tables', array( 'main_table' => $mainTable ) );
