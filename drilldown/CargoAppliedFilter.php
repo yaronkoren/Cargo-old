@@ -132,7 +132,6 @@ class CargoAppliedFilter {
 		return $sql;
 	}
 
-
 	/**
 	 * Gets an array of all values that this filter has.
 	 */

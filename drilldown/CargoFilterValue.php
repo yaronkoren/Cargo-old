@@ -94,7 +94,7 @@ class CargoFilterValue {
 	}
 
 	/**
-	 * Used in sorting, when BrowseDataPage creates a new URL.
+	 * Used in sorting, when CargoSpecialDrilldown creates a new URL.
 	 */
 	public static function compare( $fv1, $fv2 ) {
 		if ( $fv1->is_none ) return 1;
