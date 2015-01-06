@@ -124,7 +124,7 @@ class CargoTables extends IncludableSpecialPage {
 		$text = Html::element( 'p', null, wfMessage( 'cargo-cargotables-tablelist' )->parse() ) . "\n";
 		$text .= "<ul>\n";
 		foreach ( $tableNames as $tableName ) {
-			$tableLink = Html::element( 'a', array( 'href' => "$ctURL/$tableName", ), $tableName );
+			$actionLinks = Html::element( 'a', array( 'href' => "$ctURL/$tableName", ), wfMessage( 'view' )->text() );
 
 			// Actions for this table - this display is modeled on
 			// Special:ListUsers.
@@ -132,7 +132,7 @@ class CargoTables extends IncludableSpecialPage {
 			$drilldownURL = $drilldownPage->getTitle()->getLocalURL() . '/' . $tableName;
 			$drilldownURL .= ( strpos( $drilldownURL, '?' ) ) ? '&' : '?';
 			$drilldownURL .= "_single";
-			$actionLinks = Html::element( 'a', array( 'href' => $drilldownURL ), $drilldownPage->getDescription() );
+			$actionLinks .= ' | ' . Html::element( 'a', array( 'href' => $drilldownURL ), $drilldownPage->getDescription() );
 
 			if ( $wgUser->isAllowed( 'deletecargodata' ) ) {
 				$deleteTablePage = SpecialPageFactory::getPage( 'DeleteCargoTable' );
@@ -171,7 +171,7 @@ class CargoTables extends IncludableSpecialPage {
 				$attachingTemplatesText = wfMessage( 'cargo-cargotables-attachedby', implode( $templateLinks ) )->text();
 			}
 
-			$tableText = "$tableLink ($actionLinks) ($declaringTemplatesText";
+			$tableText = "$tableName ($actionLinks) ($declaringTemplatesText";
 			if ( $attachingTemplatesText != '' ) {
 				$tableText .= ", $attachingTemplatesText";
 			}
