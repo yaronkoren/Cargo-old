@@ -225,8 +225,8 @@ class CargoQueryDisplayer {
 		$sqlQuery = $this->mSQLQuery;
 		$queryStringParams['tables'] = $sqlQuery->mTablesStr;
 		$queryStringParams['fields'] = $sqlQuery->mFieldsStr;
-		if ( $sqlQuery->mWhereStr != '' ) {
-			$queryStringParams['where'] = $sqlQuery->mWhereStr;
+		if ( $sqlQuery->mOrigWhereStr != '' ) {
+			$queryStringParams['where'] = $sqlQuery->mOrigWhereStr;
 		}
 		if ( $sqlQuery->mJoinOnStr != '' ) {
 			$queryStringParams['join_on'] = $sqlQuery->mJoinOnStr;

@@ -42,6 +42,7 @@ class CargoTables extends IncludableSpecialPage {
 		$out->addWikiText( wfMessage( 'cargo-cargotables-totalrows', "'''" . $row[0] . "'''" ) . "\n" );
 
 		$sqlQuery = new CargoSQLQuery();
+		$sqlQuery->mTablesStr = $tableName;
 		$sqlQuery->mTableNames = array( $tableName );
 
 		$tableSchemas = CargoUtils::getTableSchemas( array( $tableName ) );
@@ -74,6 +75,15 @@ class CargoTables extends IncludableSpecialPage {
 		}
 
 		$sqlQuery->mAliasedFieldNames = $aliasedFieldNames;
+		// Set mFieldsStr in case we need to show a "More" link
+		// at the end.
+		$fieldsStr = '';
+		foreach ( $aliasedFieldNames as $alias => $fieldName ) {
+			$fieldsStr .= "$fieldName=$alias,";
+		}
+		// Remove the comma at the end.
+		$sqlQuery->mFieldsStr = trim( $fieldsStr, ',' );
+
 		$sqlQuery->setDescriptionsForFields();
 		$sqlQuery->handleDateFields();
 		$sqlQuery->setOrderBy();
@@ -92,12 +102,6 @@ class CargoTables extends IncludableSpecialPage {
 		// If there are (seemingly) more results than what we showed,
 		// show a "View more" link that links to Special:ViewData.
 		if ( count( $queryResults ) == $sqlQuery->mQueryLimit ) {
-			$fieldsStr = '';
-			foreach ( $aliasedFieldNames as $alias => $fieldName ) {
-				$fieldsStr .= "$fieldName=$alias,";
-			}
-			// Remove the comma at the end.
-			$fieldsStr = trim( $fieldsStr, ',' );
 			$text .= $queryDisplayer->viewMoreResultsLink();
 		}
 
