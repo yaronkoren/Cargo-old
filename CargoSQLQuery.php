@@ -12,6 +12,7 @@ class CargoSQLQuery {
 	var $mTablesStr;
 	var $mTableNames;
 	var $mFieldsStr;
+	var $mOrigWhereStr;
 	var $mWhereStr;
 	var $mJoinOnStr;
 	var $mCargoJoinConds;
@@ -38,7 +39,9 @@ class CargoSQLQuery {
 		// This _decode() call is necessary because the "where="
 		// clause can (and often does) include a call to {{PAGENAME}},
 		// which HTML-encodes certain characters, notably single quotes.
+		$sqlQuery->mOrigWhereStr = htmlspecialchars_decode( $whereStr, ENT_QUOTES );
 		$sqlQuery->mWhereStr = htmlspecialchars_decode( $whereStr, ENT_QUOTES );
+		$sqlQuery->mJoinOnStr = $joinOnStr;
 		$sqlQuery->setCargoJoinConds( $joinOnStr );
 		$sqlQuery->setAliasedFieldNames();
 		$sqlQuery->mTableSchemas = CargoUtils::getTableSchemas( $sqlQuery->mTableNames );
@@ -67,6 +70,7 @@ class CargoSQLQuery {
 		$sqlQuery->mTablesStr = $tablesStr;
 		$sqlQuery->mTableNames = explode( ',', $tablesStr );
 		$sqlQuery->mFieldsStr = $fieldsStr;
+		$sqlQuery->mOrigWhereStr = $whereStr;
 		$sqlQuery->mWhereStr = $whereStr;
 		$sqlQuery->mJoinOnStr = $joinOnStr;
 		$sqlQuery->mGroupByStr = $groupByStr;
