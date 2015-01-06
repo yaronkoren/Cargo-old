@@ -10,7 +10,7 @@
 class CargoPageValues extends IncludableSpecialPage {
 	var $mTitle;
 
-	function __construct( $title ) {
+	function __construct( $title = null ) {
 		parent::__construct( 'PageValues' );
 
 		$this->mTitle = $title;
