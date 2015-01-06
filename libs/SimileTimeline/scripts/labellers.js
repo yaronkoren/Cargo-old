@@ -15,7 +15,7 @@ Timeline.GregorianDateLabeller.labelIntervalFunctions = [];
 Timeline.GregorianDateLabeller.getMonthName = function(month, locale) {
     // Switch to use MediaWiki's i18n system.
     //return Timeline.GregorianDateLabeller.monthNames[locale][month];
-    return wgMonthNamesShort[month + 1];
+    return wgCargoMonthNamesShort[month];
 };
 
 Timeline.GregorianDateLabeller.prototype.labelInterval = function(date, intervalUnit) {

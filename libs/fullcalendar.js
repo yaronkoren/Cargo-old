@@ -405,6 +405,7 @@ function Calendar(element, instanceOptions) {
 
 	var localeData = createObject(getLocaleData(options.lang)); // make a cheap copy
 
+/*
 	if (options.monthNames) {
 		localeData._months = options.monthNames;
 	}
@@ -417,6 +418,15 @@ function Calendar(element, instanceOptions) {
 	if (options.dayNamesShort) {
 		localeData._weekdaysShort = options.dayNamesShort;
 	}
+*/
+	// Cargo-specific stuff.
+	// @TODO - we still need translations for "today", "month" "week" and
+	// "day", and possibly other strings.
+	localeData._months = wgCargoMonthNames;
+	localeData._monthsShort = wgCargoMonthNamesShort;
+	localeData._weekdays = wgCargoWeekDays;
+	localeData._weekdaysShort = wgCargoWeekDaysShort;
+
 	if (options.firstDay != null) {
 		var _week = createObject(localeData._week); // _week: { dow: # }
 		_week.dow = options.firstDay;

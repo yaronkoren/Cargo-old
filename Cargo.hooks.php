@@ -12,6 +12,16 @@ class CargoHooks {
 		global $wgCargoMapClusteringMinimum;
 
 		$vars['wgCargoMapClusteringMinimum'] = $wgCargoMapClusteringMinimum;
+
+		// Date-related arrays for the 'calendar' and 'timeline'
+		// formats.
+		// Built-in arrays already exist for month names, but those
+		// unfortunately are based on the language of the wiki, not
+		// the language of the user.
+		$vars['wgCargoMonthNames'] = array( wfMessage( 'january' )->text(), wfMessage( 'february' )->text(), wfMessage( 'march' )->text(), wfMessage( 'april' )->text(), wfMessage( 'may-long' )->text(), wfMessage( 'june' )->text(), wfMessage( 'july' )->text(), wfMessage( 'august' )->text(), wfMessage( 'september' )->text(), wfMessage( 'october' )->text(), wfMessage( 'november' )->text(), wfMessage( 'december' )->text() );
+		$vars['wgCargoMonthNamesShort'] = array( wfMessage( 'jan' )->text(), wfMessage( 'feb' )->text(), wfMessage( 'mar' )->text(), wfMessage( 'apr' )->text(), wfMessage( 'may' )->text(), wfMessage( 'jun' )->text(), wfMessage( 'jul' )->text(), wfMessage( 'aug' )->text(), wfMessage( 'sep' )->text(), wfMessage( 'oct' )->text(), wfMessage( 'nov' )->text(), wfMessage( 'dec' )->text() );
+		$vars['wgCargoWeekDays'] = array( wfMessage( 'sunday' )->text(), wfMessage( 'monday' )->text(), wfMessage( 'tuesday' )->text(), wfMessage( 'wednesday' )->text(), wfMessage( 'thursday' )->text(), wfMessage( 'friday' )->text(), wfMessage( 'saturday' )->text() );
+		$vars['wgCargoWeekDaysShort'] = array( wfMessage( 'sun' )->text(), wfMessage( 'mon' )->text(), wfMessage( 'tue' )->text(), wfMessage( 'wed' )->text(), wfMessage( 'thu' )->text(), wfMessage( 'fri' )->text(), wfMessage( 'sat' )->text() );
 		return true;
 	}
 
