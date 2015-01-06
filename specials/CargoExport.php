@@ -232,4 +232,13 @@ class CargoExport extends SpecialPage {
 		print json_encode( $allQueryResults, JSON_NUMERIC_CHECK | JSON_HEX_TAG | JSON_PRETTY_PRINT );
 	}
 
+	/**
+	 * Don't list this in Special:SpecialPages.
+	 * For some reason, setting "$this->mListed = false" instead doesn't
+	 * seem to work.
+	 */
+	function isListed() {
+		return false;
+	}
+
 }
